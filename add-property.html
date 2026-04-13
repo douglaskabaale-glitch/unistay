@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UNISTAY - List Property</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: white;
+    overflow-x: hidden;
+}
+
+/* HEADER */
+.header {
+    background: linear-gradient(90deg, #4da6ff, #2f8cff);
+    color: white;
+    padding: 16px;
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+    position: relative;
+}
+
+/* USER BOX */
+.user-box {
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255,255,255,0.2);
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 14px;
+}
+
+.user-box img {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+}
+
+/* FORM CONTAINER (FIXED RESPONSIVE) */
+.container {
+    width: 90%;
+    max-width: 450px;
+    margin: 30px auto;
+    background: white;
+    padding: 20px;
+    border-radius: 18px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+}
+
+/* INPUTS */
+input, select, textarea {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    font-size: 16px;
+}
+
+textarea {
+    resize: none;
+    height: 90px;
+}
+
+/* BUTTON */
+button {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(90deg, #4da6ff, #2f8cff);
+    border: none;
+    color: white;
+    border-radius: 999px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+/* SECTION TITLE */
+.section-title {
+    margin-top: 15px;
+    font-weight: bold;
+    color: #2f8cff;
+}
+
+/* LOCATION BOX */
+#locationBox {
+    display: none;
+}
+
+/* =========================
+   📱 MOBILE FIXES
+========================= */
+@media (max-width: 768px) {
+
+    .header {
+        font-size: 18px;
+        padding: 12px;
+    }
+
+    .user-box {
+        position: static;
+        margin-top: 10px;
+        justify-content: center;
+    }
+
+    .container {
+        margin: 20px auto;
+        padding: 15px;
+    }
+
+    input, select, textarea {
+        font-size: 15px;
+    }
+
+    button {
+        font-size: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .header {
+        font-size: 16px;
+    }
+
+    .container {
+        width: 95%;
+        padding: 12px;
+    }
+
+    input, select, textarea {
+        font-size: 14px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+    UNISTAY - List Your Property
+
+    <div class="user-box">
+        <img id="userPic">
+        <span id="userName"></span>
+    </div>
+</div>
+
+<div class="container">
+
+<h2>Add Hostel Details</h2>
+
+<input type="text" id="hostelName" placeholder="Hostel Name">
+
+<div class="section-title">Closest University</div>
+<select id="university" onchange="loadLocations()">
+    <option value="">Select University</option>
+    <option>Makerere University</option>
+    <option>Kyambogo University</option>
+    <option>Uganda Christian University</option>
+    <option>Nkumba University</option>
+    <option>Mbarara University of Science and Technology</option>
+</select>
+
+<div id="locationBox">
+    <div class="section-title">Location (Near University)</div>
+    <select id="location">
+        <option value="">Select Location</option>
+    </select>
+</div>
+
+<select id="roomType">
+    <option value="">Select Room Type</option>
+    <option value="single">Single Room</option>
+    <option value="double">Double Room</option>
+</select>
+
+<textarea id="amenities" placeholder="Amenities (Water, Security, WiFi...)"></textarea>
+
+<input type="number" id="price" placeholder="Price per month (UGX)">
+
+<div class="section-title">Cover Photo</div>
+<input type="file" id="coverInput" accept="image/*">
+
+<div class="section-title">Additional Photos</div>
+<input type="file" id="moreInput" multiple accept="image/*">
+
+<div class="section-title">Contact Information</div>
+
+<input type="text" id="contact" placeholder="WhatsApp Number">
+
+<textarea id="description" placeholder="Description (optional)"></textarea>
+
+<button onclick="submitProperty()">Submit Property</button>
+
+<p id="msg"></p>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import { getAuth, onAuthStateChanged } 
+from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
+import {
+    getFirestore,
+    collection,
+    addDoc
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCwDxwL4j_fgzGi1ffHhaG36nw2uzNiZ1E",
+  authDomain: "unistay-v1.firebaseapp.com",
+  projectId: "unistay-v1",
+  storageBucket: "unistay-v1.firebasestorage.app",
+  messagingSenderId: "125895379967",
+  appId: "1:125895379967:web:197892746f83a6bf3cf5ca"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser = null;
+
+/* AUTH */
+onAuthStateChanged(auth, (user) => {
+    if (!user) {
+        window.location.href = "auth.html";
+        return;
+    }
+
+    currentUser = user;
+
+    document.getElementById("userName").innerText =
+        user.email.split("@")[0];
+
+    document.getElementById("userPic").src =
+        "https://via.placeholder.com/35";
+});
+
+/* LOCATION */
+const uniLocations = {
+    "Makerere University": ["Kikoni","Wandegeya","Bwaise","Kavule","Makerere Hill"],
+    "Kyambogo University": ["Banda","Ntinda","Kyambogo Hill","Naalya"],
+    "Uganda Christian University": ["Mukono","Seeta","Namilyango"],
+    "Nkumba University": ["Entebbe","Kampala Road","Lutembe"],
+    "Mbarara University of Science and Technology": ["Kakoba","Nyamitanga","Mbarara Town"]
+};
+
+window.loadLocations = function () {
+
+    let uni = document.getElementById("university").value;
+    let box = document.getElementById("locationBox");
+    let select = document.getElementById("location");
+
+    select.innerHTML = '<option value="">Select Location</option>';
+
+    if (!uni || !uniLocations[uni]) {
+        box.style.display = "none";
+        return;
+    }
+
+    uniLocations[uni].forEach(loc => {
+        let opt = document.createElement("option");
+        opt.value = loc;
+        opt.textContent = loc;
+        select.appendChild(opt);
+    });
+
+    box.style.display = "block";
+};
+
+/* SUBMIT FUNCTION (UNCHANGED LOGIC) */
+window.submitProperty = async function () {
+
+    let name = document.getElementById("hostelName").value.trim();
+    let university = document.getElementById("university").value;
+    let location = document.getElementById("location").value;
+    let room = document.getElementById("roomType").value;
+    let amenities = document.getElementById("amenities").value.trim();
+    let price = document.getElementById("price").value.trim();
+    let contact = document.getElementById("contact").value.trim();
+    let desc = document.getElementById("description").value.trim();
+
+    let coverFile = document.getElementById("coverInput").files[0];
+    let moreFiles = document.getElementById("moreInput").files;
+
+    if (!name || !university || !location || !room || !price || !contact || !coverFile) {
+        document.getElementById("msg").innerText = "Please fill all required fields!";
+        return;
+    }
+
+    try {
+
+        const upload = async (file) => {
+            const url = "https://api.cloudinary.com/v1_1/dsanvos33/image/upload";
+            const form = new FormData();
+            form.append("file", file);
+            form.append("upload_preset", "unistay-images");
+
+            const res = await fetch(url, { method: "POST", body: form });
+            return (await res.json()).secure_url;
+        };
+
+        const coverURL = await upload(coverFile);
+
+        let moreURLs = [];
+        for (let i = 0; i < moreFiles.length; i++) {
+            moreURLs.push(await upload(moreFiles[i]));
+        }
+
+        await addDoc(collection(db, "properties"), {
+            landlordId: currentUser.uid,
+            hostelName: name,
+            university,
+            location,
+            roomType: room,
+            amenities,
+            price,
+            contact,
+            description: desc,
+            cover: coverURL,
+            images: moreURLs,
+            createdAt: Date.now()
+        });
+
+        document.getElementById("msg").innerText = "Property added successfully!";
+
+        setTimeout(() => {
+            window.location.href = "dashboard.html";
+        }, 1200);
+
+    } catch (err) {
+        document.getElementById("msg").innerText = err.message;
+    }
+};
+
+</script>
+
+</body>
+</html>

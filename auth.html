@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UNISTAY - Access</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: white;
+    overflow: hidden;
+}
+
+.header {
+    background: linear-gradient(90deg, #4da6ff, #2f8cff);
+    color: white;
+    padding: 16px;
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+    position: relative;
+    z-index: 2;
+}
+
+.container {
+    width: 400px;
+    margin: 70px auto;
+    background: white;
+    padding: 28px;
+    border-radius: 18px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+    position: relative;
+    z-index: 2;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin: 7px 0;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(90deg, #4da6ff, #2f8cff);
+    border: none;
+    color: white;
+    border-radius: 999px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+button:hover {
+    transform: translateY(-2px);
+}
+
+.switch {
+    text-align: center;
+    margin-top: 10px;
+    color: #4da6ff;
+    cursor: pointer;
+}
+
+#strength {
+    font-size: 13px;
+    margin-top: -5px;
+    margin-bottom: 5px;
+}
+
+#preview {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin: 10px auto;
+    display: block;
+    object-fit: cover;
+    border: 2px solid #4da6ff;
+}
+
+.file-label {
+    display: block;
+    background: linear-gradient(90deg, #4da6ff, #2f8cff);
+    color: white;
+    padding: 10px;
+    border-radius: 999px;
+    text-align: center;
+    cursor: pointer;
+    margin: 10px 0;
+    font-weight: bold;
+}
+
+.file-label input {
+    display: none;
+}
+
+.symbol {
+    position: absolute;
+    font-size: 20px;
+    color: rgba(77,166,255,0.25);
+    animation: float 12s linear infinite;
+}
+
+@keyframes float {
+    0% {transform: translateY(100vh);}
+    100% {transform: translateY(-10vh);}
+}
+
+#msg {
+    text-align: center;
+    margin-top: 10px;
+    font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">UNISTAY</div>
+
+<div class="container">
+
+<div id="loginForm">
+    <h2>Login</h2>
+    <input type="text" id="loginUser" placeholder="Username">
+    <input type="password" id="loginPass" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <div class="switch" onclick="showSignup()">Create account</div>
+</div>
+
+<div id="signupForm" style="display:none;">
+    <h2>Create Account</h2>
+
+    <input type="text" id="signupUser" placeholder="Username">
+
+    <label class="file-label" id="fileLabel">
+        Choose Profile Picture
+        <input type="file" id="profilePic" accept="image/*" onchange="loadImage(event)">
+    </label>
+
+    <img id="preview" src="" style="display:none;">
+
+    <input type="text" id="signupContact" placeholder="Email or Phone">
+
+    <input type="password" id="signupPass" placeholder="Password" oninput="checkStrength()">
+    <div id="strength"></div>
+
+    <input type="password" id="confirmPass" placeholder="Confirm Password">
+
+    <p style="text-align:center; color:#555; font-size:14px;">
+        Account Type: <strong>Landlord</strong>
+    </p>
+
+    <button onclick="signup()">Sign Up</button>
+    <div class="switch" onclick="showLogin()">Back to login</div>
+</div>
+
+<p id="msg"></p>
+
+</div>
+
+<script type="module">
+
+/* 🔥 FIREBASE IMPORTS */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import { 
+    getAuth, 
+    createUserWithEmailAndPassword, 
+    signInWithEmailAndPassword 
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
+import {
+    getFirestore
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+/* 🔥 CONFIG */
+const firebaseConfig = {
+  apiKey: "AIzaSyCwDxwL4j_fgzGi1ffHhaG36nw2uzNiZ1E",
+  authDomain: "unistay-v1.firebaseapp.com",
+  projectId: "unistay-v1",
+  storageBucket: "unistay-v1.firebasestorage.app",
+  messagingSenderId: "125895379967",
+  appId: "1:125895379967:web:197892746f83a6bf3cf5ca"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app); // READY FOR NEXT STEP
+
+/* SYMBOLS */
+const symbols = ["π","Σ","√","∫","θ","x²","∞","Δ"];
+
+for (let i = 0; i < 35; i++) {
+    let s = document.createElement("div");
+    s.className = "symbol";
+    s.innerText = symbols[Math.floor(Math.random() * symbols.length)];
+    s.style.left = Math.random() * 100 + "vw";
+    s.style.animationDuration = (6 + Math.random() * 10) + "s";
+    s.style.top = Math.random() * 100 + "vh";
+    document.body.appendChild(s);
+}
+
+/* UI */
+function showMessage(text, color="red") {
+    let msg = document.getElementById("msg");
+    msg.style.color = color;
+    msg.innerText = text;
+}
+
+window.showSignup = function() {
+    document.getElementById("loginForm").style.display = "none";
+    document.getElementById("signupForm").style.display = "block";
+    showMessage("");
+}
+
+window.showLogin = function() {
+    document.getElementById("signupForm").style.display = "none";
+    document.getElementById("loginForm").style.display = "block";
+    showMessage("");
+}
+
+/* IMAGE */
+let profileBase64 = "";
+
+window.loadImage = function(event) {
+    let reader = new FileReader();
+    reader.onload = function () {
+        profileBase64 = reader.result;
+
+        let img = document.getElementById("preview");
+        img.src = profileBase64;
+        img.style.display = "block";
+
+        document.getElementById("fileLabel").innerText = "Image Selected ✅";
+    };
+    reader.readAsDataURL(event.target.files[0]);
+}
+
+/* STRENGTH */
+window.checkStrength = function() {
+    let pass = document.getElementById("signupPass").value;
+    let strength = document.getElementById("strength");
+
+    if (pass.length < 4) {
+        strength.innerText = "Weak";
+        strength.style.color = "red";
+    } else if (pass.length < 8) {
+        strength.innerText = "Medium";
+        strength.style.color = "orange";
+    } else {
+        strength.innerText = "Strong";
+        strength.style.color = "green";
+    }
+}
+
+/* SIGNUP */
+window.signup = async function() {
+    let email = document.getElementById("signupContact").value.trim();
+    let pass = document.getElementById("signupPass").value.trim();
+    let confirm = document.getElementById("confirmPass").value.trim();
+
+    if (!email || !pass || !confirm) {
+        showMessage("All fields are required!");
+        return;
+    }
+
+    if (pass !== confirm) {
+        showMessage("Passwords do not match!");
+        return;
+    }
+
+    try {
+        await createUserWithEmailAndPassword(auth, email, pass);
+
+        showMessage("Account created successfully!", "green");
+
+        setTimeout(() => {
+            window.location.href = "dashboard.html";
+        }, 1000);
+
+    } catch (error) {
+        showMessage(error.message);
+    }
+}
+
+/* LOGIN */
+window.login = async function() {
+    let email = document.getElementById("loginUser").value.trim();
+    let pass = document.getElementById("loginPass").value.trim();
+
+    if (!email || !pass) {
+        showMessage("Please fill in all login fields!");
+        return;
+    }
+
+    try {
+        await signInWithEmailAndPassword(auth, email, pass);
+
+        showMessage("Login successful!", "green");
+
+        setTimeout(() => {
+            window.location.href = "dashboard.html";
+        }, 800);
+
+    } catch (error) {
+        showMessage("Invalid login!");
+    }
+}
+</script>
+
+</body>
+</html>

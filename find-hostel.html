@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UNISTAY - Find Hostel</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #ffffff, #eaf4ff);
+    min-height: 100vh;
+}
+
+.particles {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.particle {
+    position: absolute;
+    color: #8ecbff;
+    font-size: 30px;
+    opacity: 0.3;
+    animation: floatUp linear infinite;
+}
+
+@keyframes floatUp {
+    0% { transform: translateY(100vh); opacity: 0; }
+    100% { transform: translateY(-120vh); opacity: 0; }
+}
+
+.header {
+    text-align: center;
+    padding: 30px 20px 10px;
+    position: relative;
+    z-index: 2;
+}
+
+.header h1 {
+    color: #003399;
+    font-size: 32px;
+}
+
+.header p {
+    color: #555;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+    padding: 30px;
+    position: relative;
+    z-index: 2;
+}
+
+.card {
+    padding: 25px;
+    border-radius: 18px;
+    cursor: pointer;
+    color: white;
+    font-weight: 600;
+    transition: 0.3s;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+}
+
+.card:hover {
+    transform: scale(1.03);
+}
+
+/* FULL NAMES ONLY (IMPORTANT FIX) */
+.makerere { background:#002147; }
+.kyambogo { background:#0057b8; }
+.mubs { background:#001f3f; }
+.ucu { background:#b00020; }
+.victoria { background:#1e4d8c; }
+.gulu { background:#0b6b3a; }
+.must { background:#1b5e20; }
+.kabale { background:#1f6f4a; }
+.kiu { background:#c62828; }
+.cavendish { background:#1565c0; }
+
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 5;
+}
+
+.zoomCard {
+    width: 85%;
+    max-width: 800px;
+    padding: 25px;
+    border-radius: 20px;
+    color: white;
+}
+
+.title {
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+
+.area {
+    background: rgba(255,255,255,0.15);
+    padding: 12px;
+    margin: 8px 0;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.area:hover {
+    background: rgba(255,255,255,0.3);
+}
+</style>
+</head>
+
+<body>
+
+<div class="particles" id="particles"></div>
+
+<div class="header">
+    <h1>Find Your Hostel</h1>
+    <p>Select your university to explore nearby areas</p>
+</div>
+
+<div class="grid">
+
+    <!-- FULL NAMES ONLY -->
+    <div class="card makerere" onclick="openUni('Makerere University','makerere')">Makerere University</div>
+    <div class="card kyambogo" onclick="openUni('Kyambogo University','kyambogo')">Kyambogo University</div>
+    <div class="card mubs" onclick="openUni('Makerere University Business School','mubs')">Makerere University Business School</div>
+    <div class="card ucu" onclick="openUni('Uganda Christian University','ucu')">Uganda Christian University</div>
+    <div class="card victoria" onclick="openUni('Victoria University','victoria')">Victoria University</div>
+    <div class="card gulu" onclick="openUni('Gulu University','gulu')">Gulu University</div>
+    <div class="card must" onclick="openUni('Mbarara University of Science and Technology','must')">Mbarara University of Science and Technology</div>
+    <div class="card kabale" onclick="openUni('Kabale University','kabale')">Kabale University</div>
+    <div class="card kiu" onclick="openUni('Kampala International University','kiu')">Kampala International University</div>
+    <div class="card cavendish" onclick="openUni('Cavendish University Uganda','cavendish')">Cavendish University Uganda</div>
+
+</div>
+
+<div class="overlay" id="overlay" onclick="closeOverlay(event)">
+    <div class="zoomCard" id="zoomCard">
+        <div class="title" id="title"></div>
+        <div id="areas"></div>
+    </div>
+</div>
+
+<script>
+
+/* 🔥 FULL NORMALIZED DATA (MATCH FIRESTORE EXACTLY) */
+const data = {
+    "Makerere University": ["Wandegeya","Kikoni","Bwaise","Kawempe","Makerere Hill"],
+    "Kyambogo University": ["Banda","Ntinda","Kiwatule","Naalya","Kyambogo Hill"],
+    "Makerere University Business School": ["Nakawa","Bugolobi","Mbuya","Banda","Luzira"],
+    "Uganda Christian University": ["Mukono","Seeta","Namilyango"],
+    "Victoria University": ["Nakasero","Kololo","Kampala Road","Nsambya"],
+    "Gulu University": ["Pece","Bardege","Layibi","Gulu Town"],
+    "Mbarara University of Science and Technology": ["Kakoba","Nyamitanga","Mbarara Town"],
+    "Kabale University": ["Makanga","Kabale Town"],
+    "Kampala International University": ["Kansanga","Ggaba Road","Muyenga"],
+    "Cavendish University Uganda": ["Nakasero","Nsambya","City Centre"]
+};
+
+const colors = {
+    "Makerere University":"#002147",
+    "Kyambogo University":"#0057b8",
+    "Makerere University Business School":"#001f3f",
+    "Uganda Christian University":"#b00020",
+    "Victoria University":"#1e4d8c",
+    "Gulu University":"#0b6b3a",
+    "Mbarara University of Science and Technology":"#1b5e20",
+    "Kabale University":"#1f6f4a",
+    "Kampala International University":"#c62828",
+    "Cavendish University Uganda":"#1565c0"
+};
+
+function openUni(name, key) {
+
+    const overlay = document.getElementById("overlay");
+    const card = document.getElementById("zoomCard");
+
+    overlay.style.display = "flex";
+    card.style.background = colors[name] || "#333";
+
+    document.getElementById("title").innerText = name;
+
+    const areaBox = document.getElementById("areas");
+    areaBox.innerHTML = "";
+
+    (data[name] || []).forEach(area => {
+
+        let div = document.createElement("div");
+        div.className = "area";
+        div.innerText = area;
+
+        div.onclick = () => {
+
+            // 🔥 LOCKED CLEAN STORAGE
+            localStorage.setItem("selectedUniversity", name);
+            localStorage.setItem("selectedLocation", area);
+
+            window.location.href = "student-results.html";
+        };
+
+        areaBox.appendChild(div);
+    });
+}
+
+function closeOverlay(e){
+    if(e.target.id === "overlay"){
+        document.getElementById("overlay").style.display = "none";
+    }
+}
+
+/* particles */
+const symbols = ["∑","√","π","∞","∆","∫"];
+const box = document.getElementById("particles");
+
+for(let i=0;i<30;i++){
+    let s = document.createElement("div");
+    s.className = "particle";
+    s.innerText = symbols[Math.floor(Math.random()*symbols.length)];
+    s.style.left = Math.random()*100 + "vw";
+    s.style.animationDuration = (6 + Math.random()*10) + "s";
+    box.appendChild(s);
+}
+
+</script>
+
+</body>
+</html>

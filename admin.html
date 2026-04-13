@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UNISTAY Admin Dashboard</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #e8f3ff, #f7fbff);
+    min-height: 100vh;
+}
+
+/* HEADER */
+.header {
+    background: linear-gradient(90deg, #2f8cff, #4da6ff);
+    color: white;
+    padding: 18px;
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+/* ANALYTICS */
+.stats {
+    max-width: 1000px;
+    margin: 20px auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    padding: 0 20px;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 14px;
+    padding: 18px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    text-align: center;
+    transition: 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+}
+
+.stat-card h2 {
+    margin: 0;
+    color: #2f8cff;
+    font-size: 26px;
+}
+
+.stat-card p {
+    margin: 5px 0 0;
+    color: #666;
+}
+
+/* CONTAINER */
+.container {
+    max-width: 1000px;
+    margin: 10px auto 30px;
+    padding: 20px;
+}
+
+/* GRID */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 15px;
+}
+
+/* CARD */
+.card {
+    background: white;
+    border-radius: 16px;
+    padding: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+.card h3 {
+    margin: 0;
+    color: #2f8cff;
+}
+
+.card p {
+    margin: 5px 0;
+    color: #444;
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: #e6f0ff;
+    color: #2f8cff;
+    font-size: 12px;
+}
+
+/* DELETE BUTTON */
+button {
+    margin-top: 10px;
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #ff4d4d, #ff2f2f);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* EMPTY */
+.empty {
+    text-align: center;
+    margin-top: 80px;
+    color: #888;
+    font-size: 18px;
+}
+
+/* MODAL */
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+.hidden { display: none; }
+
+.modal {
+    background: white;
+    padding: 25px;
+    border-radius: 16px;
+    width: 320px;
+    text-align: center;
+}
+
+.modal h2 { color: #ff2f2f; }
+
+.buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.cancel {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 10px;
+    background: #eee;
+}
+
+.delete {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #ff4d4d, #ff2f2f);
+    color: white;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">UNISTAY ADMIN DASHBOARD 🔐</div>
+
+<!-- ANALYTICS -->
+<div class="stats">
+    <div class="stat-card">
+        <h2 id="totalListings">0</h2>
+        <p>Total Listings</p>
+    </div>
+
+    <div class="stat-card">
+        <h2 id="avgPrice">0</h2>
+        <p>Avg Price (UGX)</p>
+    </div>
+
+    <div class="stat-card">
+        <h2 id="totalUnis">0</h2>
+        <p>Universities</p>
+    </div>
+</div>
+
+<div class="container">
+    <div id="listings" class="grid"></div>
+</div>
+
+<!-- MODAL -->
+<div id="overlay" class="overlay hidden">
+    <div class="modal">
+        <h2>⚠️ Confirm Delete</h2>
+        <p>Are you sure?</p>
+        <div class="buttons">
+            <button class="cancel" onclick="closeModal()">Cancel</button>
+            <button class="delete" onclick="confirmDelete()">Delete</button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import { getAuth, onAuthStateChanged } 
+from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
+import {
+    getFirestore,
+    collection,
+    getDocs,
+    deleteDoc,
+    doc
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCwDxwL4j_fgzGi1ffHhaG36nw2uzNiZ1E",
+  authDomain: "unistay-v1.firebaseapp.com",
+  projectId: "unistay-v1"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const ADMIN_EMAIL = "douglaskabaale@gmail.com";
+
+let deleteTargetId = null;
+let allListings = [];
+
+/* AUTH */
+onAuthStateChanged(auth, (user) => {
+    if (!user || user.email !== ADMIN_EMAIL) {
+        alert("Access denied 🚫");
+        window.location.href = "auth.html";
+        return;
+    }
+    loadListings();
+});
+
+/* LOAD DATA */
+async function loadListings() {
+
+    const snap = await getDocs(collection(db, "properties"));
+
+    const container = document.getElementById("listings");
+    container.innerHTML = "";
+
+    allListings = [];
+
+    snap.forEach(docSnap => {
+        const data = docSnap.data();
+        data.id = docSnap.id;
+        allListings.push(data);
+    });
+
+    render();
+    updateStats();
+}
+
+/* RENDER LISTINGS */
+function render() {
+
+    const container = document.getElementById("listings");
+    container.innerHTML = "";
+
+    if (allListings.length === 0) {
+        container.innerHTML = `<div class="empty">No listings found</div>`;
+        return;
+    }
+
+    allListings.forEach(data => {
+
+        const card = document.createElement("div");
+        card.className = "card";
+
+        card.innerHTML = `
+            <h3>${data.hostelName}</h3>
+            <p>📍 ${data.university}</p>
+            <p>📌 ${data.location}</p>
+            <p>💰 UGX ${data.price}</p>
+            <span class="badge">${data.roomType}</span>
+
+            <button onclick="deleteListing('${data.id}')">
+                Delete Listing
+            </button>
+        `;
+
+        container.appendChild(card);
+    });
+}
+
+/* STATS */
+function updateStats() {
+
+    document.getElementById("totalListings").innerText = allListings.length;
+
+    let total = 0;
+    let universities = new Set();
+
+    allListings.forEach(l => {
+        total += Number(l.price || 0);
+        universities.add(l.university);
+    });
+
+    let avg = allListings.length ? Math.round(total / allListings.length) : 0;
+
+    document.getElementById("avgPrice").innerText = avg;
+    document.getElementById("totalUnis").innerText = universities.size;
+}
+
+/* DELETE */
+window.deleteListing = function(id) {
+    deleteTargetId = id;
+    document.getElementById("overlay").classList.remove("hidden");
+};
+
+window.closeModal = function() {
+    document.getElementById("overlay").classList.add("hidden");
+    deleteTargetId = null;
+};
+
+window.confirmDelete = async function() {
+
+    if (!deleteTargetId) return;
+
+    await deleteDoc(doc(db, "properties", deleteTargetId));
+
+    closeModal();
+    loadListings();
+};
+
+</script>
+
+</body>
+</html>

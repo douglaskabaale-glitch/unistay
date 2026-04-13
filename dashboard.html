@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UNISTAY - Dashboard</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: "Comic Sans MS", cursive, sans-serif;
+    background: linear-gradient(180deg, #f4f9ff, #eaf4ff);
+    overflow-x: hidden;
+}
+
+/* HEADER */
+.header {
+    background: linear-gradient(90deg, #4da6ff, #2f8cff);
+    color: white;
+    padding: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* USER */
+.user-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255,255,255,0.2);
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 14px;
+}
+
+.user-box img {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+}
+
+/* ACTIONS */
+.right-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+button {
+    padding: 9px 14px;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.add-btn { background: white; color: #2f8cff; }
+.logout-btn { background: #ff4d4d; color: white; }
+
+.bell {
+    font-size: 22px;
+}
+
+/* CONTAINER */
+.container {
+    padding: 15px;
+}
+
+h2 {
+    font-size: 20px;
+}
+
+/* CARD */
+.card {
+    background: linear-gradient(135deg, #ffffff, #eaf4ff);
+    border-radius: 18px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    margin-bottom: 15px;
+    overflow: hidden;
+    border-left: 6px solid #2f8cff;
+}
+
+.card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.card-content {
+    padding: 12px;
+}
+
+.price {
+    color: #2f8cff;
+    font-weight: bold;
+}
+
+.actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    gap: 10px;
+}
+
+.actions button {
+    flex: 1;
+}
+
+.edit-btn { background: #ffc107; }
+.delete-btn { background: #ff4d4d; color: white; }
+
+.empty {
+    text-align: center;
+    color: #777;
+    margin-top: 50px;
+}
+
+/* MODAL */
+#editModal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+}
+
+.modal {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    width: 100%;
+    max-width: 320px;
+}
+
+.modal input {
+    width: 100%;
+    padding: 10px;
+    margin: 6px 0;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.modal button {
+    width: 48%;
+    margin-top: 8px;
+}
+
+/* =========================
+   📱 MOBILE FIXES
+========================= */
+@media (max-width: 768px) {
+
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .right-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .card img {
+        height: 160px;
+    }
+
+    button {
+        font-size: 13px;
+        padding: 8px 12px;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .user-box {
+        font-size: 12px;
+    }
+
+    h2 {
+        font-size: 18px;
+    }
+
+    .card img {
+        height: 140px;
+    }
+
+    .actions {
+        flex-direction: column;
+    }
+
+    .actions button {
+        width: 100%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+
+    <div class="user-box">
+        <img id="userPic">
+        <span id="userName"></span>
+    </div>
+
+    <div class="right-actions">
+        <div class="bell">🔔</div>
+        <button class="add-btn" onclick="goAdd()">+ Add Property</button>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+</div>
+
+<div class="container">
+    <h2>Your Properties</h2>
+    <div id="propertyList"></div>
+</div>
+
+<!-- EDIT MODAL -->
+<div id="editModal">
+    <div class="modal">
+        <h3>Edit Property</h3>
+
+        <input id="eName" placeholder="Hostel Name">
+        <input id="ePrice" placeholder="Price">
+        <input id="eContact" placeholder="Contact">
+
+        <div style="display:flex; justify-content:space-between;">
+            <button onclick="saveEdit()">Save</button>
+            <button onclick="closeEdit()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } 
+from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
+import {
+    getFirestore,
+    collection,
+    query,
+    where,
+    getDocs,
+    doc,
+    deleteDoc,
+    updateDoc
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCwDxwL4j_fgzGi1ffHhaG36nw2uzNiZ1E",
+  authDomain: "unistay-v1.firebaseapp.com",
+  projectId: "unistay-v1",
+  storageBucket: "unistay-v1.firebasestorage.app",
+  messagingSenderId: "125895379967",
+  appId: "1:125895379967:web:197892746f83a6bf3cf5ca"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser = null;
+let editId = null;
+
+/* AUTH */
+onAuthStateChanged(auth, async (user) => {
+    if (!user) return (window.location = "auth.html");
+
+    currentUser = user;
+
+    document.getElementById("userName").innerText =
+        user.email.split("@")[0];
+
+    document.getElementById("userPic").src =
+        "https://via.placeholder.com/35";
+
+    loadProperties(user.uid);
+});
+
+/* LOAD */
+async function loadProperties(uid) {
+    const q = query(collection(db, "properties"), where("landlordId", "==", uid));
+    const snap = await getDocs(q);
+
+    let data = [];
+    snap.forEach(d => data.push({ id: d.id, ...d.data() }));
+
+    render(data);
+}
+
+/* RENDER */
+function render(properties) {
+    let box = document.getElementById("propertyList");
+    box.innerHTML = "";
+
+    if (!properties.length) {
+        box.innerHTML = `<p class="empty">No properties yet.</p>`;
+        return;
+    }
+
+    properties.forEach(p => {
+        let div = document.createElement("div");
+        div.className = "card";
+
+        div.innerHTML = `
+            <img src="${p.cover}">
+            <div class="card-content">
+                <h3>${p.hostelName}</h3>
+                <p class="price">UGX ${p.price}</p>
+                <p>${p.contact}</p>
+
+                <div class="actions">
+                    <button class="edit-btn" onclick="openEdit('${p.id}','${p.hostelName}','${p.price}','${p.contact}')">Edit</button>
+                    <button class="delete-btn" onclick="deleteProperty('${p.id}')">Delete</button>
+                </div>
+            </div>
+        `;
+
+        box.appendChild(div);
+    });
+}
+
+/* DELETE */
+window.deleteProperty = async (id) => {
+    await deleteDoc(doc(db, "properties", id));
+    location.reload();
+};
+
+/* EDIT */
+window.openEdit = (id, name, price, contact) => {
+    editId = id;
+    document.getElementById("eName").value = name;
+    document.getElementById("ePrice").value = price;
+    document.getElementById("eContact").value = contact;
+    document.getElementById("editModal").style.display = "flex";
+};
+
+window.closeEdit = () => {
+    document.getElementById("editModal").style.display = "none";
+};
+
+window.saveEdit = async () => {
+    await updateDoc(doc(db, "properties", editId), {
+        hostelName: document.getElementById("eName").value,
+        price: document.getElementById("ePrice").value,
+        contact: document.getElementById("eContact").value
+    });
+
+    closeEdit();
+    location.reload();
+};
+
+/* NAV */
+window.goAdd = () => window.location = "add-property.html";
+
+/* LOGOUT */
+window.logout = () => signOut(auth).then(() => location = "auth.html");
+
+</script>
+
+</body>
+</html>

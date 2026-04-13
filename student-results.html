@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UNISTAY - Results</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: "Comic Sans MS", cursive, sans-serif;
+    background: linear-gradient(135deg, #dff6ff, #d9ffe8);
+    min-height: 100vh;
+}
+
+/* HEADER */
+.header {
+    background: linear-gradient(90deg, #4da6ff, #2f8cff);
+    color: white;
+    padding: 14px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* INFO */
+.info {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 16px;
+    padding: 0 10px;
+}
+
+/* GRID (FIXED RESPONSIVE) */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+    padding: 20px;
+}
+
+/* CARD */
+.card {
+    background: white;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+
+.card:hover {
+    transform: scale(1.03);
+}
+
+/* IMAGE */
+.card img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    background: #eee;
+}
+
+/* CONTENT */
+.card-content {
+    padding: 10px;
+}
+
+.price {
+    color: #2f8cff;
+    font-weight: bold;
+}
+
+/* EMPTY STATE */
+.empty {
+    height: 60vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    opacity: 0.4;
+    text-align: center;
+    padding: 20px;
+}
+
+/* PARTICLES */
+.particles {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.particle {
+    position: absolute;
+    color: #7ec8ff;
+    font-size: 24px;
+    opacity: 0.3;
+    animation: floatUp linear infinite;
+}
+
+@keyframes floatUp {
+    0% { transform: translateY(100vh); opacity: 0; }
+    100% { transform: translateY(-120vh); opacity: 0; }
+}
+
+/* LAYER FIX */
+.header, .info, .grid {
+    position: relative;
+    z-index: 2;
+}
+
+/* 📱 MOBILE FIX */
+@media (max-width: 600px) {
+
+    .header {
+        font-size: 18px;
+    }
+
+    .info {
+        font-size: 14px;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+        padding: 12px;
+    }
+
+    .card img {
+        height: 180px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="particles" id="particles"></div>
+
+<div class="header">UNISTAY - Available Hostels</div>
+<div class="info" id="infoText"></div>
+
+<div id="container"></div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import { getFirestore, collection, query, where, getDocs } 
+from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCwDxwL4j_fgzGi1ffHhaG36nw2uzNiZ1E",
+  authDomain: "unistay-v1.firebaseapp.com",
+  projectId: "unistay-v1"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+/* INPUT */
+const selectedUniversity =
+    (localStorage.getItem("selectedUniversity") || "").trim();
+
+const selectedLocation =
+    (localStorage.getItem("selectedLocation") || "").trim();
+
+/* UI */
+document.getElementById("infoText").innerText =
+`${selectedUniversity} → ${selectedLocation}`;
+
+/* NORMALIZER */
+function norm(v) {
+    return (v || "").toLowerCase().trim();
+}
+
+/* LOAD RESULTS */
+async function loadResults() {
+
+    const container = document.getElementById("container");
+
+    if (!selectedUniversity || !selectedLocation) {
+        container.innerHTML = `<div class="empty">Missing selection</div>`;
+        return;
+    }
+
+    container.innerHTML = `<div class="empty">Loading hostels...</div>`;
+
+    const q = query(
+        collection(db, "properties"),
+        where("university", "==", selectedUniversity)
+    );
+
+    const snap = await getDocs(q);
+
+    let results = [];
+
+    snap.forEach(docSnap => {
+        const p = docSnap.data();
+
+        if (
+            norm(p.university) === norm(selectedUniversity) &&
+            norm(p.location) === norm(selectedLocation)
+        ) {
+            results.push(p);
+        }
+    });
+
+    render(results);
+}
+
+/* RENDER */
+function render(results) {
+
+    const container = document.getElementById("container");
+
+    if (!results.length) {
+        container.innerHTML = `<div class="empty">No listings found 😢</div>`;
+        return;
+    }
+
+    const grid = document.createElement("div");
+    grid.className = "grid";
+
+    results.forEach((p) => {
+
+        const card = document.createElement("div");
+        card.className = "card";
+
+        card.innerHTML = `
+            <img src="${p.cover || ''}" 
+                 onerror="this.src='https://via.placeholder.com/300x200'">
+
+            <div class="card-content">
+                <h3>${p.hostelName || "Unnamed"}</h3>
+                <p>${p.roomType || ""}</p>
+                <p class="price">UGX ${p.price || ""}</p>
+                <p>${p.location || ""}</p>
+                <p>📞 ${p.contact || ""}</p>
+            </div>
+        `;
+
+        card.onclick = () => {
+            localStorage.setItem("selectedProperty", JSON.stringify(p));
+            window.location.href = "hostel-details.html";
+        };
+
+        grid.appendChild(card);
+    });
+
+    container.innerHTML = "";
+    container.appendChild(grid);
+}
+
+loadResults();
+
+/* PARTICLES */
+const symbols = ["π","Σ","√","∫","θ","x²","∞","Δ"];
+const box = document.getElementById("particles");
+
+for (let i = 0; i < 25; i++) {
+    let s = document.createElement("div");
+    s.className = "particle";
+    s.innerText = symbols[Math.floor(Math.random() * symbols.length)];
+    s.style.left = Math.random() * 100 + "vw";
+    s.style.top = Math.random() * 100 + "vh";
+    s.style.animationDuration = (8 + Math.random() * 10) + "s";
+    box.appendChild(s);
+}
+
+</script>
+
+</body>
+</html>
