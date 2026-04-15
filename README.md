@@ -1,0 +1,1 @@
+UNISTAY is a student-focused housing platform that connects landlords with tenants in a simple, modern, and secure way. It allows users to browse listings, post properties, and manage accommodations efficiently.
