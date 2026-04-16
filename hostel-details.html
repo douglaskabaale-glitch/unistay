@@ -11,12 +11,6 @@ body {
     font-family: "Comic Sans MS", cursive, sans-serif;
     background: linear-gradient(135deg, #e6f4ff, #e9ffe9);
     min-height: 100vh;
-    animation: pageLoad 0.6s ease-out;
-}
-
-@keyframes pageLoad {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
 }
 
 .header {
@@ -86,7 +80,6 @@ body {
     cursor: pointer;
 }
 
-/* REVIEWS */
 .reviews-box {
     margin-top: 20px;
     background: white;
@@ -101,7 +94,6 @@ body {
     border-radius: 10px;
 }
 
-/* ⭐ AVERAGE RATING */
 .avg-rating {
     font-weight: bold;
     color: #ff9800;
@@ -160,18 +152,22 @@ body {
         <button class="book-btn" onclick="bookNow()">BOOK NOW ON WHATSAPP</button>
     </div>
 
-    <!-- REVIEWS -->
     <div class="reviews-box">
 
         <h3>Reviews</h3>
 
-        <div id="avgRating" class="avg-rating">No ratings yet</div>
+        <div id="avgRating" class="avg-rating">Loading reviews...</div>
 
-        <input id="rating" type="number" min="1" max="5" placeholder="Rating (1-5)" style="width:100%; padding:10px; margin-bottom:10px;">
+        <input id="rating" type="number" min="1" max="5"
+               placeholder="Rating (1-5)"
+               style="width:100%; padding:10px; margin-bottom:10px;">
 
-        <textarea id="reviewText" placeholder="Write your review..." style="width:100%; padding:10px; height:80px;"></textarea>
+        <textarea id="reviewText"
+                  placeholder="Write your review..."
+                  style="width:100%; padding:10px; height:80px;"></textarea>
 
-        <button onclick="submitReview()" style="margin-top:10px; width:100%; padding:10px; background:#2f8cff; color:white; border:none;">
+        <button onclick="submitReview()"
+                style="margin-top:10px; width:100%; padding:10px; background:#2f8cff; color:white; border:none;">
             Submit Review
         </button>
 
@@ -200,46 +196,51 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/* PROPERTY */
+/* GET PROPERTY */
 let property = JSON.parse(localStorage.getItem("selectedProperty"));
 
-if (!property) {
-    alert("No property selected!");
+/* HARD STOP IF MISSING */
+if (!property || !property.id) {
+    alert("Missing hostel data. Please select a hostel again.");
     window.location.href = "student-results.html";
 }
 
-/* DISPLAY */
-document.getElementById("mainImage").src = property.cover;
-document.getElementById("name").innerText = property.hostelName;
-document.getElementById("price").innerText = "UGX " + property.price;
-document.getElementById("room").innerText = "Room: " + property.roomType;
-document.getElementById("location").innerText = "Location: " + property.location;
-document.getElementById("amenities").innerText = "Amenities: " + property.amenities;
-document.getElementById("contact").innerText = "Contact: " + property.contact;
-document.getElementById("desc").innerText = property.description || "";
+/* DISPLAY DATA */
+function renderProperty() {
 
-/* GALLERY */
-let gallery = document.getElementById("gallery");
+    document.getElementById("mainImage").src = property.cover || "";
+    document.getElementById("name").innerText = property.hostelName || "";
+    document.getElementById("price").innerText = "UGX " + (property.price || "");
+    document.getElementById("room").innerText = "Room: " + (property.roomType || "");
+    document.getElementById("location").innerText = "Location: " + (property.location || "");
+    document.getElementById("amenities").innerText = "Amenities: " + (property.amenities || "");
+    document.getElementById("contact").innerText = "Contact: " + (property.contact || "");
+    document.getElementById("desc").innerText = property.description || "";
 
-(property.images || []).forEach(img => {
-    let image = document.createElement("img");
-    image.src = img;
-    image.onclick = () => {
-        document.getElementById("mainImage").src = img;
-    };
-    gallery.appendChild(image);
-});
+    let gallery = document.getElementById("gallery");
+
+    (property.images || []).forEach(img => {
+        let image = document.createElement("img");
+        image.src = img;
+        image.onclick = () => {
+            document.getElementById("mainImage").src = img;
+        };
+        gallery.appendChild(image);
+    });
+}
+
+renderProperty();
 
 /* WHATSAPP */
 window.bookNow = function () {
-    let phone = property.contact.replace(/\s+/g, '');
+    let phone = (property.contact || "").replace(/\s+/g, '');
     if (!phone.startsWith("+")) phone = "+256" + phone;
 
     let message = `Hello, I am interested in your hostel: ${property.hostelName}`;
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, "_blank");
 };
 
-/* ⭐ SUBMIT REVIEW */
+/* SUBMIT REVIEW */
 window.submitReview = async function () {
 
     const rating = Number(document.getElementById("rating").value);
@@ -262,7 +263,7 @@ window.submitReview = async function () {
     loadReviews();
 };
 
-/* ⭐ LOAD REVIEWS + AVERAGE */
+/* LOAD REVIEWS */
 async function loadReviews() {
 
     const snap = await getDocs(collection(db, "properties", property.id, "reviews"));
@@ -273,29 +274,25 @@ async function loadReviews() {
     snap.forEach(doc => {
         const r = doc.data();
         reviews.push(r);
-        total += r.rating;
+        total += r.rating || 0;
     });
 
-    // average rating
     const avg = reviews.length ? (total / reviews.length).toFixed(1) : 0;
 
     document.getElementById("avgRating").innerText =
-        reviews.length ? `⭐ Average Rating: ${avg} / 5 (${reviews.length} reviews)` : "No ratings yet";
+        reviews.length
+            ? `⭐ Average Rating: ${avg} / 5 (${reviews.length} reviews)`
+            : "No ratings yet";
 
-    // newest first
     reviews.reverse();
 
-    let html = "";
-    reviews.forEach(r => {
-        html += `
+    document.getElementById("reviewsContainer").innerHTML =
+        reviews.map(r => `
             <div class="review">
                 ⭐ ${r.rating}/5
                 <p>${r.text}</p>
             </div>
-        `;
-    });
-
-    document.getElementById("reviewsContainer").innerHTML = html;
+        `).join("");
 }
 
 loadReviews();
@@ -313,7 +310,6 @@ function createParticles(){
 
         s.style.left = Math.random() * 100 + "vw";
         s.style.top = Math.random() * 100 + "vh";
-        s.style.fontSize = (18 + Math.random() * 22) + "px";
         s.style.animationDuration = (8 + Math.random() * 10) + "s";
 
         container.appendChild(s);
