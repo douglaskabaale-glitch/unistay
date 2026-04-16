@@ -65,7 +65,6 @@ body {
     font-weight: bold;
 }
 
-/* ⭐ NEW RATING STYLE */
 .rating {
     margin-top: 5px;
     font-size: 14px;
@@ -96,8 +95,13 @@ body {
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-import { getFirestore, collection, query, where, getDocs } 
-from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+import {
+    getFirestore,
+    collection,
+    query,
+    where,
+    getDocs
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCwDxwL4j_fgzGi1ffHHhaG36nw2uzNiE",
@@ -122,6 +126,27 @@ document.getElementById("infoText").innerText =
 /* NORMALIZER */
 function norm(v) {
     return (v || "").toLowerCase().trim();
+}
+
+/* 🔥 GET LIVE RATING FROM REVIEWS */
+async function getRating(propertyId) {
+
+    const snap = await getDocs(
+        collection(db, "properties", propertyId, "reviews")
+    );
+
+    let total = 0;
+    let count = 0;
+
+    snap.forEach(doc => {
+        total += doc.data().rating || 0;
+        count++;
+    });
+
+    return {
+        avg: count ? (total / count) : 0,
+        count
+    };
 }
 
 /* LOAD RESULTS */
@@ -156,7 +181,10 @@ async function loadResults() {
             norm(p.university) === norm(selectedUniversity) &&
             norm(p.location) === norm(selectedLocation)
         ) {
-            results.push(p);
+            results.push({
+                id: docSnap.id,
+                ...p
+            });
         }
     });
 
@@ -164,7 +192,7 @@ async function loadResults() {
 }
 
 /* RENDER */
-function render(results) {
+async function render(results) {
 
     const container = document.getElementById("container");
 
@@ -176,10 +204,9 @@ function render(results) {
     const grid = document.createElement("div");
     grid.className = "grid";
 
-    results.forEach((p) => {
+    for (let p of results) {
 
-        const rating = p.avgRating || 0;
-        const count = p.reviewCount || 0;
+        const ratingData = await getRating(p.id);
 
         const card = document.createElement("div");
         card.className = "card";
@@ -194,7 +221,7 @@ function render(results) {
                 <p class="price">UGX ${p.price || ""}</p>
 
                 <div class="rating">
-                    ⭐ ${rating.toFixed(1)} (${count} reviews)
+                    ⭐ ${ratingData.avg.toFixed(1)} (${ratingData.count} reviews)
                 </div>
 
                 <p>${p.location || ""}</p>
@@ -208,7 +235,7 @@ function render(results) {
         };
 
         grid.appendChild(card);
-    });
+    }
 
     container.innerHTML = "";
     container.appendChild(grid);
