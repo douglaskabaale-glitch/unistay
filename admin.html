@@ -95,7 +95,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCwDxwL4j_fgzGi1ffHHaG36nw2uzNiE",
+  apiKey: "AIzaSyCwDxwL4j_fgzGi1ffHhaG36nw2uzNiZ1E",
   authDomain: "unistay-v1.firebaseapp.com",
   projectId: "unistay-v1"
 };
@@ -104,33 +104,19 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-/* 🔐 SET YOUR ADMIN EMAIL HERE */
 const ADMIN_EMAIL = "douglaskabaale@gmail.com";
 
-/* DEBUG (IMPORTANT) */
+let allListings = [];
+
+/* AUTH */
 onAuthStateChanged(auth, (user) => {
-
-    console.log("CURRENT USER:", user?.email);
-
-    if (!user) {
-        console.log("No user logged in yet");
-        return;
-    }
-
-    const email = (user.email || "").trim().toLowerCase();
-    const admin = ADMIN_EMAIL.trim().toLowerCase();
-
-    if (email !== admin) {
+    if (!user || user.email !== ADMIN_EMAIL) {
         alert("Access denied 🚫");
         window.location.href = "auth.html";
         return;
     }
-
     loadListings();
 });
-
-
-let allListings = [];
 
 /* LOAD DATA */
 async function loadListings() {
@@ -162,10 +148,10 @@ function render() {
         card.className = "card";
 
         card.innerHTML = `
-            <h3>${data.hostelName || ""}</h3>
-            <p>📍 ${data.university || ""}</p>
-            <p>📌 ${data.location || ""}</p>
-            <p>💰 UGX ${data.price || ""}</p>
+            <h3>${data.hostelName}</h3>
+            <p>📍 ${data.university}</p>
+            <p>📌 ${data.location}</p>
+            <p>💰 UGX ${data.price}</p>
 
             <span class="status ${status}">
                 ${status.toUpperCase()}
