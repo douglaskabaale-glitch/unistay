@@ -11,8 +11,6 @@ body {
     font-family: "Comic Sans MS", cursive, sans-serif;
     background: linear-gradient(135deg, #e6f4ff, #e9ffe9);
     min-height: 100vh;
-
-    /* 🌟 smooth page entry */
     animation: pageLoad 0.6s ease-out;
 }
 
@@ -21,7 +19,6 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* HEADER */
 .header {
     background: linear-gradient(90deg, #4da6ff, #2f8cff);
     color: white;
@@ -31,34 +28,24 @@ body {
     font-weight: bold;
 }
 
-/* CONTAINER */
 .container {
     max-width: 900px;
     margin: auto;
     padding: 20px;
 }
 
-/* MAIN IMAGE */
 .main-img {
     width: 100%;
     height: 350px;
     object-fit: cover;
     border-radius: 18px;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-    transition: 0.3s ease;
 }
 
-.main-img:hover {
-    transform: scale(1.01);
-}
-
-/* GALLERY */
 .gallery {
     display: flex;
     gap: 10px;
     margin-top: 10px;
     overflow-x: auto;
-    padding-bottom: 5px;
 }
 
 .gallery img {
@@ -67,44 +54,25 @@ body {
     object-fit: cover;
     border-radius: 10px;
     cursor: pointer;
-    transition: 0.3s ease;
-    box-shadow: 0 5px 12px rgba(0,0,0,0.1);
 }
 
-.gallery img:hover {
-    transform: scale(1.08);
-}
-
-/* INFO CARD (PREMIUM) */
 .card {
     background: white;
     padding: 22px;
     border-radius: 18px;
     margin-top: 15px;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.12);
-    transition: 0.3s ease;
 }
 
-.card:hover {
-    transform: translateY(-4px);
-}
-
-/* TITLE */
 .title {
     font-size: 26px;
     font-weight: bold;
     color: #2f8cff;
-    margin-bottom: 10px;
 }
 
-/* INFO TEXT */
 .info {
     margin: 6px 0;
-    color: #333;
-    font-size: 15px;
 }
 
-/* BOOK BUTTON (PREMIUM GREEN) */
 .book-btn {
     margin-top: 18px;
     width: 100%;
@@ -116,40 +84,30 @@ body {
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
-    transition: 0.3s ease;
-    box-shadow: 0 10px 25px rgba(37, 211, 102, 0.3);
-    position: relative;
-    overflow: hidden;
 }
 
-/* button glow hover */
-.book-btn:hover {
-    transform: scale(1.03);
-    box-shadow: 0 15px 35px rgba(37, 211, 102, 0.5);
+/* REVIEWS */
+.reviews-box {
+    margin-top: 20px;
+    background: white;
+    padding: 15px;
+    border-radius: 18px;
 }
 
-/* shimmer effect */
-.book-btn::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: rgba(255,255,255,0.2);
-    transform: skewX(-20deg);
+.review {
+    background: #f4f9ff;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 10px;
 }
 
-.book-btn:hover::after {
-    animation: shine 0.7s ease;
+/* ⭐ AVERAGE RATING */
+.avg-rating {
+    font-weight: bold;
+    color: #ff9800;
+    margin-bottom: 10px;
 }
 
-@keyframes shine {
-    from { left: -100%; }
-    to { left: 100%; }
-}
-
-/* 🌟 FLOATING PARTICLES */
 .particles {
     position: fixed;
     inset: 0;
@@ -166,18 +124,10 @@ body {
 }
 
 @keyframes floatUp {
-    0% {
-        transform: translateY(100vh);
-        opacity: 0;
-    }
-    10% { opacity: 0.4; }
-    100% {
-        transform: translateY(-120vh);
-        opacity: 0;
-    }
+    0% { transform: translateY(100vh); opacity: 0; }
+    100% { transform: translateY(-120vh); opacity: 0; }
 }
 
-/* keep UI above particles */
 .header, .container {
     position: relative;
     z-index: 2;
@@ -187,12 +137,9 @@ body {
 
 <body>
 
-<!-- 🌟 PARTICLES -->
 <div class="particles" id="particles"></div>
 
-<div class="header">
-    Hostel Details
-</div>
+<div class="header">Hostel Details</div>
 
 <div class="container">
 
@@ -213,11 +160,47 @@ body {
         <button class="book-btn" onclick="bookNow()">BOOK NOW ON WHATSAPP</button>
     </div>
 
+    <!-- REVIEWS -->
+    <div class="reviews-box">
+
+        <h3>Reviews</h3>
+
+        <div id="avgRating" class="avg-rating">No ratings yet</div>
+
+        <input id="rating" type="number" min="1" max="5" placeholder="Rating (1-5)" style="width:100%; padding:10px; margin-bottom:10px;">
+
+        <textarea id="reviewText" placeholder="Write your review..." style="width:100%; padding:10px; height:80px;"></textarea>
+
+        <button onclick="submitReview()" style="margin-top:10px; width:100%; padding:10px; background:#2f8cff; color:white; border:none;">
+            Submit Review
+        </button>
+
+        <div id="reviewsContainer"></div>
+    </div>
+
 </div>
 
-<script>
+<script type="module">
 
-/* GET PROPERTY */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import {
+    getFirestore,
+    collection,
+    addDoc,
+    getDocs,
+    serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCwDxwL4j_fgzGi1ffHHhaG36nw2uzNiE",
+  authDomain: "unistay-v1.firebaseapp.com",
+  projectId: "unistay-v1"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+/* PROPERTY */
 let property = JSON.parse(localStorage.getItem("selectedProperty"));
 
 if (!property) {
@@ -225,10 +208,8 @@ if (!property) {
     window.location.href = "student-results.html";
 }
 
-/* MAIN IMAGE */
+/* DISPLAY */
 document.getElementById("mainImage").src = property.cover;
-
-/* DETAILS */
 document.getElementById("name").innerText = property.hostelName;
 document.getElementById("price").innerText = "UGX " + property.price;
 document.getElementById("room").innerText = "Room: " + property.roomType;
@@ -243,31 +224,83 @@ let gallery = document.getElementById("gallery");
 (property.images || []).forEach(img => {
     let image = document.createElement("img");
     image.src = img;
-
     image.onclick = () => {
         document.getElementById("mainImage").src = img;
     };
-
     gallery.appendChild(image);
 });
 
 /* WHATSAPP */
-function bookNow() {
-
+window.bookNow = function () {
     let phone = property.contact.replace(/\s+/g, '');
-
-    if (!phone.startsWith("+")) {
-        phone = "+256" + phone;
-    }
+    if (!phone.startsWith("+")) phone = "+256" + phone;
 
     let message = `Hello, I am interested in your hostel: ${property.hostelName}`;
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, "_blank");
+};
 
-    let url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+/* ⭐ SUBMIT REVIEW */
+window.submitReview = async function () {
 
-    window.open(url, "_blank");
+    const rating = Number(document.getElementById("rating").value);
+    const text = document.getElementById("reviewText").value.trim();
+
+    if (!rating || rating < 1 || rating > 5 || !text) {
+        alert("Enter valid rating (1-5) and review");
+        return;
+    }
+
+    await addDoc(collection(db, "properties", property.id, "reviews"), {
+        rating,
+        text,
+        createdAt: serverTimestamp()
+    });
+
+    document.getElementById("rating").value = "";
+    document.getElementById("reviewText").value = "";
+
+    loadReviews();
+};
+
+/* ⭐ LOAD REVIEWS + AVERAGE */
+async function loadReviews() {
+
+    const snap = await getDocs(collection(db, "properties", property.id, "reviews"));
+
+    let reviews = [];
+    let total = 0;
+
+    snap.forEach(doc => {
+        const r = doc.data();
+        reviews.push(r);
+        total += r.rating;
+    });
+
+    // average rating
+    const avg = reviews.length ? (total / reviews.length).toFixed(1) : 0;
+
+    document.getElementById("avgRating").innerText =
+        reviews.length ? `⭐ Average Rating: ${avg} / 5 (${reviews.length} reviews)` : "No ratings yet";
+
+    // newest first
+    reviews.reverse();
+
+    let html = "";
+    reviews.forEach(r => {
+        html += `
+            <div class="review">
+                ⭐ ${r.rating}/5
+                <p>${r.text}</p>
+            </div>
+        `;
+    });
+
+    document.getElementById("reviewsContainer").innerHTML = html;
 }
 
-/* 🌟 PARTICLES */
+loadReviews();
+
+/* PARTICLES */
 const symbols = ["π","Σ","√","∫","θ","x²","∞","Δ"];
 
 function createParticles(){
@@ -282,7 +315,6 @@ function createParticles(){
         s.style.top = Math.random() * 100 + "vh";
         s.style.fontSize = (18 + Math.random() * 22) + "px";
         s.style.animationDuration = (8 + Math.random() * 10) + "s";
-        s.style.opacity = Math.random() * 0.4;
 
         container.appendChild(s);
     }
