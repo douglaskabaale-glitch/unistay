@@ -3,265 +3,326 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>UNISTAY - List Property</title>
+<title>UNISTAY - Add Property</title>
 
 <style>
-body {
+* {
     margin: 0;
-    font-family: Arial, sans-serif;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", sans-serif;
+}
+
+body {
     background: white;
-    overflow-x: hidden;
-}
-
-/* HEADER */
-.header {
-    background: linear-gradient(90deg, #4da6ff, #2f8cff);
-    color: white;
-    padding: 16px;
-    text-align: center;
-    font-size: 22px;
-    font-weight: bold;
-    position: relative;
-}
-
-/* USER BOX */
-.user-box {
-    position: absolute;
-    right: 15px;
-    top: 10px;
+    min-height: 100vh;
     display: flex;
+    justify-content: center;
     align-items: center;
-    gap: 10px;
-    background: rgba(255,255,255,0.2);
-    padding: 5px 10px;
-    border-radius: 999px;
-    font-size: 14px;
+    overflow: hidden;
 }
 
-.user-box img {
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
+/* PARTICLES */
+.particles {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
 }
 
-/* FORM CONTAINER */
+.particle {
+    position: absolute;
+    font-size: 38px;
+    opacity: 0.55;
+    color: #2f8cff;
+    animation: floatUp linear infinite;
+}
+
+@keyframes floatUp {
+    0% { transform: translateY(110vh); opacity: 0; }
+    20% { opacity: 0.6; }
+    100% { transform: translateY(-10vh); opacity: 0; }
+}
+
+/* PREMIUM BOX */
 .container {
-    width: 90%;
-    max-width: 450px;
-    margin: 30px auto;
-    background: white;
-    padding: 20px;
-    border-radius: 18px;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+    position: relative;
+    z-index: 2;
+    width: 92%;
+    max-width: 440px;
+    background: rgba(255,255,255,0.96);
+    backdrop-filter: blur(14px);
+    padding: 28px;
+    border-radius: 22px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.12);
+    border: 1px solid rgba(47,140,255,0.08);
+}
+
+h2 {
+    text-align: center;
+    color: #003399;
+    margin-bottom: 18px;
+    font-size: 22px;
+}
+
+.input-group {
+    margin-top: 12px;
 }
 
 input, select, textarea {
     width: 100%;
     padding: 12px;
-    margin: 8px 0;
     border-radius: 10px;
-    border: 1px solid #ddd;
-    font-size: 16px;
+    border: 1px solid #e1e1e1;
+    outline: none;
+    transition: 0.2s;
+    background: #fff;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: #2f8cff;
+    box-shadow: 0 0 0 3px rgba(47,140,255,0.12);
+}
+
+.error {
+    color: red;
+    font-size: 12px;
+    margin-top: 4px;
+    display: none;
 }
 
 textarea {
+    height: 85px;
     resize: none;
-    height: 90px;
 }
 
 button {
     width: 100%;
-    padding: 12px;
-    background: linear-gradient(90deg, #4da6ff, #2f8cff);
+    margin-top: 18px;
+    padding: 14px;
     border: none;
-    color: white;
     border-radius: 999px;
+    background: linear-gradient(135deg, #00c853, #00e676);
+    color: white;
     font-weight: bold;
     cursor: pointer;
-    font-size: 16px;
+    transition: 0.25s;
 }
 
-.section-title {
-    margin-top: 15px;
-    font-weight: bold;
-    color: #2f8cff;
-}
-
-#locationBox {
-    display: none;
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.15);
 }
 </style>
 </head>
 
 <body>
 
-<div class="header">
-    UNISTAY - List Your Property
-
-    <div class="user-box">
-        <img id="userPic">
-        <span id="userName"></span>
-    </div>
-</div>
+<div class="particles" id="particles"></div>
 
 <div class="container">
 
-<h2>Add Hostel Details</h2>
+    <h2>Add Property</h2>
 
-<input type="text" id="hostelName" placeholder="Hostel Name">
+    <div class="input-group">
+        <input id="hostelName" placeholder="Hostel Name">
+        <div class="error" id="err-hostelName">Field needed</div>
+    </div>
 
-<div class="section-title">Closest University</div>
-<select id="university" onchange="loadLocations()">
-    <option value="">Select University</option>
-    <option>Makerere University</option>
-    <option>Kyambogo University</option>
-    <option>Uganda Christian University</option>
-    <option>Nkumba University</option>
-    <option>Mbarara University of Science and Technology</option>
-</select>
+    <div class="input-group">
+        <select id="university">
+            <option value="">Select University</option>
+            <option>Makerere University</option>
+            <option>Kyambogo University</option>
+            <option>Makerere University Business School</option>
+            <option>Uganda Christian University</option>
+            <option>Victoria University</option>
+            <option>Gulu University</option>
+            <option>Mbarara University of Science and Technology</option>
+            <option>Kabale University</option>
+            <option>Kampala International University</option>
+            <option>Cavendish University Uganda</option>
+        </select>
+        <div class="error" id="err-university">Field needed</div>
+    </div>
 
-<div id="locationBox">
-    <div class="section-title">Location (Near University)</div>
-    <select id="location">
-        <option value="">Select Location</option>
-    </select>
-</div>
+    <div class="input-group">
+        <select id="location">
+            <option value="">Select Location</option>
+        </select>
+        <div class="error" id="err-location">Field needed</div>
+    </div>
 
-<select id="roomType">
-    <option value="">Select Room Type</option>
-    <option value="single">Single Room</option>
-    <option value="double">Double Room</option>
-</select>
+    <div class="input-group">
+        <input id="price" type="number" placeholder="Price (UGX)">
+        <div class="error" id="err-price">Field needed</div>
+    </div>
 
-<textarea id="amenities" placeholder="Amenities"></textarea>
+    <div class="input-group">
+        <input id="contact" placeholder="Contact">
+        <div class="error" id="err-contact">Field needed</div>
+    </div>
 
-<input type="number" id="price" placeholder="Price per month (UGX)">
+    <input id="amenities" placeholder="Amenities (WiFi, Water, Security)">
+    <textarea id="description" placeholder="Description"></textarea>
 
-<div class="section-title">Cover Photo</div>
-<input type="file" id="coverInput" accept="image/*">
+    <div class="input-group">
+        <input type="file" id="image">
+        <div class="error" id="err-image">Field needed</div>
+    </div>
 
-<div class="section-title">Additional Photos</div>
-<input type="file" id="moreInput" multiple accept="image/*">
-
-<div class="section-title">Contact Information</div>
-
-<input type="text" id="contact" placeholder="WhatsApp Number">
-
-<textarea id="description" placeholder="Description (optional)"></textarea>
-
-<button onclick="submitProperty()">Submit Property</button>
-
-<p id="msg"></p>
+    <button onclick="submitProperty()">Submit Property</button>
 
 </div>
 
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-import { getAuth, onAuthStateChanged } 
-from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-
-import {
-    getFirestore,
-    collection,
-    addDoc
-} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+import { getFirestore, collection, addDoc } 
+from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCwDxwL4j_fgzGi1ffHhaG36nw2uzNiZ1E",
   authDomain: "unistay-v1.firebaseapp.com",
-  projectId: "unistay-v1",
+  projectId: "unistay-v1"
 };
 
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
 const db = getFirestore(app);
 
-let currentUser = null;
+/* 🔥 FIXED CLOUDINARY */
+const upload = async (file) => {
+    const url = "https://api.cloudinary.com/v1_1/dsanvos33/image/upload";
+    const form = new FormData();
+    form.append("file", file);
+    form.append("upload_preset", "unistay-images");
 
-onAuthStateChanged(auth, (user) => {
-    if (!user) window.location.href = "auth.html";
-    currentUser = user;
+    const res = await fetch(url, { method: "POST", body: form });
+    const data = await res.json();
+
+    if (!data.secure_url) {
+        console.error("Cloudinary error:", data);
+        throw new Error("Upload failed");
+    }
+
+    return data.secure_url;
+};
+
+/* 🔥 FULL LOCATION MAP (FIXED + 5+ EACH) */
+const data = {
+    "Makerere University": ["Wandegeya","Kikoni","Bwaise","Makerere Hill","Naakulabye"],
+    "Kyambogo University": ["Banda","Kiwatule","Ntinda","Naalya","Kyambogo Hill"],
+    "Makerere University Business School": ["Nakawa","Bugolobi","Mbuya","Luzira","Kitintale"],
+    "Uganda Christian University": ["Mukono","Seeta","Namilyango","Goma","Sonde"],
+    "Victoria University": ["Nakasero","Kololo","Kampala Road","Nsambya","CBD"],
+    "Gulu University": ["Pece","Bardege","Layibi","Gulu Town","Laroo"],
+    "Mbarara University of Science and Technology": ["Kakoba","Nyamitanga","Kamukuzi","Mbarara Town","Katete"],
+    "Kabale University": ["Makanga","Kabale Town","Kikungiri","Rushoroza","Nyabikoni"],
+    "Kampala International University": ["Kansanga","Ggaba Road","Muyenga","Makindye","Kabalagala"],
+    "Cavendish University Uganda": ["Nsambya","Nakasero","Kampala CBD","Wandegeya","Nateete"]
+};
+
+/* UPDATE LOCATION DROPDOWN */
+document.getElementById("university").addEventListener("change", function () {
+
+    const uni = this.value;
+    const locationSelect = document.getElementById("location");
+
+    locationSelect.innerHTML = `<option value="">Select Location</option>`;
+
+    if (data[uni]) {
+        data[uni].forEach(loc => {
+            let opt = document.createElement("option");
+            opt.value = loc;
+            opt.textContent = loc;
+            locationSelect.appendChild(opt);
+        });
+    }
 });
 
-const uniLocations = {
-    "Makerere University": ["Kikoni","Wandegeya","Bwaise","Kavule"],
-    "Kyambogo University": ["Banda","Ntinda","Naalya"],
-    "Uganda Christian University": ["Mukono","Seeta","Namilyango"],
-};
+/* VALIDATION */
+function showError(id, show) {
+    document.getElementById("err-" + id).style.display = show ? "block" : "none";
+}
 
-window.loadLocations = function () {
-    let uni = document.getElementById("university").value;
-    let box = document.getElementById("locationBox");
-    let select = document.getElementById("location");
+function validate() {
 
-    select.innerHTML = '<option value="">Select Location</option>';
+    let valid = true;
 
-    if (!uniLocations[uni]) {
-        box.style.display = "none";
-        return;
-    }
-
-    uniLocations[uni].forEach(loc => {
-        let opt = document.createElement("option");
-        opt.value = loc;
-        opt.textContent = loc;
-        select.appendChild(opt);
+    ["hostelName","university","location","price","contact"].forEach(f => {
+        const val = document.getElementById(f).value;
+        const empty = !val || val.trim() === "";
+        showError(f, empty);
+        if (empty) valid = false;
     });
 
-    box.style.display = "block";
-};
+    const file = document.getElementById("image").files[0];
 
-window.submitProperty = async function () {
-
-    let name = document.getElementById("hostelName").value;
-    let university = document.getElementById("university").value;
-    let location = document.getElementById("location").value;
-    let room = document.getElementById("roomType").value;
-    let amenities = document.getElementById("amenities").value;
-    let price = document.getElementById("price").value;
-    let contact = document.getElementById("contact").value;
-    let desc = document.getElementById("description").value;
-
-    let coverFile = document.getElementById("coverInput").files[0];
-
-    if (!name || !university || !location || !room || !price || !contact || !coverFile) {
-        alert("Fill all fields");
-        return;
+    if (!file) {
+        showError("image", true);
+        valid = false;
+    } else {
+        showError("image", false);
     }
 
-    const upload = async (file) => {
-        const url = "https://api.cloudinary.com/v1_1/dsanvos33/image/upload";
-        const form = new FormData();
-        form.append("file", file);
-        form.append("upload_preset", "unistay-images");
+    return valid;
+}
 
-        const res = await fetch(url, { method: "POST", body: form });
-        return (await res.json()).secure_url;
-    };
+/* SUBMIT */
+window.submitProperty = async () => {
 
-    const coverURL = await upload(coverFile);
+    if (!validate()) return;
 
-    await addDoc(collection(db, "properties"), {
-        hostelName: name,
-        university,
-        location,
-        roomType: room,
-        amenities,
-        price,
-        contact,
-        description: desc,
-        cover: coverURL,
-        landlordId: currentUser.uid,
-        createdAt: Date.now(),
+    const hostelName = document.getElementById("hostelName").value;
+    const university = document.getElementById("university").value;
+    const location = document.getElementById("location").value;
+    const price = document.getElementById("price").value;
+    const contact = document.getElementById("contact").value;
+    const amenities = document.getElementById("amenities").value;
+    const description = document.getElementById("description").value;
+    const file = document.getElementById("image").files[0];
 
-        // 🔥 ADMIN APPROVAL FIELD
-        status: "pending"
-    });
+    try {
 
-    alert("Submitted for approval!");
-    window.location.href = "dashboard.html";
+        const imageUrl = await upload(file);
+
+        await addDoc(collection(db, "properties"), {
+            hostelName,
+            university,
+            location,
+            price,
+            contact,
+            amenities,
+            description,
+            cover: imageUrl,
+            status: "pending",
+            createdAt: Date.now()
+        });
+
+        alert("Submitted successfully ✅");
+        location.reload();
+
+    } catch (e) {
+        alert("Upload failed ❌");
+        console.error(e);
+    }
 };
+
+/* PARTICLES */
+const symbols = ["∑","√","π","∞","∆","∫","±"];
+const box = document.getElementById("particles");
+
+for (let i = 0; i < 40; i++) {
+    let p = document.createElement("div");
+    p.className = "particle";
+    p.innerText = symbols[Math.floor(Math.random()*symbols.length)];
+
+    p.style.left = Math.random() * 100 + "vw";
+    p.style.animationDuration = (6 + Math.random()*6) + "s";
+    p.style.fontSize = (32 + Math.random()*18) + "px";
+
+    box.appendChild(p);
+}
 
 </script>
 
