@@ -151,54 +151,6 @@ h2 {
     width: 48%;
     margin-top: 8px;
 }
-
-/* =========================
-   📱 MOBILE FIXES
-========================= */
-@media (max-width: 768px) {
-
-    .header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .right-actions {
-        width: 100%;
-        justify-content: space-between;
-    }
-
-    .card img {
-        height: 160px;
-    }
-
-    button {
-        font-size: 13px;
-        padding: 8px 12px;
-    }
-}
-
-@media (max-width: 480px) {
-
-    .user-box {
-        font-size: 12px;
-    }
-
-    h2 {
-        font-size: 18px;
-    }
-
-    .card img {
-        height: 140px;
-    }
-
-    .actions {
-        flex-direction: column;
-    }
-
-    .actions button {
-        width: 100%;
-    }
-}
 </style>
 </head>
 
@@ -210,6 +162,8 @@ h2 {
         <img id="userPic">
         <span id="userName"></span>
     </div>
+
+    <div id="statusBox"></div>
 
     <div class="right-actions">
         <div class="bell">🔔</div>
@@ -242,8 +196,11 @@ h2 {
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } 
-from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import { 
+    getAuth, 
+    onAuthStateChanged, 
+    signOut 
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
 import {
     getFirestore,
@@ -252,6 +209,7 @@ import {
     where,
     getDocs,
     doc,
+    getDoc,
     deleteDoc,
     updateDoc
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
@@ -274,7 +232,11 @@ let editId = null;
 
 /* AUTH */
 onAuthStateChanged(auth, async (user) => {
-    if (!user) return (window.location = "auth.html");
+
+    if (!user) {
+        window.location = "auth.html";
+        return;
+    }
 
     currentUser = user;
 
@@ -283,6 +245,20 @@ onAuthStateChanged(auth, async (user) => {
 
     document.getElementById("userPic").src =
         "https://via.placeholder.com/35";
+
+    /* 🔥 GET USER STATUS */
+    const userRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userRef);
+
+    if (userSnap.exists()) {
+        const status = userSnap.data().status;
+
+        document.getElementById("statusBox").innerText =
+            "Status: " + status;
+
+        document.getElementById("statusBox").style.color =
+            status === "approved" ? "lightgreen" : "yellow";
+    }
 
     loadProperties(user.uid);
 });
