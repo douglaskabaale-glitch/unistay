@@ -126,7 +126,7 @@ button:hover {
 
 <div id="loginForm">
     <h2>Login</h2>
-    <input type="text" id="loginUser" placeholder="Username">
+    <input type="text" id="loginUser" placeholder="Email">
     <input type="password" id="loginPass" placeholder="Password">
     <button onclick="login()">Login</button>
     <div class="switch" onclick="showSignup()">Create account</div>
@@ -144,7 +144,7 @@ button:hover {
 
     <img id="preview" src="" style="display:none;">
 
-    <input type="text" id="signupContact" placeholder="Email or Phone">
+    <input type="text" id="signupContact" placeholder="Email">
 
     <input type="password" id="signupPass" placeholder="Password" oninput="checkStrength()">
     <div id="strength"></div>
@@ -174,7 +174,9 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
 import {
-    getFirestore
+    getFirestore,
+    doc,
+    setDoc
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
 /* 🔥 CONFIG */
@@ -189,7 +191,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getFirestore(app); // READY FOR NEXT STEP
+const db = getFirestore(app);
 
 /* SYMBOLS */
 const symbols = ["π","Σ","√","∫","θ","x²","∞","Δ"];
@@ -204,13 +206,14 @@ for (let i = 0; i < 35; i++) {
     document.body.appendChild(s);
 }
 
-/* UI */
+/* MESSAGE */
 function showMessage(text, color="red") {
     let msg = document.getElementById("msg");
     msg.style.color = color;
     msg.innerText = text;
 }
 
+/* NAV */
 window.showSignup = function() {
     document.getElementById("loginForm").style.display = "none";
     document.getElementById("signupForm").style.display = "block";
@@ -240,7 +243,7 @@ window.loadImage = function(event) {
     reader.readAsDataURL(event.target.files[0]);
 }
 
-/* STRENGTH */
+/* PASSWORD STRENGTH */
 window.checkStrength = function() {
     let pass = document.getElementById("signupPass").value;
     let strength = document.getElementById("strength");
@@ -262,8 +265,9 @@ window.signup = async function() {
     let email = document.getElementById("signupContact").value.trim();
     let pass = document.getElementById("signupPass").value.trim();
     let confirm = document.getElementById("confirmPass").value.trim();
+    let username = document.getElementById("signupUser").value.trim();
 
-    if (!email || !pass || !confirm) {
+    if (!email || !pass || !confirm || !username) {
         showMessage("All fields are required!");
         return;
     }
@@ -274,15 +278,29 @@ window.signup = async function() {
     }
 
     try {
-        await createUserWithEmailAndPassword(auth, email, pass);
+        const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+        const user = userCredential.user;
+
+        await setDoc(doc(db, "users", user.uid), {
+            name: username,
+            email: email,
+            role: "landlord",
+            status: "pending",
+            profileImage: profileBase64 || null,
+            createdAt: new Date()
+        });
 
         showMessage("Account created successfully!", "green");
 
+        console.log("USER SAVED WITH PENDING STATUS");
+
+        // 3. REDIRECT ONLY AFTER SAVE
         setTimeout(() => {
             window.location.href = "dashboard.html";
         }, 1000);
 
     } catch (error) {
+        console.error(error);
         showMessage(error.message);
     }
 }
@@ -310,6 +328,7 @@ window.login = async function() {
         showMessage("Invalid login!");
     }
 }
+
 </script>
 
 </body>
