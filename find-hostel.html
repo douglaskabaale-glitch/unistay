@@ -15,34 +15,13 @@
 
 body {
     background: linear-gradient(135deg, #ffffff, #eaf4ff);
-    min-height: 100vh;
 }
 
-.particles {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-}
-
-.particle {
-    position: absolute;
-    color: #8ecbff;
-    font-size: 30px;
-    opacity: 0.3;
-    animation: floatUp linear infinite;
-}
-
-@keyframes floatUp {
-    0% { transform: translateY(100vh); opacity: 0; }
-    100% { transform: translateY(-120vh); opacity: 0; }
-}
-
+/* HEADER */
 .header {
     text-align: center;
     padding: 30px 20px 10px;
     position: relative;
-    z-index: 2;
 }
 
 .header h1 {
@@ -54,188 +33,305 @@ body {
     color: #555;
 }
 
+/* FILTER ICON */
+.filter-icon {
+    position: absolute;
+    right: 20px;
+    top: 35px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+/* GRID */
 .grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 18px;
+    gap: 20px;
     padding: 30px;
-    position: relative;
-    z-index: 2;
 }
 
+/* CARD */
 .card {
-    padding: 25px;
-    border-radius: 18px;
+    padding: 28px;
+    border-radius: 20px;
     cursor: pointer;
     color: white;
     font-weight: 600;
+    transition: all 0.35s ease;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.08);
+    opacity: 0;
     transition: 0.3s;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+}
+
+.card:hover::after {
+    opacity: 1;
 }
 
 .card:hover {
-    transform: scale(1.03);
+    transform: translateY(-6px) scale(1.03);
 }
 
-/* FULL NAMES ONLY (IMPORTANT FIX) */
-.makerere { background:#002147; }
-.kyambogo { background:#0057b8; }
-.mubs { background:#001f3f; }
-.ucu { background:#b00020; }
-.victoria { background:#1e4d8c; }
-.gulu { background:#0b6b3a; }
-.must { background:#1b5e20; }
-.kabale { background:#1f6f4a; }
-.kiu { background:#c62828; }
-.cavendish { background:#1565c0; }
+/* 🎨 UNIVERSITY COLORS */
+.makerere { background: linear-gradient(135deg,#001a3a,#002147); }
+.kyambogo { background: linear-gradient(135deg,#0046a8,#0057b8); }
+.mubs { background: linear-gradient(135deg,#00152a,#001f3f); }
+.ucu { background: linear-gradient(135deg,#8b0000,#b00020); }
+.victoria { background: linear-gradient(135deg,#163a6b,#1e4d8c); }
+.gulu { background: linear-gradient(135deg,#084d2b,#0b6b3a); }
+.must { background: linear-gradient(135deg,#0f3d13,#1b5e20); }
+.kabale { background: linear-gradient(135deg,#174c35,#1f6f4a); }
+.kiu { background: linear-gradient(135deg,#8b1c1c,#c62828); }
+.cavendish { background: linear-gradient(135deg,#0d47a1,#1565c0); }
 
+/* OVERLAY */
 .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+/* POPUP */
+.zoomCard {
+    width: 85%;
+    max-width: 800px;
+    padding: 30px;
+    border-radius: 22px;
+    color: white;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+    animation: pop 0.3s ease;
+}
+
+@keyframes pop {
+    from { transform: scale(0.85); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.area {
+    background: rgba(255,255,255,0.15);
+    padding: 14px;
+    margin: 10px 0;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+.area:hover {
+    background: rgba(255,255,255,0.3);
+    transform: translateX(5px);
+}
+
+/* FILTER MODAL */
+.filter-overlay {
     position: fixed;
     inset: 0;
     background: rgba(0,0,0,0.6);
     display: none;
     justify-content: center;
     align-items: center;
-    z-index: 5;
 }
 
-.zoomCard {
-    width: 85%;
-    max-width: 800px;
-    padding: 25px;
-    border-radius: 20px;
+.filter-box {
+    width: 90%;
+    max-width: 400px;
+    padding: 22px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #00c6ff, #0072ff);
     color: white;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
 }
 
-.title {
-    font-size: 24px;
-    margin-bottom: 15px;
-}
-
-.area {
-    background: rgba(255,255,255,0.15);
-    padding: 12px;
-    margin: 8px 0;
+.filter-box input,
+.filter-box select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
     border-radius: 10px;
-    cursor: pointer;
+    border: none;
 }
 
-.area:hover {
-    background: rgba(255,255,255,0.3);
+.filter-box button {
+    width: 100%;
+    margin-top: 15px;
+    padding: 12px;
+    border-radius: 999px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    background: white;
+    color: #0072ff;
 }
 </style>
 </head>
 
 <body>
 
-<div class="particles" id="particles"></div>
-
 <div class="header">
     <h1>Find Your Hostel</h1>
     <p>Select your university to explore nearby areas</p>
+    <div class="filter-icon" onclick="openFilter()">⚙️</div>
 </div>
 
-<div class="grid">
-
-    <!-- FULL NAMES ONLY -->
-    <div class="card makerere" onclick="openUni('Makerere University','makerere')">Makerere University</div>
-    <div class="card kyambogo" onclick="openUni('Kyambogo University','kyambogo')">Kyambogo University</div>
-    <div class="card mubs" onclick="openUni('Makerere University Business School','mubs')">Makerere University Business School</div>
-    <div class="card ucu" onclick="openUni('Uganda Christian University','ucu')">Uganda Christian University</div>
-    <div class="card victoria" onclick="openUni('Victoria University','victoria')">Victoria University</div>
-    <div class="card gulu" onclick="openUni('Gulu University','gulu')">Gulu University</div>
-    <div class="card must" onclick="openUni('Mbarara University of Science and Technology','must')">Mbarara University of Science and Technology</div>
-    <div class="card kabale" onclick="openUni('Kabale University','kabale')">Kabale University</div>
-    <div class="card kiu" onclick="openUni('Kampala International University','kiu')">Kampala International University</div>
-    <div class="card cavendish" onclick="openUni('Cavendish University Uganda','cavendish')">Cavendish University Uganda</div>
-
-</div>
+<div class="grid" id="uniGrid"></div>
 
 <div class="overlay" id="overlay" onclick="closeOverlay(event)">
     <div class="zoomCard" id="zoomCard">
-        <div class="title" id="title"></div>
+        <h2 id="title"></h2>
         <div id="areas"></div>
+    </div>
+</div>
+
+<div id="filterModal" class="filter-overlay" onclick="closeFilter(event)">
+    <div class="filter-box">
+
+        <h2>Filter Hostels</h2>
+
+        <label>University</label>
+        <select id="filterUniversity"></select>
+
+        <label>Location</label>
+        <input id="filterLocation">
+
+        <label>Max Price</label>
+        <input id="filterPrice" type="number">
+
+        <label>Min Rating</label>
+        <select id="filterRating">
+            <option value="">Any</option>
+            <option value="1">1+</option>
+            <option value="2">2+</option>
+            <option value="3">3+</option>
+            <option value="4">4+</option>
+            <option value="5">5</option>
+        </select>
+
+        <button onclick="applyFilters()">Apply Filters</button>
+
     </div>
 </div>
 
 <script>
 
-/* 🔥 FULL NORMALIZED DATA (MATCH FIRESTORE EXACTLY) */
-const data = {
-    "Makerere University": ["Wandegeya","Kikoni","Bwaise","Kawempe","Makerere Hill"],
-    "Kyambogo University": ["Banda","Ntinda","Kiwatule","Naalya","Kyambogo Hill"],
-    "Makerere University Business School": ["Nakawa","Bugolobi","Mbuya","Banda","Luzira"],
-    "Uganda Christian University": ["Mukono","Seeta","Namilyango"],
-    "Victoria University": ["Nakasero","Kololo","Kampala Road","Nsambya"],
-    "Gulu University": ["Pece","Bardege","Layibi","Gulu Town"],
-    "Mbarara University of Science and Technology": ["Kakoba","Nyamitanga","Mbarara Town"],
-    "Kabale University": ["Makanga","Kabale Town"],
-    "Kampala International University": ["Kansanga","Ggaba Road","Muyenga"],
-    "Cavendish University Uganda": ["Nakasero","Nsambya","City Centre"]
+/* 🎯 CENTRAL DATA */
+const universities = {
+    "Makerere University": ["Wandegeya","Kikoni","Bwaise"],
+    "Kyambogo University": ["Banda","Ntinda"],
+    "Makerere University Business School": ["Nakawa","Bugolobi"],
+    "Uganda Christian University": ["Mukono","Seeta"],
+    "Victoria University": ["Nakasero","Kololo"],
+    "Gulu University": ["Pece","Bardege"],
+    "Mbarara University of Science and Technology": ["Kakoba"],
+    "Kabale University": ["Makanga"],
+    "Kampala International University": ["Kansanga"],
+    "Cavendish University Uganda": ["Nakasero"]
 };
 
-const colors = {
-    "Makerere University":"#002147",
-    "Kyambogo University":"#0057b8",
-    "Makerere University Business School":"#001f3f",
-    "Uganda Christian University":"#b00020",
-    "Victoria University":"#1e4d8c",
-    "Gulu University":"#0b6b3a",
-    "Mbarara University of Science and Technology":"#1b5e20",
-    "Kabale University":"#1f6f4a",
-    "Kampala International University":"#c62828",
-    "Cavendish University Uganda":"#1565c0"
+/* 🎨 CLASS MAP */
+const classMap = {
+    "Makerere University":"makerere",
+    "Kyambogo University":"kyambogo",
+    "Makerere University Business School":"mubs",
+    "Uganda Christian University":"ucu",
+    "Victoria University":"victoria",
+    "Gulu University":"gulu",
+    "Mbarara University of Science and Technology":"must",
+    "Kabale University":"kabale",
+    "Kampala International University":"kiu",
+    "Cavendish University Uganda":"cavendish"
 };
 
-function openUni(name, key) {
+/* BUILD GRID */
+const grid = document.getElementById("uniGrid");
+
+Object.keys(universities).forEach(name => {
+
+    const div = document.createElement("div");
+    div.className = "card " + classMap[name];
+    div.innerText = name;
+
+    div.onclick = () => openUni(name);
+
+    grid.appendChild(div);
+});
+
+/* FILTER DROPDOWN */
+const select = document.getElementById("filterUniversity");
+select.innerHTML = `<option value="">All</option>`;
+
+Object.keys(universities).forEach(name => {
+    const opt = document.createElement("option");
+    opt.value = name;
+    opt.innerText = name;
+    select.appendChild(opt);
+});
+
+/* OPEN UNI */
+function openUni(name){
 
     const overlay = document.getElementById("overlay");
     const card = document.getElementById("zoomCard");
 
     overlay.style.display = "flex";
-    card.style.background = colors[name] || "#333";
+    card.className = "zoomCard " + classMap[name]; // 🔥 COLOR RESTORED
 
     document.getElementById("title").innerText = name;
 
-    const areaBox = document.getElementById("areas");
-    areaBox.innerHTML = "";
+    const box = document.getElementById("areas");
+    box.innerHTML = "";
 
-    (data[name] || []).forEach(area => {
+    universities[name].forEach(area => {
 
         let div = document.createElement("div");
         div.className = "area";
         div.innerText = area;
 
         div.onclick = () => {
-
-            // 🔥 LOCKED CLEAN STORAGE
             localStorage.setItem("selectedUniversity", name);
             localStorage.setItem("selectedLocation", area);
-
             window.location.href = "student-results.html";
         };
 
-        areaBox.appendChild(div);
+        box.appendChild(div);
     });
+}
+
+/* FILTER */
+function applyFilters(){
+    localStorage.setItem("filterUniversity", document.getElementById("filterUniversity").value);
+    localStorage.setItem("filterLocation", document.getElementById("filterLocation").value);
+    localStorage.setItem("filterPrice", document.getElementById("filterPrice").value);
+    localStorage.setItem("filterRating", document.getElementById("filterRating").value);
+
+    window.location.href = "student-results.html";
+}
+
+/* MODALS */
+function openFilter(){
+    document.getElementById("filterModal").style.display = "flex";
+}
+
+function closeFilter(e){
+    if(e.target.id === "filterModal"){
+        document.getElementById("filterModal").style.display = "none";
+    }
 }
 
 function closeOverlay(e){
     if(e.target.id === "overlay"){
         document.getElementById("overlay").style.display = "none";
     }
-}
-
-/* particles */
-const symbols = ["∑","√","π","∞","∆","∫"];
-const box = document.getElementById("particles");
-
-for(let i=0;i<30;i++){
-    let s = document.createElement("div");
-    s.className = "particle";
-    s.innerText = symbols[Math.floor(Math.random()*symbols.length)];
-    s.style.left = Math.random()*100 + "vw";
-    s.style.animationDuration = (6 + Math.random()*10) + "s";
-    box.appendChild(s);
 }
 
 </script>
