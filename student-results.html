@@ -53,7 +53,6 @@ body {
     width: 100%;
     height: 160px;
     object-fit: cover;
-    background: #eee;
 }
 
 .card-content {
@@ -77,8 +76,8 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 20px;
-    opacity: 0.4;
+    font-size: 18px;
+    opacity: 0.5;
     text-align: center;
     padding: 20px;
 }
@@ -98,13 +97,11 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/fireba
 import {
     getFirestore,
     collection,
-    query,
-    where,
     getDocs
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCwDxwL4j_fgzGi1ffHHhaG36nw2uzNiE",
+  apiKey: "AIzaSyCwDxwL4j_fgzGi1ffHhaG36nw2uzNiZ1E",
   authDomain: "unistay-v1.firebaseapp.com",
   projectId: "unistay-v1"
 };
@@ -112,14 +109,18 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/* INPUT */
-const selectedUniversity =
-    (localStorage.getItem("selectedUniversity") || "").trim();
+/* ---------------------------
+   FILTER VALUES (FROM STORAGE)
+----------------------------*/
+const selectedUniversity = (localStorage.getItem("selectedUniversity") || "").trim();
+const selectedLocation = (localStorage.getItem("selectedLocation") || "").trim();
 
-const selectedLocation =
-    (localStorage.getItem("selectedLocation") || "").trim();
+const filterUniversity = (localStorage.getItem("filterUniversity") || "").toLowerCase();
+const filterLocation = (localStorage.getItem("filterLocation") || "").toLowerCase();
+const filterPrice = parseInt(localStorage.getItem("filterPrice")) || Infinity;
+const filterRating = parseInt(localStorage.getItem("filterRating")) || 0;
 
-/* UI */
+/* UI INFO */
 document.getElementById("infoText").innerText =
 `${selectedUniversity} → ${selectedLocation}`;
 
@@ -128,7 +129,7 @@ function norm(v) {
     return (v || "").toLowerCase().trim();
 }
 
-/* 🔥 GET LIVE RATING FROM REVIEWS */
+/* GET REVIEWS */
 async function getRating(propertyId) {
 
     const snap = await getDocs(
@@ -149,24 +150,13 @@ async function getRating(propertyId) {
     };
 }
 
-/* LOAD RESULTS */
+/* LOAD */
 async function loadResults() {
 
     const container = document.getElementById("container");
-
-    if (!selectedUniversity || !selectedLocation) {
-        container.innerHTML = `<div class="empty">Missing selection</div>`;
-        return;
-    }
-
     container.innerHTML = `<div class="empty">Loading hostels...</div>`;
 
-    const q = query(
-        collection(db, "properties"),
-        where("university", "==", selectedUniversity)
-    );
-
-    const snap = await getDocs(q);
+    const snap = await getDocs(collection(db, "properties"));
 
     let results = [];
 
@@ -174,18 +164,30 @@ async function loadResults() {
 
         const p = docSnap.data();
 
-        const isApproved = (p.status || "pending") === "approved";
+        // 🔥 MUST BE APPROVED
+        if ((p.status || "pending") !== "approved") return;
 
-        if (
-            isApproved &&
-            norm(p.university) === norm(selectedUniversity) &&
-            norm(p.location) === norm(selectedLocation)
-        ) {
-            results.push({
-                id: docSnap.id,
-                ...p
-            });
+        // UNIVERSITY FILTER (from both sources)
+        if (filterUniversity && filterUniversity !== "") {
+            if (norm(p.university) !== filterUniversity) return;
+        } else {
+            if (norm(p.university) !== norm(selectedUniversity)) return;
         }
+
+        // LOCATION FILTER
+        if (filterLocation && filterLocation !== "") {
+            if (!norm(p.location).includes(filterLocation)) return;
+        } else {
+            if (norm(p.location) !== norm(selectedLocation)) return;
+        }
+
+        // PRICE FILTER
+        if (p.price && Number(p.price) > filterPrice) return;
+
+        results.push({
+            id: docSnap.id,
+            ...p
+        });
     });
 
     render(results);
@@ -197,7 +199,7 @@ async function render(results) {
     const container = document.getElementById("container");
 
     if (!results.length) {
-        container.innerHTML = `<div class="empty">No approved listings found 😢</div>`;
+        container.innerHTML = `<div class="empty">No matching hostels found 😢</div>`;
         return;
     }
 
@@ -207,6 +209,9 @@ async function render(results) {
     for (let p of results) {
 
         const ratingData = await getRating(p.id);
+
+        // rating filter
+        if (ratingData.avg < filterRating) continue;
 
         const card = document.createElement("div");
         card.className = "card";
@@ -221,7 +226,7 @@ async function render(results) {
                 <p class="price">UGX ${p.price || ""}</p>
 
                 <div class="rating">
-                    ⭐ ${ratingData.avg.toFixed(1)} (${ratingData.count} reviews)
+                    ⭐ ${ratingData.avg.toFixed(1)} (${ratingData.count})
                 </div>
 
                 <p>${p.location || ""}</p>
