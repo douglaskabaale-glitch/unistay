@@ -15,6 +15,29 @@
 
 body {
     background: linear-gradient(135deg, #ffffff, #eaf4ff);
+    overflow-x: hidden;
+}
+
+/* PARTICLES */
+.particles {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.particle {
+    position: absolute;
+    font-size: 34px;
+    opacity: 0.25;
+    color: #4da6ff;
+    animation: floatUp linear infinite;
+}
+
+@keyframes floatUp {
+    0% { transform: translateY(100vh); opacity: 0; }
+    20% { opacity: 0.4; }
+    100% { transform: translateY(-10vh); opacity: 0; }
 }
 
 /* HEADER */
@@ -22,6 +45,7 @@ body {
     text-align: center;
     padding: 30px 20px 10px;
     position: relative;
+    z-index: 2;
 }
 
 .header h1 {
@@ -33,13 +57,18 @@ body {
     color: #555;
 }
 
-/* FILTER ICON */
+/* FUNNEL FILTER ICON */
 .filter-icon {
     position: absolute;
     right: 20px;
     top: 35px;
     font-size: 24px;
     cursor: pointer;
+    transition: 0.25s;
+}
+
+.filter-icon:hover {
+    transform: scale(1.1);
 }
 
 /* GRID */
@@ -48,40 +77,49 @@ body {
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 20px;
     padding: 30px;
+    position: relative;
+    z-index: 2;
 }
 
-/* CARD */
+/* 💎 PREMIUM GLOSSY CARD */
 .card {
     padding: 28px;
-    border-radius: 20px;
+    border-radius: 22px;
     cursor: pointer;
     color: white;
     font-weight: 600;
-    transition: all 0.35s ease;
-    box-shadow: 0 12px 30px rgba(0,0,0,0.15);
     text-align: center;
     position: relative;
     overflow: hidden;
+    transition: 0.35s ease;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.25),
+        0 15px 35px rgba(0,0,0,0.18);
 }
 
-.card::after {
+/* glossy shine */
+.card::before {
     content: "";
     position: absolute;
-    inset: 0;
-    background: rgba(255,255,255,0.08);
-    opacity: 0;
-    transition: 0.3s;
+    top: -100%;
+    left: -40%;
+    width: 60%;
+    height: 300%;
+    background: rgba(255,255,255,0.25);
+    transform: rotate(25deg);
+    transition: 0.6s;
 }
 
-.card:hover::after {
-    opacity: 1;
+.card:hover::before {
+    top: 120%;
 }
 
 .card:hover {
     transform: translateY(-6px) scale(1.03);
 }
 
-/* 🎨 UNIVERSITY COLORS */
+/* 🎨 COLORS */
 .makerere { background: linear-gradient(135deg,#001a3a,#002147); }
 .kyambogo { background: linear-gradient(135deg,#0046a8,#0057b8); }
 .mubs { background: linear-gradient(135deg,#00152a,#001f3f); }
@@ -101,6 +139,7 @@ body {
     display: none;
     justify-content: center;
     align-items: center;
+    z-index: 5;
 }
 
 /* POPUP */
@@ -119,8 +158,9 @@ body {
     to { transform: scale(1); opacity: 1; }
 }
 
+/* AREA BUTTONS */
 .area {
-    background: rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.18);
     padding: 14px;
     margin: 10px 0;
     border-radius: 12px;
@@ -141,6 +181,7 @@ body {
     display: none;
     justify-content: center;
     align-items: center;
+    z-index: 10;
 }
 
 .filter-box {
@@ -178,10 +219,12 @@ body {
 
 <body>
 
+<div class="particles" id="particles"></div>
+
 <div class="header">
     <h1>Find Your Hostel</h1>
     <p>Select your university to explore nearby areas</p>
-    <div class="filter-icon" onclick="openFilter()">⚙️</div>
+    <div class="filter-icon" onclick="openFilter()">⏳</div>
 </div>
 
 <div class="grid" id="uniGrid"></div>
@@ -224,7 +267,7 @@ body {
 
 <script>
 
-/* 🔥 UNIVERSITIES + 5+ LOCATIONS EACH */
+/* DATA */
 const universities = {
     "Makerere University": ["Wandegeya","Kikoni","Bwaise","Kawempe","Makerere Hill"],
     "Kyambogo University": ["Banda","Ntinda","Kiwatule","Naalya","Kyambogo Hill"],
@@ -292,7 +335,6 @@ function openUni(name){
     box.innerHTML = "";
 
     universities[name].forEach(area => {
-
         let div = document.createElement("div");
         div.className = "area";
         div.innerText = area;
@@ -334,6 +376,21 @@ function closeOverlay(e){
     if(e.target.id === "overlay"){
         document.getElementById("overlay").style.display = "none";
     }
+}
+
+/* PARTICLES */
+const symbols = ["∑","√","π","∞","∆","∫","±"];
+const box = document.getElementById("particles");
+
+for (let i = 0; i < 40; i++) {
+    let p = document.createElement("div");
+    p.className = "particle";
+    p.innerText = symbols[Math.floor(Math.random()*symbols.length)];
+
+    p.style.left = Math.random() * 100 + "vw";
+    p.style.animationDuration = (6 + Math.random()*6) + "s";
+
+    box.appendChild(p);
 }
 
 </script>
