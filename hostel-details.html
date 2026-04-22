@@ -8,11 +8,12 @@
 <style>
 body {
     margin: 0;
-    font-family: "Comic Sans MS", cursive, sans-serif;
+    font-family: "Segoe UI", sans-serif;
     background: linear-gradient(135deg, #e6f4ff, #e9ffe9);
     min-height: 100vh;
 }
 
+/* HEADER */
 .header {
     background: linear-gradient(90deg, #4da6ff, #2f8cff);
     color: white;
@@ -22,19 +23,23 @@ body {
     font-weight: bold;
 }
 
+/* CONTAINER */
 .container {
     max-width: 900px;
     margin: auto;
     padding: 20px;
 }
 
+/* MAIN IMAGE */
 .main-img {
     width: 100%;
     height: 350px;
     object-fit: cover;
     border-radius: 18px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.15);
 }
 
+/* GALLERY */
 .gallery {
     display: flex;
     gap: 10px;
@@ -50,23 +55,91 @@ body {
     cursor: pointer;
 }
 
+/* CARD */
 .card {
     background: white;
-    padding: 22px;
+    padding: 20px;
     border-radius: 18px;
     margin-top: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
 }
 
+/* TITLE */
 .title {
     font-size: 26px;
     font-weight: bold;
     color: #2f8cff;
+    margin-bottom: 10px;
 }
 
-.info {
-    margin: 6px 0;
+/* DETAILS GRID */
+.details-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
 }
 
+/* DETAIL BOX */
+.detail-box {
+    background: linear-gradient(135deg, #f8fbff, #eef6ff);
+    border: 1px solid rgba(47,140,255,0.15);
+    padding: 14px;
+    border-radius: 14px;
+    transition: 0.2s;
+}
+
+.detail-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(47,140,255,0.12);
+}
+
+/* LABEL */
+.label {
+    font-size: 12px;
+    text-transform: uppercase;
+    color: #666;
+    margin-bottom: 5px;
+    letter-spacing: 1px;
+}
+
+/* VALUE */
+.value {
+    font-size: 16px;
+    font-weight: 600;
+    color: #222;
+}
+
+/* PRICE BOX */
+.price-box {
+    background: linear-gradient(135deg, #2f8cff, #4da6ff);
+    color: white;
+}
+
+.price-box .label {
+    color: rgba(255,255,255,0.8);
+}
+
+.price-box .value {
+    color: white;
+    font-size: 20px;
+}
+
+/* TAGS */
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tag {
+    background: #2f8cff;
+    color: white;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+}
+
+/* 🚀 GLOSSY BOOK BUTTON */
 .book-btn {
     margin-top: 18px;
     width: 100%;
@@ -78,28 +151,83 @@ body {
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
 }
 
+.book-btn:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+}
+
+/* SHINE EFFECT */
+.book-btn::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -75%;
+    width: 50%;
+    height: 100%;
+    background: rgba(255,255,255,0.35);
+    transform: skewX(-25deg);
+    transition: 0.6s;
+}
+
+.book-btn:hover::after {
+    left: 130%;
+}
+
+/* 💎 PREMIUM REVIEWS PANEL */
 .reviews-box {
-    margin-top: 20px;
-    background: white;
-    padding: 15px;
-    border-radius: 18px;
+    margin-top: 25px;
+    background: linear-gradient(135deg, #ffffff, #f6fbff);
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+    border: 1px solid rgba(47,140,255,0.08);
 }
 
-.review {
-    background: #f4f9ff;
-    padding: 10px;
-    margin-top: 10px;
-    border-radius: 10px;
+.reviews-box h3 {
+    margin-bottom: 12px;
+    color: #2f8cff;
+    font-size: 18px;
 }
 
+/* AVG RATING */
 .avg-rating {
     font-weight: bold;
     color: #ff9800;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
+    background: #fff7e6;
+    padding: 10px;
+    border-radius: 12px;
+    display: inline-block;
 }
 
+/* REVIEW CARD */
+.review {
+    background: linear-gradient(135deg, #f4f9ff, #ffffff);
+    padding: 14px;
+    margin-top: 12px;
+    border-radius: 14px;
+    border-left: 4px solid #2f8cff;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.05);
+    transition: 0.2s;
+}
+
+.review:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(47,140,255,0.12);
+}
+
+.review p {
+    margin-top: 6px;
+    color: #444;
+    font-size: 14px;
+}
+
+/* PARTICLES */
 .particles {
     position: fixed;
     inset: 0;
@@ -142,12 +270,39 @@ body {
     <div class="card">
         <div class="title" id="name"></div>
 
-        <div class="info" id="price"></div>
-        <div class="info" id="room"></div>
-        <div class="info" id="location"></div>
-        <div class="info" id="amenities"></div>
-        <div class="info" id="contact"></div>
-        <div class="info" id="desc"></div>
+        <div class="details-grid">
+
+            <div class="detail-box price-box">
+                <div class="label">Price</div>
+                <div class="value" id="price"></div>
+            </div>
+
+            <div class="detail-box">
+                <div class="label">Room Type</div>
+                <div class="value" id="room"></div>
+            </div>
+
+            <div class="detail-box">
+                <div class="label">Location</div>
+                <div class="value" id="location"></div>
+            </div>
+
+            <div class="detail-box">
+                <div class="label">Amenities</div>
+                <div class="tags" id="amenities"></div>
+            </div>
+
+            <div class="detail-box">
+                <div class="label">Contact</div>
+                <div class="value" id="contact"></div>
+            </div>
+
+            <div class="detail-box">
+                <div class="label">Description</div>
+                <div class="value" id="desc"></div>
+            </div>
+
+        </div>
 
         <button class="book-btn" onclick="bookNow()">BOOK NOW ON WHATSAPP</button>
     </div>
@@ -196,37 +351,29 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/* GET PROPERTY */
 let property = JSON.parse(localStorage.getItem("selectedProperty"));
 
-/* HARD STOP IF MISSING */
 if (!property || !property.id) {
-    alert("Missing hostel data. Please select a hostel again.");
+    alert("Missing hostel data");
     window.location.href = "student-results.html";
 }
 
-/* DISPLAY DATA */
+/* RENDER */
 function renderProperty() {
 
     document.getElementById("mainImage").src = property.cover || "";
     document.getElementById("name").innerText = property.hostelName || "";
     document.getElementById("price").innerText = "UGX " + (property.price || "");
-    document.getElementById("room").innerText = "Room: " + (property.roomType || "");
-    document.getElementById("location").innerText = "Location: " + (property.location || "");
-    document.getElementById("amenities").innerText = "Amenities: " + (property.amenities || "");
-    document.getElementById("contact").innerText = "Contact: " + (property.contact || "");
+    document.getElementById("room").innerText = property.roomType || "";
+    document.getElementById("location").innerText = property.location || "";
+    document.getElementById("contact").innerText = property.contact || "";
     document.getElementById("desc").innerText = property.description || "";
 
-    let gallery = document.getElementById("gallery");
-
-    (property.images || []).forEach(img => {
-        let image = document.createElement("img");
-        image.src = img;
-        image.onclick = () => {
-            document.getElementById("mainImage").src = img;
-        };
-        gallery.appendChild(image);
-    });
+    document.getElementById("amenities").innerHTML =
+        (property.amenities || "")
+        .split(",")
+        .map(a => `<span class="tag">${a.trim()}</span>`)
+        .join("");
 }
 
 renderProperty();
@@ -236,20 +383,16 @@ window.bookNow = function () {
     let phone = (property.contact || "").replace(/\s+/g, '');
     if (!phone.startsWith("+")) phone = "+256" + phone;
 
-    let message = `Hello, I am interested in your hostel: ${property.hostelName}`;
-    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, "_blank");
+    window.open(`https://wa.me/${phone}?text=Hello, interested in ${property.hostelName}`, "_blank");
 };
 
-/* SUBMIT REVIEW */
+/* REVIEWS */
 window.submitReview = async function () {
 
     const rating = Number(document.getElementById("rating").value);
-    const text = document.getElementById("reviewText").value.trim();
+    const text = document.getElementById("reviewText").value;
 
-    if (!rating || rating < 1 || rating > 5 || !text) {
-        alert("Enter valid rating (1-5) and review");
-        return;
-    }
+    if (!rating || !text) return alert("Invalid input");
 
     await addDoc(collection(db, "properties", property.id, "reviews"), {
         rating,
@@ -257,13 +400,9 @@ window.submitReview = async function () {
         createdAt: serverTimestamp()
     });
 
-    document.getElementById("rating").value = "";
-    document.getElementById("reviewText").value = "";
-
     loadReviews();
 };
 
-/* LOAD REVIEWS */
 async function loadReviews() {
 
     const snap = await getDocs(collection(db, "properties", property.id, "reviews"));
@@ -280,11 +419,7 @@ async function loadReviews() {
     const avg = reviews.length ? (total / reviews.length).toFixed(1) : 0;
 
     document.getElementById("avgRating").innerText =
-        reviews.length
-            ? `⭐ Average Rating: ${avg} / 5 (${reviews.length} reviews)`
-            : "No ratings yet";
-
-    reviews.reverse();
+        reviews.length ? `⭐ ${avg} / 5 (${reviews.length})` : "No reviews yet";
 
     document.getElementById("reviewsContainer").innerHTML =
         reviews.map(r => `
@@ -298,25 +433,20 @@ async function loadReviews() {
 loadReviews();
 
 /* PARTICLES */
-const symbols = ["π","Σ","√","∫","θ","x²","∞","Δ"];
+const symbols = ["π","Σ","√","∫","θ","∞","Δ"];
 
-function createParticles(){
-    const container = document.getElementById("particles");
+const container = document.getElementById("particles");
 
-    for (let i = 0; i < 30; i++) {
-        let s = document.createElement("div");
-        s.className = "particle";
-        s.innerText = symbols[Math.floor(Math.random() * symbols.length)];
+for (let i = 0; i < 30; i++) {
+    let p = document.createElement("div");
+    p.className = "particle";
+    p.innerText = symbols[Math.floor(Math.random()*symbols.length)];
 
-        s.style.left = Math.random() * 100 + "vw";
-        s.style.top = Math.random() * 100 + "vh";
-        s.style.animationDuration = (8 + Math.random() * 10) + "s";
+    p.style.left = Math.random() * 100 + "vw";
+    p.style.animationDuration = (6 + Math.random()*6) + "s";
 
-        container.appendChild(s);
-    }
+    container.appendChild(p);
 }
-
-createParticles();
 
 </script>
 
