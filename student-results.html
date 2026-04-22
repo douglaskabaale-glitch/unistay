@@ -8,83 +8,181 @@
 <style>
 body {
     margin: 0;
-    font-family: "Comic Sans MS", cursive, sans-serif;
-    background: linear-gradient(135deg, #dff6ff, #d9ffe8);
+    font-family: "Segoe UI", sans-serif;
+    background: linear-gradient(135deg, #eef6ff, #f3fff6);
     min-height: 100vh;
+    overflow-x: hidden;
 }
 
+/* HEADER */
 .header {
-    background: linear-gradient(90deg, #4da6ff, #2f8cff);
+    background: linear-gradient(90deg, #2f8cff, #4da6ff);
     color: white;
-    padding: 14px;
+    padding: 16px;
     text-align: center;
     font-size: 20px;
     font-weight: bold;
 }
 
+/* INFO */
 .info {
     text-align: center;
-    margin-top: 15px;
-    font-size: 16px;
-    padding: 0 10px;
+    margin: 10px;
+    font-size: 14px;
+    opacity: 0.7;
 }
 
+/* PARTICLES */
+.particles {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.particle {
+    position: absolute;
+    font-size: 22px;
+    opacity: 0.35;
+    color: #7ec8ff;
+    animation: floatUp linear infinite;
+}
+
+@keyframes floatUp {
+    0% { transform: translateY(110vh); opacity: 0; }
+    20% { opacity: 0.6; }
+    100% { transform: translateY(-10vh); opacity: 0; }
+}
+
+/* GRID */
 .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 14px;
-    padding: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+    padding: 25px;
+    position: relative;
+    z-index: 2;
 }
 
+/* ===== PREMIUM CARD ===== */
 .card {
-    background: white;
-    border-radius: 14px;
+    position: relative;
+    border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
     cursor: pointer;
-    transition: 0.25s ease;
+    transition: 0.35s ease;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+    color: white;
+}
+
+/* glossy shine layer */
+.card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        120deg,
+        rgba(255,255,255,0.25),
+        rgba(255,255,255,0.05),
+        rgba(255,255,255,0.15)
+    );
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* moving shine effect */
+.card::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -60%;
+    width: 60%;
+    height: 200%;
+    background: rgba(255,255,255,0.25);
+    transform: rotate(25deg);
+    transition: 0.5s;
+}
+
+.card:hover::after {
+    left: 120%;
 }
 
 .card:hover {
-    transform: scale(1.03);
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: 0 18px 45px rgba(0,0,0,0.25);
 }
 
+/* IMAGE */
 .card img {
     width: 100%;
-    height: 160px;
+    height: 170px;
     object-fit: cover;
 }
 
+/* CONTENT */
 .card-content {
-    padding: 10px;
+    padding: 14px;
+    backdrop-filter: blur(10px);
 }
 
+/* TITLE */
+.title {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* INFO ROWS */
+.section {
+    display: flex;
+    justify-content: space-between;
+    margin: 6px 0;
+    font-size: 13px;
+    padding: 6px 10px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.18);
+}
+
+/* PRICE */
 .price {
-    color: #2f8cff;
     font-weight: bold;
 }
 
+/* RATING */
 .rating {
-    margin-top: 5px;
-    font-size: 14px;
-    color: #ff9800;
+    margin-top: 8px;
+    font-size: 13px;
+    color: #fff3b0;
     font-weight: bold;
 }
 
+/* EMPTY */
 .empty {
     height: 60vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 18px;
     opacity: 0.5;
-    text-align: center;
-    padding: 20px;
 }
+
+/* ===== UNIVERSITY GRADIENTS ===== */
+.makerere { background: linear-gradient(135deg,#001a3a,#002147); }
+.kyambogo { background: linear-gradient(135deg,#0046a8,#0057b8); }
+.mubs { background: linear-gradient(135deg,#00152a,#001f3f); }
+.ucu { background: linear-gradient(135deg,#8b0000,#b00020); }
+.victoria { background: linear-gradient(135deg,#163a6b,#1e4d8c); }
+.gulu { background: linear-gradient(135deg,#084d2b,#0b6b3a); }
+.must { background: linear-gradient(135deg,#0f3d13,#1b5e20); }
+.kabale { background: linear-gradient(135deg,#174c35,#1f6f4a); }
+.kiu { background: linear-gradient(135deg,#8b1c1c,#c62828); }
+.cavendish { background: linear-gradient(135deg,#0d47a1,#1565c0); }
+
 </style>
 </head>
 
 <body>
+
+<div class="particles" id="particles"></div>
 
 <div class="header">UNISTAY - Available Hostels</div>
 <div class="info" id="infoText"></div>
@@ -97,11 +195,13 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/fireba
 import {
     getFirestore,
     collection,
+    query,
+    where,
     getDocs
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCwDxwL4j_fgzGi1ffHhaG36nw2uzNiZ1E",
+  apiKey: "AIzaSyCwDxwL4j_fgzGi1ffHHhaG36nw2uzNiE",
   authDomain: "unistay-v1.firebaseapp.com",
   projectId: "unistay-v1"
 };
@@ -109,144 +209,150 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/* ---------------------------
-   FILTER VALUES (FROM STORAGE)
-----------------------------*/
-const selectedUniversity = (localStorage.getItem("selectedUniversity") || "").trim();
-const selectedLocation = (localStorage.getItem("selectedLocation") || "").trim();
+/* INPUT */
+const selectedUniversity =
+    (localStorage.getItem("selectedUniversity") || "").trim();
 
-const filterUniversity = (localStorage.getItem("filterUniversity") || "").toLowerCase();
-const filterLocation = (localStorage.getItem("filterLocation") || "").toLowerCase();
-const filterPrice = parseInt(localStorage.getItem("filterPrice")) || Infinity;
-const filterRating = parseInt(localStorage.getItem("filterRating")) || 0;
+const selectedLocation =
+    (localStorage.getItem("selectedLocation") || "").trim();
 
-/* UI INFO */
 document.getElementById("infoText").innerText =
 `${selectedUniversity} → ${selectedLocation}`;
 
-/* NORMALIZER */
-function norm(v) {
+/* NORMALIZE */
+function norm(v){
     return (v || "").toLowerCase().trim();
 }
 
-/* GET REVIEWS */
-async function getRating(propertyId) {
+/* RATINGS */
+async function getRating(id){
+    const snap = await getDocs(collection(db,"properties",id,"reviews"));
 
-    const snap = await getDocs(
-        collection(db, "properties", propertyId, "reviews")
-    );
-
-    let total = 0;
-    let count = 0;
-
-    snap.forEach(doc => {
-        total += doc.data().rating || 0;
-        count++;
+    let t=0,c=0;
+    snap.forEach(d=>{
+        t+=d.data().rating||0;
+        c++;
     });
 
     return {
-        avg: count ? (total / count) : 0,
-        count
+        avg: c ? t/c : 0,
+        count: c
     };
 }
 
 /* LOAD */
-async function loadResults() {
+async function loadResults(){
 
     const container = document.getElementById("container");
-    container.innerHTML = `<div class="empty">Loading hostels...</div>`;
 
-    const snap = await getDocs(collection(db, "properties"));
+    if(!selectedUniversity){
+        container.innerHTML = `<div class="empty">No university selected</div>`;
+        return;
+    }
+
+    container.innerHTML = `<div class="empty">Loading...</div>`;
+
+    const q = query(
+        collection(db,"properties"),
+        where("university","==",selectedUniversity)
+    );
+
+    const snap = await getDocs(q);
 
     let results = [];
 
-    snap.forEach(docSnap => {
+    snap.forEach(doc=>{
+        const p = doc.data();
 
-        const p = docSnap.data();
+        const ok =
+            (p.status || "pending") === "approved" &&
+            norm(p.university) === norm(selectedUniversity) &&
+            (!selectedLocation || norm(p.location) === norm(selectedLocation));
 
-        // 🔥 MUST BE APPROVED
-        if ((p.status || "pending") !== "approved") return;
-
-        // UNIVERSITY FILTER (from both sources)
-        if (filterUniversity && filterUniversity !== "") {
-            if (norm(p.university) !== filterUniversity) return;
-        } else {
-            if (norm(p.university) !== norm(selectedUniversity)) return;
+        if(ok){
+            results.push({id:doc.id,...p});
         }
-
-        // LOCATION FILTER
-        if (filterLocation && filterLocation !== "") {
-            if (!norm(p.location).includes(filterLocation)) return;
-        } else {
-            if (norm(p.location) !== norm(selectedLocation)) return;
-        }
-
-        // PRICE FILTER
-        if (p.price && Number(p.price) > filterPrice) return;
-
-        results.push({
-            id: docSnap.id,
-            ...p
-        });
     });
 
     render(results);
 }
 
 /* RENDER */
-async function render(results) {
+async function render(results){
 
     const container = document.getElementById("container");
 
-    if (!results.length) {
-        container.innerHTML = `<div class="empty">No matching hostels found 😢</div>`;
+    if(!results.length){
+        container.innerHTML = `<div class="empty">No hostels found 😢</div>`;
         return;
     }
 
     const grid = document.createElement("div");
     grid.className = "grid";
 
-    for (let p of results) {
+    for(let p of results){
 
-        const ratingData = await getRating(p.id);
+        const rating = await getRating(p.id);
 
-        // rating filter
-        if (ratingData.avg < filterRating) continue;
+        const uniClass =
+            p.university.includes("Makerere") ? "makerere" :
+            p.university.includes("Kyambogo") ? "kyambogo" :
+            p.university.includes("MUBS") ? "mubs" :
+            p.university.includes("UCU") ? "ucu" :
+            p.university.includes("Victoria") ? "victoria" :
+            p.university.includes("Gulu") ? "gulu" :
+            p.university.includes("Mbarara") ? "must" :
+            p.university.includes("Kabale") ? "kabale" :
+            p.university.includes("KIU") ? "kiu" :
+            "cavendish";
 
         const card = document.createElement("div");
-        card.className = "card";
+        card.className = `card ${uniClass}`;
 
         card.innerHTML = `
-            <img src="${p.cover || ''}" 
-                 onerror="this.src='https://via.placeholder.com/300x200'">
+            <img src="${p.cover}" onerror="this.src='https://via.placeholder.com/400x300'">
 
             <div class="card-content">
-                <h3>${p.hostelName || "Unnamed"}</h3>
-                <p>${p.roomType || ""}</p>
-                <p class="price">UGX ${p.price || ""}</p>
+                <div class="title">${p.hostelName}</div>
 
-                <div class="rating">
-                    ⭐ ${ratingData.avg.toFixed(1)} (${ratingData.count})
-                </div>
+                <div class="section"><span>📍 Location</span><span>${p.location}</span></div>
+                <div class="section"><span>💰 Price</span><span class="price">UGX ${p.price}</span></div>
+                <div class="section"><span>🏠 Type</span><span>${p.roomType||"-"}</span></div>
 
-                <p>${p.location || ""}</p>
-                <p>📞 ${p.contact || ""}</p>
+                <div class="rating">⭐ ${rating.avg.toFixed(1)} (${rating.count})</div>
             </div>
         `;
 
-        card.onclick = () => {
-            localStorage.setItem("selectedProperty", JSON.stringify(p));
-            window.location.href = "hostel-details.html";
+        card.onclick = ()=>{
+            localStorage.setItem("selectedProperty",JSON.stringify(p));
+            window.location.href="hostel-details.html";
         };
 
         grid.appendChild(card);
     }
 
-    container.innerHTML = "";
+    container.innerHTML="";
     container.appendChild(grid);
 }
 
 loadResults();
+
+/* PARTICLES */
+const symbols=["✦","✧","✺","✹","✷","+","-","%","#"];
+
+const box=document.getElementById("particles");
+
+for(let i=0;i<40;i++){
+    let p=document.createElement("div");
+    p.className="particle";
+    p.innerText=symbols[Math.floor(Math.random()*symbols.length)];
+
+    p.style.left=Math.random()*100+"vw";
+    p.style.animationDuration=(6+Math.random()*6)+"s";
+    p.style.fontSize=(18+Math.random()*20)+"px";
+
+    box.appendChild(p);
+}
 
 </script>
 
