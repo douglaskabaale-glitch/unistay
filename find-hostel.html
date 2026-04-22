@@ -224,21 +224,20 @@ body {
 
 <script>
 
-/* 🎯 CENTRAL DATA */
+/* 🔥 UNIVERSITIES + 5+ LOCATIONS EACH */
 const universities = {
-    "Makerere University": ["Wandegeya","Kikoni","Bwaise"],
-    "Kyambogo University": ["Banda","Ntinda"],
-    "Makerere University Business School": ["Nakawa","Bugolobi"],
-    "Uganda Christian University": ["Mukono","Seeta"],
-    "Victoria University": ["Nakasero","Kololo"],
-    "Gulu University": ["Pece","Bardege"],
-    "Mbarara University of Science and Technology": ["Kakoba"],
-    "Kabale University": ["Makanga"],
-    "Kampala International University": ["Kansanga"],
-    "Cavendish University Uganda": ["Nakasero"]
+    "Makerere University": ["Wandegeya","Kikoni","Bwaise","Kawempe","Makerere Hill"],
+    "Kyambogo University": ["Banda","Ntinda","Kiwatule","Naalya","Kyambogo Hill"],
+    "Makerere University Business School": ["Nakawa","Bugolobi","Mbuya","Banda","Luzira"],
+    "Uganda Christian University": ["Mukono","Seeta","Namilyango","Goma","Wantoni"],
+    "Victoria University": ["Nakasero","Kololo","Kampala Road","Nsambya","Bugolobi"],
+    "Gulu University": ["Pece","Bardege","Layibi","Gulu Town","Unyama"],
+    "Mbarara University of Science and Technology": ["Kakoba","Nyamitanga","Mbarara Town","Kijungu","Nyakayojo"],
+    "Kabale University": ["Makanga","Kabale Town","Kikungiri","Rutooma","Kyanamira"],
+    "Kampala International University": ["Kansanga","Ggaba Road","Muyenga","Kabalagala","Bukasa"],
+    "Cavendish University Uganda": ["Nakasero","Nsambya","City Centre","Kololo","Wandegeya"]
 };
 
-/* 🎨 CLASS MAP */
 const classMap = {
     "Makerere University":"makerere",
     "Kyambogo University":"kyambogo",
@@ -256,12 +255,14 @@ const classMap = {
 const grid = document.getElementById("uniGrid");
 
 Object.keys(universities).forEach(name => {
-
     const div = document.createElement("div");
     div.className = "card " + classMap[name];
     div.innerText = name;
 
-    div.onclick = () => openUni(name);
+    div.onclick = () => {
+        localStorage.clear();
+        openUni(name);
+    };
 
     grid.appendChild(div);
 });
@@ -279,12 +280,11 @@ Object.keys(universities).forEach(name => {
 
 /* OPEN UNI */
 function openUni(name){
-
     const overlay = document.getElementById("overlay");
     const card = document.getElementById("zoomCard");
 
     overlay.style.display = "flex";
-    card.className = "zoomCard " + classMap[name]; // 🔥 COLOR RESTORED
+    card.className = "zoomCard " + classMap[name];
 
     document.getElementById("title").innerText = name;
 
@@ -298,8 +298,8 @@ function openUni(name){
         div.innerText = area;
 
         div.onclick = () => {
-            localStorage.setItem("selectedUniversity", name);
-            localStorage.setItem("selectedLocation", area);
+            localStorage.setItem("selectedUniversity", name.trim());
+            localStorage.setItem("selectedLocation", area.trim());
             window.location.href = "student-results.html";
         };
 
@@ -309,8 +309,10 @@ function openUni(name){
 
 /* FILTER */
 function applyFilters(){
-    localStorage.setItem("filterUniversity", document.getElementById("filterUniversity").value);
-    localStorage.setItem("filterLocation", document.getElementById("filterLocation").value);
+    localStorage.clear();
+
+    localStorage.setItem("filterUniversity", document.getElementById("filterUniversity").value.trim());
+    localStorage.setItem("filterLocation", document.getElementById("filterLocation").value.trim());
     localStorage.setItem("filterPrice", document.getElementById("filterPrice").value);
     localStorage.setItem("filterRating", document.getElementById("filterRating").value);
 
