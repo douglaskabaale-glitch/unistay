@@ -9,19 +9,21 @@
 body {
     margin: 0;
     font-family: "Segoe UI", sans-serif;
-    background: linear-gradient(135deg, #eef6ff, #f3fff6);
+    background: radial-gradient(circle at top, #0b1220, #05070d);
     min-height: 100vh;
     overflow-x: hidden;
+    color: #e6f1ff;
 }
 
 /* HEADER */
 .header {
-    background: linear-gradient(90deg, #2f8cff, #4da6ff);
-    color: white;
+    background: linear-gradient(90deg, #0f2a4d, #0b3b6e);
+    color: #7ecbff;
     padding: 16px;
     text-align: center;
     font-size: 20px;
     font-weight: bold;
+    box-shadow: 0 0 25px rgba(126,203,255,0.15);
 }
 
 /* INFO */
@@ -29,7 +31,8 @@ body {
     text-align: center;
     margin: 10px;
     font-size: 14px;
-    opacity: 0.7;
+    opacity: 0.75;
+    color: #9fbad6;
 }
 
 /* PARTICLES */
@@ -44,7 +47,8 @@ body {
     position: absolute;
     font-size: 22px;
     opacity: 0.35;
-    color: #7ec8ff;
+    color: #7ecbff;
+    filter: drop-shadow(0 0 6px #4da6ff);
     animation: floatUp linear infinite;
 }
 
@@ -64,27 +68,29 @@ body {
     z-index: 2;
 }
 
-/* ===== PREMIUM CARD ===== */
+/* ===== PREMIUM DARK CARD ===== */
 .card {
     position: relative;
     border-radius: 20px;
     overflow: hidden;
     cursor: pointer;
     transition: 0.35s ease;
-    box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.6);
     color: white;
+    background: rgba(255,255,255,0.03);
+    backdrop-filter: blur(12px);
 }
 
-/* glossy shine layer */
+/* glossy shine */
 .card::before {
     content: "";
     position: absolute;
     inset: 0;
     background: linear-gradient(
         120deg,
-        rgba(255,255,255,0.25),
-        rgba(255,255,255,0.05),
-        rgba(255,255,255,0.15)
+        rgba(255,255,255,0.10),
+        rgba(255,255,255,0.02),
+        rgba(255,255,255,0.08)
     );
     opacity: 0.6;
     pointer-events: none;
@@ -98,7 +104,7 @@ body {
     left: -60%;
     width: 60%;
     height: 200%;
-    background: rgba(255,255,255,0.25);
+    background: rgba(126,203,255,0.18);
     transform: rotate(25deg);
     transition: 0.5s;
 }
@@ -109,7 +115,7 @@ body {
 
 .card:hover {
     transform: translateY(-8px) scale(1.03);
-    box-shadow: 0 18px 45px rgba(0,0,0,0.25);
+    box-shadow: 0 18px 45px rgba(0,0,0,0.8);
 }
 
 /* IMAGE */
@@ -130,6 +136,7 @@ body {
     font-size: 16px;
     font-weight: bold;
     margin-bottom: 10px;
+    color: #7ecbff;
 }
 
 /* INFO ROWS */
@@ -140,19 +147,21 @@ body {
     font-size: 13px;
     padding: 6px 10px;
     border-radius: 10px;
-    background: rgba(255,255,255,0.18);
+    background: rgba(255,255,255,0.06);
+    color: #d6e6ff;
 }
 
 /* PRICE */
 .price {
     font-weight: bold;
+    color: #7cffb2;
 }
 
 /* RATING */
 .rating {
     margin-top: 8px;
     font-size: 13px;
-    color: #fff3b0;
+    color: #ffd86b;
     font-weight: bold;
 }
 
@@ -162,20 +171,21 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    opacity: 0.5;
+    opacity: 0.6;
+    color: #9fbad6;
 }
 
-/* ===== UNIVERSITY GRADIENTS ===== */
-.makerere { background: linear-gradient(135deg,#001a3a,#002147); }
-.kyambogo { background: linear-gradient(135deg,#0046a8,#0057b8); }
-.mubs { background: linear-gradient(135deg,#00152a,#001f3f); }
-.ucu { background: linear-gradient(135deg,#8b0000,#b00020); }
-.victoria { background: linear-gradient(135deg,#163a6b,#1e4d8c); }
-.gulu { background: linear-gradient(135deg,#084d2b,#0b6b3a); }
-.must { background: linear-gradient(135deg,#0f3d13,#1b5e20); }
-.kabale { background: linear-gradient(135deg,#174c35,#1f6f4a); }
-.kiu { background: linear-gradient(135deg,#8b1c1c,#c62828); }
-.cavendish { background: linear-gradient(135deg,#0d47a1,#1565c0); }
+/* ===== UNIVERSITY GRADIENTS (dark preserved) ===== */
+.makerere { background: linear-gradient(135deg,#001a3a,#000814); }
+.kyambogo { background: linear-gradient(135deg,#001b3a,#000c1f); }
+.mubs { background: linear-gradient(135deg,#00152a,#000b18); }
+.ucu { background: linear-gradient(135deg,#2a0000,#120000); }
+.victoria { background: linear-gradient(135deg,#0b1f3a,#000814); }
+.gulu { background: linear-gradient(135deg,#052b18,#00150a); }
+.must { background: linear-gradient(135deg,#0b2a0d,#001006); }
+.kabale { background: linear-gradient(135deg,#0f2f22,#00150f); }
+.kiu { background: linear-gradient(135deg,#2a0a0a,#120000); }
+.cavendish { background: linear-gradient(135deg,#081a3a,#000814); }
 
 </style>
 </head>
@@ -311,14 +321,15 @@ async function render(results){
 
         card.innerHTML = `
             <img src="${p.cover}" onerror="this.src='https://via.placeholder.com/400x300'">
-
+           
             <div class="card-content">
                 <div class="title">${p.hostelName}</div>
-
+                
                 <div class="section"><span>📍 Location</span><span>${p.location}</span></div>
                 <div class="section"><span>💰 Price</span><span class="price">UGX ${p.price}</span></div>
                 <div class="section"><span>🏠 Type</span><span>${p.roomType||"-"}</span></div>
-
+                
+                ${p.verified ? `<div class="verified-badge">✔</div>` : ""}
                 <div class="rating">⭐ ${rating.avg.toFixed(1)} (${rating.count})</div>
             </div>
         `;
