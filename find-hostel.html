@@ -14,7 +14,8 @@
 }
 
 body {
-    background: linear-gradient(135deg, #ffffff, #eaf4ff);
+    background: radial-gradient(circle at top, #0a0f1c, #05070d);
+    color: white;
     overflow-x: hidden;
 }
 
@@ -28,10 +29,11 @@ body {
 
 .particle {
     position: absolute;
-    font-size: 34px;
+    font-size: 30px;
     opacity: 0.25;
     color: #4da6ff;
     animation: floatUp linear infinite;
+    filter: drop-shadow(0 0 6px #4da6ff);
 }
 
 @keyframes floatUp {
@@ -49,39 +51,26 @@ body {
 }
 
 .header h1 {
-    color: #003399;
-    font-size: 32px;
+    color: #7ecbff;
+    font-size: 34px;
+    text-shadow: 0 0 15px rgba(126,203,255,0.5);
 }
 
 .header p {
-    color: #555;
-}
-
-/* FUNNEL FILTER ICON */
-.filter-icon {
-    position: absolute;
-    right: 20px;
-    top: 35px;
-    font-size: 24px;
-    cursor: pointer;
-    transition: 0.25s;
-}
-
-.filter-icon:hover {
-    transform: scale(1.1);
+    color: #aaa;
 }
 
 /* GRID */
 .grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 20px;
+    gap: 22px;
     padding: 30px;
     position: relative;
     z-index: 2;
 }
 
-/* 💎 PREMIUM GLOSSY CARD */
+/* UNIVERSITY CARDS */
 .card {
     padding: 28px;
     border-radius: 22px;
@@ -92,10 +81,8 @@ body {
     position: relative;
     overflow: hidden;
     transition: 0.35s ease;
-
-    box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.25),
-        0 15px 35px rgba(0,0,0,0.18);
+    box-shadow: 0 0 25px rgba(0,0,0,0.5);
+    backdrop-filter: blur(10px);
 }
 
 /* glossy shine */
@@ -106,7 +93,7 @@ body {
     left: -40%;
     width: 60%;
     height: 300%;
-    background: rgba(255,255,255,0.25);
+    background: rgba(255,255,255,0.08);
     transform: rotate(25deg);
     transition: 0.6s;
 }
@@ -117,29 +104,31 @@ body {
 
 .card:hover {
     transform: translateY(-6px) scale(1.03);
+    box-shadow: 0 0 30px rgba(77,166,255,0.3);
 }
 
-/* 🎨 COLORS */
-.makerere { background: linear-gradient(135deg,#001a3a,#002147); }
-.kyambogo { background: linear-gradient(135deg,#0046a8,#0057b8); }
-.mubs { background: linear-gradient(135deg,#00152a,#001f3f); }
-.ucu { background: linear-gradient(135deg,#8b0000,#b00020); }
-.victoria { background: linear-gradient(135deg,#163a6b,#1e4d8c); }
-.gulu { background: linear-gradient(135deg,#084d2b,#0b6b3a); }
-.must { background: linear-gradient(135deg,#0f3d13,#1b5e20); }
-.kabale { background: linear-gradient(135deg,#174c35,#1f6f4a); }
-.kiu { background: linear-gradient(135deg,#8b1c1c,#c62828); }
-.cavendish { background: linear-gradient(135deg,#0d47a1,#1565c0); }
+/* COLORS */
+.makerere { background: linear-gradient(135deg,#001a3a,#000814); }
+.kyambogo { background: linear-gradient(135deg,#001b3a,#000c1f); }
+.mubs { background: linear-gradient(135deg,#00152a,#000b18); }
+.ucu { background: linear-gradient(135deg,#2a0000,#120000); }
+.victoria { background: linear-gradient(135deg,#0b1f3a,#000814); }
+.gulu { background: linear-gradient(135deg,#052b18,#00150a); }
+.must { background: linear-gradient(135deg,#0b2a0d,#001006); }
+.kabale { background: linear-gradient(135deg,#0f2f22,#00150f); }
+.kiu { background: linear-gradient(135deg,#2a0a0a,#120000); }
+.cavendish { background: linear-gradient(135deg,#081a3a,#000814); }
 
 /* OVERLAY */
 .overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.65);
+    background: rgba(0,0,0,0.75);
     display: none;
     justify-content: center;
     align-items: center;
     z-index: 5;
+    backdrop-filter: blur(8px);
 }
 
 /* POPUP */
@@ -149,8 +138,8 @@ body {
     padding: 30px;
     border-radius: 22px;
     color: white;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-    animation: pop 0.3s ease;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    animation: pop 0.25s ease;
 }
 
 @keyframes pop {
@@ -158,9 +147,9 @@ body {
     to { transform: scale(1); opacity: 1; }
 }
 
-/* AREA BUTTONS */
+/* AREAS */
 .area {
-    background: rgba(255,255,255,0.18);
+    background: rgba(255,255,255,0.08);
     padding: 14px;
     margin: 10px 0;
     border-radius: 12px;
@@ -169,51 +158,10 @@ body {
 }
 
 .area:hover {
-    background: rgba(255,255,255,0.3);
+    background: rgba(126,203,255,0.2);
     transform: translateX(5px);
 }
 
-/* FILTER MODAL */
-.filter-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.6);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 10;
-}
-
-.filter-box {
-    width: 90%;
-    max-width: 400px;
-    padding: 22px;
-    border-radius: 18px;
-    background: linear-gradient(135deg, #00c6ff, #0072ff);
-    color: white;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-}
-
-.filter-box input,
-.filter-box select {
-    width: 100%;
-    padding: 10px;
-    margin-top: 8px;
-    border-radius: 10px;
-    border: none;
-}
-
-.filter-box button {
-    width: 100%;
-    margin-top: 15px;
-    padding: 12px;
-    border-radius: 999px;
-    border: none;
-    font-weight: bold;
-    cursor: pointer;
-    background: white;
-    color: #0072ff;
-}
 </style>
 </head>
 
@@ -224,7 +172,6 @@ body {
 <div class="header">
     <h1>Find Your Hostel</h1>
     <p>Select your university to explore nearby areas</p>
-    <div class="filter-icon" onclick="openFilter()">⏳</div>
 </div>
 
 <div class="grid" id="uniGrid"></div>
@@ -233,35 +180,6 @@ body {
     <div class="zoomCard" id="zoomCard">
         <h2 id="title"></h2>
         <div id="areas"></div>
-    </div>
-</div>
-
-<div id="filterModal" class="filter-overlay" onclick="closeFilter(event)">
-    <div class="filter-box">
-
-        <h2>Filter Hostels</h2>
-
-        <label>University</label>
-        <select id="filterUniversity"></select>
-
-        <label>Location</label>
-        <input id="filterLocation">
-
-        <label>Max Price</label>
-        <input id="filterPrice" type="number">
-
-        <label>Min Rating</label>
-        <select id="filterRating">
-            <option value="">Any</option>
-            <option value="1">1+</option>
-            <option value="2">2+</option>
-            <option value="3">3+</option>
-            <option value="4">4+</option>
-            <option value="5">5</option>
-        </select>
-
-        <button onclick="applyFilters()">Apply Filters</button>
-
     </div>
 </div>
 
@@ -294,7 +212,7 @@ const classMap = {
     "Cavendish University Uganda":"cavendish"
 };
 
-/* BUILD GRID */
+/* GRID */
 const grid = document.getElementById("uniGrid");
 
 Object.keys(universities).forEach(name => {
@@ -310,25 +228,10 @@ Object.keys(universities).forEach(name => {
     grid.appendChild(div);
 });
 
-/* FILTER DROPDOWN */
-const select = document.getElementById("filterUniversity");
-select.innerHTML = `<option value="">All</option>`;
-
-Object.keys(universities).forEach(name => {
-    const opt = document.createElement("option");
-    opt.value = name;
-    opt.innerText = name;
-    select.appendChild(opt);
-});
-
 /* OPEN UNI */
 function openUni(name){
-    const overlay = document.getElementById("overlay");
-    const card = document.getElementById("zoomCard");
-
-    overlay.style.display = "flex";
-    card.className = "zoomCard " + classMap[name];
-
+    document.getElementById("overlay").style.display = "flex";
+    document.getElementById("zoomCard").className = "zoomCard " + classMap[name];
     document.getElementById("title").innerText = name;
 
     const box = document.getElementById("areas");
@@ -349,29 +252,7 @@ function openUni(name){
     });
 }
 
-/* FILTER */
-function applyFilters(){
-    localStorage.clear();
-
-    localStorage.setItem("filterUniversity", document.getElementById("filterUniversity").value.trim());
-    localStorage.setItem("filterLocation", document.getElementById("filterLocation").value.trim());
-    localStorage.setItem("filterPrice", document.getElementById("filterPrice").value);
-    localStorage.setItem("filterRating", document.getElementById("filterRating").value);
-
-    window.location.href = "student-results.html";
-}
-
-/* MODALS */
-function openFilter(){
-    document.getElementById("filterModal").style.display = "flex";
-}
-
-function closeFilter(e){
-    if(e.target.id === "filterModal"){
-        document.getElementById("filterModal").style.display = "none";
-    }
-}
-
+/* CLOSE */
 function closeOverlay(e){
     if(e.target.id === "overlay"){
         document.getElementById("overlay").style.display = "none";
@@ -386,10 +267,8 @@ for (let i = 0; i < 40; i++) {
     let p = document.createElement("div");
     p.className = "particle";
     p.innerText = symbols[Math.floor(Math.random()*symbols.length)];
-
     p.style.left = Math.random() * 100 + "vw";
     p.style.animationDuration = (6 + Math.random()*6) + "s";
-
     box.appendChild(p);
 }
 
