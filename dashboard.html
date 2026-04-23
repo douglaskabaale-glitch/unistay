@@ -9,20 +9,23 @@
 body {
     margin: 0;
     font-family: "Comic Sans MS", cursive, sans-serif;
-    background: linear-gradient(180deg, #f4f9ff, #eaf4ff);
+    background: radial-gradient(circle at top, #0a0f1c, #05070d);
+    color: #e6f1ff;
     overflow-x: hidden;
 }
 
 /* HEADER */
 .header {
-    background: linear-gradient(90deg, #4da6ff, #2f8cff);
-    color: white;
+    background: linear-gradient(90deg, #0b1220, #070b14);
+    color: #7ecbff;
     padding: 12px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
     gap: 10px;
+    box-shadow: 0 0 20px rgba(77,166,255,0.15);
+    border-bottom: 1px solid rgba(126,203,255,0.1);
 }
 
 /* USER */
@@ -30,40 +33,74 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
-    background: rgba(255,255,255,0.2);
-    padding: 5px 10px;
+    background: rgba(255,255,255,0.05);
+    padding: 6px 12px;
     border-radius: 999px;
     font-size: 14px;
+    box-shadow: 0 0 10px rgba(77,166,255,0.1);
 }
 
 .user-box img {
     width: 35px;
     height: 35px;
     border-radius: 50%;
+    border: 2px solid #2f8cff;
 }
 
-/* ACTIONS */
+/* ACTION BUTTONS */
 .right-actions {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     flex-wrap: wrap;
 }
 
+/* GLOBAL BUTTON GLOW */
 button {
-    padding: 9px 14px;
+    padding: 10px 16px;
     border: none;
     border-radius: 999px;
     cursor: pointer;
     font-weight: bold;
     font-size: 14px;
+    transition: 0.3s ease;
+    position: relative;
+    overflow: hidden;
 }
 
-.add-btn { background: white; color: #2f8cff; }
-.logout-btn { background: #ff4d4d; color: white; }
+/* glowing pulse */
+button::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(90deg, #4da6ff, #7ecbff, #4da6ff);
+    z-index: -1;
+    filter: blur(10px);
+    opacity: 0.4;
+}
+
+/* HOVER GLOW */
+button:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 0 20px rgba(126,203,255,0.4);
+}
+
+/* SPECIFIC BUTTONS */
+.add-btn {
+    background: linear-gradient(135deg, #0b2a4a, #0d3a66);
+    color: #7ecbff;
+    border: 1px solid rgba(126,203,255,0.3);
+}
+
+.logout-btn {
+    background: linear-gradient(135deg, #2a0b0b, #3a0d0d);
+    color: #ff6b6b;
+    border: 1px solid rgba(255,107,107,0.3);
+}
 
 .bell {
     font-size: 22px;
+    filter: drop-shadow(0 0 6px #4da6ff);
 }
 
 /* CONTAINER */
@@ -73,16 +110,24 @@ button {
 
 h2 {
     font-size: 20px;
+    color: #7ecbff;
+    text-shadow: 0 0 10px rgba(77,166,255,0.2);
 }
 
 /* CARD */
 .card {
-    background: linear-gradient(135deg, #ffffff, #eaf4ff);
+    background: linear-gradient(135deg, #0b1220, #070b14);
     border-radius: 18px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
     margin-bottom: 15px;
     overflow: hidden;
     border-left: 6px solid #2f8cff;
+    transition: 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0 25px rgba(77,166,255,0.2);
 }
 
 .card img {
@@ -96,10 +141,11 @@ h2 {
 }
 
 .price {
-    color: #2f8cff;
+    color: #7ecbff;
     font-weight: bold;
 }
 
+/* ACTIONS */
 .actions {
     display: flex;
     justify-content: space-between;
@@ -107,13 +153,18 @@ h2 {
     gap: 10px;
 }
 
-.actions button {
-    flex: 1;
+/* EDIT / DELETE */
+.edit-btn {
+    background: linear-gradient(135deg, #ffb300, #ff9800);
+    color: black;
 }
 
-.edit-btn { background: #ffc107; }
-.delete-btn { background: #ff4d4d; color: white; }
+.delete-btn {
+    background: linear-gradient(135deg, #ff4d4d, #c62828);
+    color: white;
+}
 
+/* EMPTY */
 .empty {
     text-align: center;
     color: #777;
@@ -124,32 +175,46 @@ h2 {
 #editModal {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0,0,0,0.7);
     display: none;
     justify-content: center;
     align-items: center;
     padding: 15px;
+    backdrop-filter: blur(8px);
 }
 
 .modal {
-    background: white;
+    background: linear-gradient(135deg, #0b1220, #070b14);
     padding: 20px;
     border-radius: 15px;
     width: 100%;
     max-width: 320px;
+    border: 1px solid rgba(126,203,255,0.2);
+    box-shadow: 0 0 25px rgba(77,166,255,0.15);
 }
 
+.modal h3 {
+    color: #7ecbff;
+}
+
+/* INPUTS */
 .modal input {
     width: 100%;
     padding: 10px;
     margin: 6px 0;
     border-radius: 8px;
-    border: 1px solid #ddd;
+    border: 1px solid rgba(126,203,255,0.2);
+    background: #0a0f1c;
+    color: white;
+    outline: none;
 }
 
+/* MODAL BUTTONS */
 .modal button {
     width: 48%;
     margin-top: 8px;
+    background: linear-gradient(135deg, #2f8cff, #4da6ff);
+    color: black;
 }
 </style>
 </head>
@@ -246,7 +311,6 @@ onAuthStateChanged(auth, async (user) => {
     document.getElementById("userPic").src =
         "https://via.placeholder.com/35";
 
-    /* 🔥 GET USER STATUS */
     const userRef = doc(db, "users", user.uid);
     const userSnap = await getDoc(userRef);
 
@@ -257,7 +321,7 @@ onAuthStateChanged(auth, async (user) => {
             "Status: " + status;
 
         document.getElementById("statusBox").style.color =
-            status === "approved" ? "lightgreen" : "yellow";
+            status === "approved" ? "#7CFF7C" : "#FFD37C";
     }
 
     loadProperties(user.uid);
@@ -336,10 +400,7 @@ window.saveEdit = async () => {
     location.reload();
 };
 
-/* NAV */
 window.goAdd = () => window.location = "add-property.html";
-
-/* LOGOUT */
 window.logout = () => signOut(auth).then(() => location = "auth.html");
 
 </script>
