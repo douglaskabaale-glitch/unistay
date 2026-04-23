@@ -9,12 +9,14 @@
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background: white;
+    background: radial-gradient(circle at top, #0b1220, #05070f);
     overflow: hidden;
+    color: white;
 }
 
+/* HEADER */
 .header {
-    background: linear-gradient(90deg, #4da6ff, #2f8cff);
+    background: linear-gradient(90deg, #1b3cff, #00c6ff);
     color: white;
     padding: 16px;
     text-align: center;
@@ -22,56 +24,69 @@ body {
     font-weight: bold;
     position: relative;
     z-index: 2;
+    box-shadow: 0 0 20px rgba(0,198,255,0.4);
 }
 
+/* CONTAINER */
 .container {
     width: 400px;
     margin: 70px auto;
-    background: white;
+    background: rgba(15, 20, 35, 0.9);
     padding: 28px;
     border-radius: 18px;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+    box-shadow: 0 0 30px rgba(0,198,255,0.15);
     position: relative;
     z-index: 2;
+    backdrop-filter: blur(10px);
 }
 
+/* INPUTS */
 input {
     width: 100%;
     padding: 10px;
     margin: 7px 0;
     border-radius: 10px;
-    border: 1px solid #ddd;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.05);
+    color: white;
+    outline: none;
 }
 
+/* BUTTON */
 button {
     width: 100%;
     padding: 12px;
-    background: linear-gradient(90deg, #4da6ff, #2f8cff);
+    background: linear-gradient(90deg, #1b3cff, #00c6ff);
     border: none;
     color: white;
     border-radius: 999px;
     font-weight: bold;
     cursor: pointer;
     transition: 0.2s;
+    box-shadow: 0 0 15px rgba(0,198,255,0.4);
 }
 
 button:hover {
     transform: translateY(-2px);
+    box-shadow: 0 0 25px rgba(0,198,255,0.7);
 }
 
+/* SWITCH */
 .switch {
     text-align: center;
     margin-top: 10px;
-    color: #4da6ff;
+    color: #00c6ff;
     cursor: pointer;
 }
 
+/* STRONG / MEDIUM TEXT */
 #strength {
     font-size: 13px;
     margin-top: -5px;
     margin-bottom: 5px;
 }
 
+/* PROFILE PREVIEW */
 #preview {
     width: 60px;
     height: 60px;
@@ -79,12 +94,13 @@ button:hover {
     margin: 10px auto;
     display: block;
     object-fit: cover;
-    border: 2px solid #4da6ff;
+    border: 2px solid #00c6ff;
 }
 
+/* FILE LABEL */
 .file-label {
     display: block;
-    background: linear-gradient(90deg, #4da6ff, #2f8cff);
+    background: linear-gradient(90deg, #1b3cff, #00c6ff);
     color: white;
     padding: 10px;
     border-radius: 999px;
@@ -98,10 +114,11 @@ button:hover {
     display: none;
 }
 
+/* FLOATING SYMBOLS */
 .symbol {
     position: absolute;
-    font-size: 20px;
-    color: rgba(77,166,255,0.25);
+    font-size: 18px;
+    color: rgba(0,198,255,0.15);
     animation: float 12s linear infinite;
 }
 
@@ -110,6 +127,7 @@ button:hover {
     100% {transform: translateY(-10vh);}
 }
 
+/* MESSAGE */
 #msg {
     text-align: center;
     margin-top: 10px;
@@ -151,7 +169,7 @@ button:hover {
 
     <input type="password" id="confirmPass" placeholder="Confirm Password">
 
-    <p style="text-align:center; color:#555; font-size:14px;">
+    <p style="text-align:center; color:#aaa; font-size:14px;">
         Account Type: <strong>Landlord</strong>
     </p>
 
@@ -165,7 +183,6 @@ button:hover {
 
 <script type="module">
 
-/* 🔥 FIREBASE IMPORTS */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import { 
     getAuth, 
@@ -179,7 +196,7 @@ import {
     setDoc
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-/* 🔥 CONFIG */
+/* KEEP YOUR ORIGINAL CONFIG (UNCHANGED) */
 const firebaseConfig = {
   apiKey: "AIzaSyCwDxwL4j_fgzGi1ffHhaG36nw2uzNiZ1E",
   authDomain: "unistay-v1.firebaseapp.com",
@@ -193,7 +210,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-/* SYMBOLS */
+/* FLOATING SYMBOLS */
 const symbols = ["π","Σ","√","∫","θ","x²","∞","Δ"];
 
 for (let i = 0; i < 35; i++) {
@@ -250,17 +267,17 @@ window.checkStrength = function() {
 
     if (pass.length < 4) {
         strength.innerText = "Weak";
-        strength.style.color = "red";
+        strength.style.color = "#ff4d4d";
     } else if (pass.length < 8) {
         strength.innerText = "Medium";
         strength.style.color = "orange";
     } else {
         strength.innerText = "Strong";
-        strength.style.color = "green";
+        strength.style.color = "#00ff99";
     }
 }
 
-/* SIGNUP */
+/* SIGNUP (UNCHANGED LOGIC) */
 window.signup = async function() {
     let email = document.getElementById("signupContact").value.trim();
     let pass = document.getElementById("signupPass").value.trim();
@@ -290,22 +307,18 @@ window.signup = async function() {
             createdAt: new Date()
         });
 
-        showMessage("Account created successfully!", "green");
+        showMessage("Account created successfully!", "#00ff99");
 
-        console.log("USER SAVED WITH PENDING STATUS");
-
-        // 3. REDIRECT ONLY AFTER SAVE
         setTimeout(() => {
             window.location.href = "dashboard.html";
         }, 1000);
 
     } catch (error) {
-        console.error(error);
         showMessage(error.message);
     }
 }
 
-/* LOGIN */
+/* LOGIN (UNCHANGED LOGIC) */
 window.login = async function() {
     let email = document.getElementById("loginUser").value.trim();
     let pass = document.getElementById("loginPass").value.trim();
@@ -318,7 +331,7 @@ window.login = async function() {
     try {
         await signInWithEmailAndPassword(auth, email, pass);
 
-        showMessage("Login successful!", "green");
+        showMessage("Login successful!", "#00ff99");
 
         setTimeout(() => {
             window.location.href = "dashboard.html";
