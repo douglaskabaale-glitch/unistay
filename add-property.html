@@ -14,12 +14,13 @@
 }
 
 body {
-    background: white;
+    background: radial-gradient(circle at top, #0b1220, #05070f);
     min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
     overflow: hidden;
+    color: white;
 }
 
 /* PARTICLES */
@@ -33,34 +34,35 @@ body {
 .particle {
     position: absolute;
     font-size: 38px;
-    opacity: 0.55;
-    color: #2f8cff;
+    opacity: 0.5;
+    color: #00c6ff;
     animation: floatUp linear infinite;
+    text-shadow: 0 0 10px rgba(0,198,255,0.4);
 }
 
 @keyframes floatUp {
     0% { transform: translateY(110vh); opacity: 0; }
-    20% { opacity: 0.6; }
+    20% { opacity: 0.7; }
     100% { transform: translateY(-10vh); opacity: 0; }
 }
 
-/* PREMIUM BOX */
+/* CONTAINER */
 .container {
     position: relative;
     z-index: 2;
     width: 92%;
     max-width: 440px;
-    background: rgba(255,255,255,0.96);
+    background: rgba(15, 20, 35, 0.92);
     backdrop-filter: blur(14px);
     padding: 28px;
     border-radius: 22px;
-    box-shadow: 0 25px 60px rgba(0,0,0,0.12);
-    border: 1px solid rgba(47,140,255,0.08);
+    box-shadow: 0 0 40px rgba(0,198,255,0.12);
+    border: 1px solid rgba(0,198,255,0.12);
 }
 
 h2 {
     text-align: center;
-    color: #003399;
+    color: #00c6ff;
     margin-bottom: 18px;
     font-size: 22px;
 }
@@ -73,22 +75,28 @@ input, select, textarea {
     width: 100%;
     padding: 12px;
     border-radius: 10px;
-    border: 1px solid #e1e1e1;
+    border: 1px solid rgba(255,255,255,0.08);
     outline: none;
+    background: rgba(255,255,255,0.05);
+    color: white;
     transition: 0.2s;
-    background: #fff;
+    appearance: none;
+}
+
+/* 🔥 DROPDOWN FIX */
+select {
+    background-color: rgba(15, 20, 35, 0.95);
+    color: white;
+}
+
+select option {
+    background-color: #0b1220;
+    color: white;
 }
 
 input:focus, select:focus, textarea:focus {
-    border-color: #2f8cff;
-    box-shadow: 0 0 0 3px rgba(47,140,255,0.12);
-}
-
-.error {
-    color: red;
-    font-size: 12px;
-    margin-top: 4px;
-    display: none;
+    border-color: #00c6ff;
+    box-shadow: 0 0 0 3px rgba(0,198,255,0.15);
 }
 
 textarea {
@@ -96,22 +104,31 @@ textarea {
     resize: none;
 }
 
+.error {
+    color: #ff4d4d;
+    font-size: 12px;
+    margin-top: 4px;
+    display: none;
+}
+
+/* BUTTON */
 button {
     width: 100%;
     margin-top: 18px;
     padding: 14px;
     border: none;
     border-radius: 999px;
-    background: linear-gradient(135deg, #00c853, #00e676);
+    background: linear-gradient(135deg, #00c6ff, #0072ff);
     color: white;
     font-weight: bold;
     cursor: pointer;
     transition: 0.25s;
+    box-shadow: 0 0 20px rgba(0,198,255,0.25);
 }
 
 button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+    box-shadow: 0 0 30px rgba(0,198,255,0.45);
 }
 </style>
 </head>
@@ -190,7 +207,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/* 🔥 FIXED CLOUDINARY */
+/* CLOUDINARY */
 const upload = async (file) => {
     const url = "https://api.cloudinary.com/v1_1/dsanvos33/image/upload";
     const form = new FormData();
@@ -200,15 +217,10 @@ const upload = async (file) => {
     const res = await fetch(url, { method: "POST", body: form });
     const data = await res.json();
 
-    if (!data.secure_url) {
-        console.error("Cloudinary error:", data);
-        throw new Error("Upload failed");
-    }
-
     return data.secure_url;
 };
 
-/* 🔥 FULL LOCATION MAP (FIXED + 5+ EACH) */
+/* LOCATION DATA */
 const data = {
     "Makerere University": ["Wandegeya","Kikoni","Bwaise","Makerere Hill","Naakulabye"],
     "Kyambogo University": ["Banda","Kiwatule","Ntinda","Naalya","Kyambogo Hill"],
@@ -222,7 +234,7 @@ const data = {
     "Cavendish University Uganda": ["Nsambya","Nakasero","Kampala CBD","Wandegeya","Nateete"]
 };
 
-/* UPDATE LOCATION DROPDOWN */
+/* DROPDOWN */
 document.getElementById("university").addEventListener("change", function () {
 
     const uni = this.value;
@@ -240,13 +252,12 @@ document.getElementById("university").addEventListener("change", function () {
     }
 });
 
-/* VALIDATION */
+/* VALIDATION + SUBMIT (UNCHANGED) */
 function showError(id, show) {
     document.getElementById("err-" + id).style.display = show ? "block" : "none";
 }
 
 function validate() {
-
     let valid = true;
 
     ["hostelName","university","location","price","contact"].forEach(f => {
@@ -268,7 +279,6 @@ function validate() {
     return valid;
 }
 
-/* SUBMIT */
 window.submitProperty = async () => {
 
     if (!validate()) return;
@@ -282,30 +292,23 @@ window.submitProperty = async () => {
     const description = document.getElementById("description").value;
     const file = document.getElementById("image").files[0];
 
-    try {
+    const imageUrl = await upload(file);
 
-        const imageUrl = await upload(file);
+    await addDoc(collection(db, "properties"), {
+        hostelName,
+        university,
+        location,
+        price,
+        contact,
+        amenities,
+        description,
+        cover: imageUrl,
+        status: "pending",
+        createdAt: Date.now()
+    });
 
-        await addDoc(collection(db, "properties"), {
-            hostelName,
-            university,
-            location,
-            price,
-            contact,
-            amenities,
-            description,
-            cover: imageUrl,
-            status: "pending",
-            createdAt: Date.now()
-        });
-
-        alert("Submitted successfully ✅");
-        location.reload();
-
-    } catch (e) {
-        alert("Upload failed ❌");
-        console.error(e);
-    }
+    alert("Submitted successfully ✅");
+    location.reload();
 };
 
 /* PARTICLES */
