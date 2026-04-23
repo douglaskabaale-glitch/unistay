@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>UNISTAY</title>
 
-<!-- ✅ GOOGLE FONT ADDED -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
@@ -13,105 +12,104 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    font-family: "Poppins", sans-serif;
 }
 
 body {
-    background: white;
+    background: linear-gradient(135deg, #0a0a0a, #121212);
+    color: #eee;
     overflow-x: hidden;
-    transition: 0.4s ease;
-}
-
-/* BACKGROUND */
-body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background-image:
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Cg fill='%237ecbff' fill-opacity='0.18'%3E%3Ctext x='80' y='120' font-size='90'%3E%2B%3C/text%3E%3Ctext x='300' y='200' font-size='100'%3E-%3C/text%3E%3Ctext x='450' y='100' font-size='95'%3E%3D%3C/text%3E%3C/g%3E%3C/svg%3E");
-    background-size: 600px 600px;
-    opacity: 0.5;
-    z-index: 0;
 }
 
 /* PARTICLES */
 .particle {
     position: absolute;
-    background: #7ecbff;
     border-radius: 50%;
-    opacity: 0.6;
+    background: #4da6ff;
+    box-shadow: 0 0 10px #4da6ff, 0 0 20px #4da6ff;
+    opacity: 0.7;
     animation: floatUp linear infinite;
-    z-index: 1;
+}
+
+/* STARDUST TRAIL */
+.particle::after {
+    content: "";
+    position: absolute;
+    width: 6px;
+    height: 20px;
+    background: linear-gradient(to top, rgba(77,166,255,0.6), transparent);
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    filter: blur(3px);
 }
 
 @keyframes floatUp {
     0% { transform: translateY(100vh); opacity: 0; }
-    20% { opacity: 0.6; }
+    20% { opacity: 1; }
     100% { transform: translateY(-10vh); opacity: 0; }
 }
 
-/* MAIN CONTAINER */
+/* CONTAINER */
 .container {
-    position: relative;
-    z-index: 2;
     text-align: center;
-    padding: 60px 20px 40px;
-    max-width: 1200px;
-    margin: auto;
+    padding: 60px 20px;
 }
 
-/* LOGO */
+/* LOGO BOX (GLOW FIXED) */
+.logo-box {
+    display: inline-block;
+    padding: 22px;
+    border-radius: 30px;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(12px);
+    box-shadow:
+        0 0 25px rgba(77,166,255,0.5),
+        inset 0 0 10px rgba(77,166,255,0.2);
+}
+
 .logo {
-    width: 340px;
+    width: 320px;
     max-width: 90%;
-    margin-bottom: 15px;
 }
 
 /* TAGLINE */
 .tagline {
-    font-size: 18px;
-    color: #444;
-    margin-bottom: 30px;
-    padding: 0 10px;
+    margin: 25px 0;
+    color: #bbb;
 }
 
-/* BUTTONS */
-.btn-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 50px;
-}
-
+/* 🔥 GLOW BUTTONS (ALWAYS ON) */
 .btn {
     width: 260px;
-    max-width: 90%;
     padding: 18px;
-    font-size: 18px;
-    border: none;
     border-radius: 18px;
-    cursor: pointer;
+    border: none;
     font-weight: bold;
-    transition: all 0.35s ease;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    color: white;
+    cursor: pointer;
+
+    box-shadow:
+        0 0 12px rgba(77,166,255,0.6),
+        0 0 25px rgba(77,166,255,0.4);
+    transition: 0.3s;
 }
 
 .find {
-    background: linear-gradient(135deg, #00c853, #00e676);
-    color: white;
+    background: linear-gradient(135deg, #00e676, #00c853);
+    box-shadow: 0 0 18px #00e676, 0 0 35px #00e676;
 }
 
 .list {
-    background: linear-gradient(135deg, #2962ff, #448aff);
-    color: white;
+    background: linear-gradient(135deg, #448aff, #2962ff);
+    box-shadow: 0 0 18px #448aff, 0 0 35px #2962ff;
 }
 
 .btn:hover {
-    transform: translateY(-4px) scale(1.03);
+    transform: scale(1.05);
 }
 
-/* SECTIONS */
+/* SECTION BOXES (GLOW RESTORED) */
 .section {
     max-width: 900px;
     margin: auto;
@@ -120,21 +118,26 @@ body::before {
 }
 
 .section h2 {
-    color: #003399;
+    color: #4da6ff;
     margin-bottom: 15px;
+}
+
+.step, .reason, .stat, .about, .founder-card {
+    background: rgba(255,255,255,0.05);
+    border-radius: 16px;
+    padding: 20px;
+    margin: 10px;
+    backdrop-filter: blur(10px);
+
+    box-shadow:
+        0 0 10px rgba(77,166,255,0.25),
+        0 0 25px rgba(77,166,255,0.15);
 }
 
 /* GRIDS */
 .steps, .reasons {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 15px;
-}
-
-.step, .reason {
-    background: rgba(0, 51, 153, 0.08);
-    padding: 20px;
-    border-radius: 12px;
 }
 
 /* STATS */
@@ -142,108 +145,33 @@ body::before {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 15px;
-}
-
-.stat {
-    background: rgba(0, 51, 153, 0.12);
-    padding: 18px;
-    border-radius: 12px;
-    min-width: 140px;
-    font-weight: bold;
 }
 
 /* ABOUT SECTION */
 .about {
-    max-width: 900px;
-    margin: 60px auto;
-    padding: 25px;
-    background: rgba(255,255,255,0.95);
-    border-radius: 16px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
     text-align: left;
 }
 
-.about h2 {
-    text-align: center;
-    color: #003399;
-    margin-bottom: 15px;
-}
-
-.about p {
-    margin: 10px 0;
-    color: #333;
-    line-height: 1.6;
-}
-
-/* FOUNDER CARD */
-.founder-card {
-    margin-top: 20px;
-    padding: 20px;
-    background: rgba(0, 51, 153, 0.06);
-    border-radius: 16px;
-}
-
+/* FOUNDER */
 .founder-top {
     display: flex;
     align-items: center;
     gap: 15px;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
 
 .founder-img {
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid #2f8cff;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
-}
-
-.founder-top h3 {
-    margin: 0;
-    color: #003399;
-}
-
-.role {
-    margin: 2px 0 0;
-    font-size: 14px;
-    color: #666;
-}
-
-.founder-details p {
-    margin: 6px 0;
-    color: #333;
+    border: 2px solid #4da6ff;
 }
 
 /* FOOTER */
 footer {
     text-align: center;
     padding: 20px;
-    font-size: 13px;
-    color: #666;
-}
-
-/* MOBILE */
-@media (max-width: 768px) {
-    .btn {
-        width: 100%;
-        font-size: 16px;
-    }
-
-    .section {
-        padding: 30px 15px;
-    }
-
-    .founder-top {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .founder-img {
-        width: 90px;
-        height: 90px;
-    }
+    color: #777;
 }
 </style>
 </head>
@@ -256,14 +184,13 @@ function createParticles() {
         let p = document.createElement("div");
         p.classList.add("particle");
 
-        let size = Math.random() * 10 + 5;
+        let size = Math.random() * 8 + 4;
         p.style.width = size + "px";
         p.style.height = size + "px";
 
         p.style.left = Math.random() * window.innerWidth + "px";
-        p.style.top = Math.random() * window.innerHeight + "px";
+        p.style.animationDuration = (6 + Math.random() * 6) + "s";
 
-        p.style.animationDuration = (6 + Math.random() * 8) + "s";
         document.body.appendChild(p);
     }
 }
@@ -272,14 +199,17 @@ createParticles();
 
 <div class="container">
 
-    <img src="logo.png" class="logo" alt="UNISTAY Logo">
+    <!-- LOGO (RESTORED CONTENT) -->
+    <div class="logo-box">
+        <img src="logo.png" class="logo">
+    </div>
 
     <div class="tagline">
         Find trusted student hostels near your university in seconds.
     </div>
 
-    <div class="btn-container">
-        <button class="btn find" onclick="window.location='find-hostel.html'">Find a Hostel</button>
+    <div>
+        <button class="btn find" onclick="window.location='find-hostel.html'">Find a Hostel</button><br><br>
         <button class="btn list" onclick="window.location='auth.html'">List My Property</button>
     </div>
 </div>
@@ -322,24 +252,21 @@ createParticles();
     <div class="founder-card">
 
         <div class="founder-top">
-            <img src="founder.jpg" class="founder-img" alt="Founder Image">
+            <img src="founder.jpg" class="founder-img">
 
             <div>
                 <h3>Douglas Kabaale</h3>
-                <p class="role">Founder & Developer</p>
+                <p>Founder & Developer</p>
             </div>
         </div>
 
-        <div class="founder-details">
-            <p><b>Education:</b> Victoria University — Bachelor of Information Technology (2025)</p>
-            <p><b>Location:</b> Kampala, Uganda</p>
-            <p><b>Contact:</b> 0769216912</p>
-        </div>
+        <p><b>Education:</b> Victoria University — BIT (2025)</p>
+        <p><b>Location:</b> Kampala, Uganda</p>
+        <p><b>Contact:</b> 0769216912</p>
     </div>
 
     <p>
-        My vision is to expand UNISTAY across all universities in Uganda, integrate it into admission systems,
-        and eventually expand to neighboring countries.
+        My vision is to expand UNISTAY across all universities in Uganda and beyond.
     </p>
 </div>
 
