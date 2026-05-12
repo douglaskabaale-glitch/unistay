@@ -273,6 +273,7 @@ async function loadResults(){
 
     snap.forEach(doc=>{
         const p = doc.data();
+        const plan = p.plan || "boost";
 
         const ok =
             (p.status || "pending") === "approved" &&
@@ -335,8 +336,8 @@ async function render(results){
         `;
 
         card.onclick = ()=>{
-            localStorage.setItem("selectedProperty",JSON.stringify(p));
-            window.location.href="hostel-details.html";
+            localStorage.setItem("selectedProperty", JSON.stringify(p));
+            window.location.href = "hostel-details.html?id=" + p.id;
         };
 
         grid.appendChild(card);
