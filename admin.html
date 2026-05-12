@@ -193,6 +193,115 @@ body {
     50% { opacity: 0.6; }
     100% { transform: translateY(-10vh); opacity: 0; }
 }
+
+.receipts-panel {
+    padding: 20px;
+    color: #e6f1ff;
+}
+
+.receipt-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-top: 15px;
+}
+
+/* BASE BUTTON */
+.receipt-btn {
+    padding: 15px;
+    border-radius: 14px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+
+    backdrop-filter: blur(10px);
+    transition: 0.3s;
+
+    box-shadow: 0 0 15px rgba(255,255,255,0.05);
+}
+
+/* HOVER EFFECT */
+.receipt-btn:hover {
+    transform: translateY(-3px) scale(1.03);
+}
+
+/* THEMES */
+.boost {
+    background: linear-gradient(135deg, #3b82f6, #1e3a8a);
+    box-shadow: 0 0 20px rgba(59,130,246,0.4);
+}
+
+.amplify {
+    background: linear-gradient(135deg, #22c55e, #14532d);
+    box-shadow: 0 0 20px rgba(34,197,94,0.4);
+}
+
+.prime {
+    background: linear-gradient(135deg, #a855f7, #3b0764);
+    box-shadow: 0 0 20px rgba(168,85,247,0.4);
+}
+
+.elite {
+    background: linear-gradient(135deg, #facc15, #854d0e);
+    color: black;
+    box-shadow: 0 0 25px rgba(250,204,21,0.4);
+}
+
+/* MODAL */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(10px);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-card {
+    background: rgba(10,15,28,0.85);
+    padding: 20px;
+    border-radius: 16px;
+    width: 320px;
+
+    border: 1px solid rgba(126,200,255,0.15);
+    box-shadow: 0 0 25px rgba(77,166,255,0.2);
+}
+
+.modal-card input {
+    width: 100%;
+    margin: 8px 0;
+    padding: 10px;
+    border-radius: 10px;
+
+    background: #0a0f1c;
+    border: 1px solid rgba(126,200,255,0.2);
+    color: white;
+}
+
+.generate-btn {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+
+    background: linear-gradient(135deg, #4da6ff, #7ecbff);
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.close-btn {
+    width: 100%;
+    margin-top: 8px;
+    padding: 10px;
+    border-radius: 999px;
+    border: none;
+    background: #2a2a2a;
+    color: white;
+}
+
 </style>
 </head>
 
@@ -207,6 +316,8 @@ body {
 
     <div class="nav-item" onclick="showSection('users')">👤 Users</div>
     <div class="nav-item" onclick="showSection('properties')">🏠 Properties</div>
+    <div class="nav-item" onclick="showSection('receipts')">🧾 Receipts</div>
+
     <div class="nav-item" onclick="logout()">🚪 Logout</div>
 </div>
 
@@ -227,6 +338,52 @@ body {
         <div class="grid" id="properties"></div>
     </div>
 
+    <!-- RECEIPTS (NOW INSIDE MAIN) -->
+    <div id="receiptsSection" style="display:none;" class="receipts-panel">
+
+        <h3>Generate Receipts</h3>
+
+        <div class="receipt-grid">
+
+            <button class="receipt-btn boost" onclick="openReceipt('Boost')">
+                Boost Receipt
+            </button>
+
+            <button class="receipt-btn amplify" onclick="openReceipt('Amplify')">
+                Amplify Receipt
+            </button>
+
+            <button class="receipt-btn prime" onclick="openReceipt('Prime')">
+                Prime Receipt
+            </button>
+
+            <button class="receipt-btn elite" onclick="openReceipt('Elite')">
+                Elite Receipt
+            </button>
+
+        </div>
+    </div>
+
+</div>
+
+<div id="receiptModal" class="modal">
+    <div class="modal-card">
+
+        <h3 id="receiptTitle">Generate Receipt</h3>
+
+        <input id="rHostel" placeholder="Hostel Name">
+        <input id="rDate" type="date">
+        <input id="rAmount" placeholder="Funds Paid (UGX)">
+
+        <button class="generate-btn" onclick="generateReceipt()">
+            Generate PDF
+        </button>
+
+        <button onclick="closeReceipt()" class="close-btn">
+            Cancel
+        </button>
+
+    </div>
 </div>
 
 <script type="module">
@@ -271,11 +428,14 @@ onAuthStateChanged(auth, (user) => {
 
 /* NAV */
 window.showSection = (section) => {
-    document.getElementById("usersSection").style.display =
-        section === "users" ? "block" : "none";
 
-    document.getElementById("propertiesSection").style.display =
-        section === "properties" ? "block" : "none";
+    const sections = ["usersSection", "propertiesSection", "receiptsSection"];
+
+    sections.forEach(id => {
+        document.getElementById(id).style.display = "none";
+    });
+
+    document.getElementById(section + "Section").style.display = "block";
 };
 
 /* USERS */
@@ -316,6 +476,8 @@ async function loadUsers() {
 /* PROPERTIES */
 async function loadProperties() {
     const snap = await getDocs(collection(db, "properties"));
+
+    const plan = d.plan || "boost";
 
     const box = document.getElementById("properties");
     box.innerHTML = "";
@@ -377,6 +539,125 @@ for (let i = 0; i < 35; i++) {
     p.style.animationDuration = (6 + Math.random()*6) + "s";
     p.style.fontSize = (16 + Math.random()*18) + "px";
     box.appendChild(p);
+}
+
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script>
+let selectedPlan = "";
+
+
+function openReceipt(plan) {
+    selectedPlan = plan;
+    document.getElementById("receiptTitle").innerText =
+        plan + " Subscription Receipt";
+
+    document.getElementById("receiptModal").style.display = "flex";
+}
+
+function closeReceipt() {
+    document.getElementById("receiptModal").style.display = "none";
+}
+
+/* =========================
+   PDF GENERATION
+========================= */
+function generateReceipt() {
+
+    const hostel = document.getElementById("rHostel").value;
+    const date = document.getElementById("rDate").value;
+    const amount = document.getElementById("rAmount").value;
+
+    if (!hostel || !date || !amount) {
+        alert("Fill all fields");
+        return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    // ===================== COLORS (UNISTAY THEME) =====================
+    const blue = [77, 166, 255];
+    const dark = [5, 7, 13];
+    const green = [0, 200, 83];
+    const purple = [168, 85, 247];
+
+    // ===================== HEADER =====================
+    doc.setFillColor(...dark);
+    doc.rect(0, 0, 210, 40, "F");
+
+    doc.setTextColor(...blue);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
+    doc.text("UNISTAY", 14, 20);
+
+    doc.setFontSize(11);
+    doc.setTextColor(200, 220, 255);
+    doc.text("Premium Hostel Listing Platform", 14, 28);
+
+    doc.setTextColor(255, 255, 255);
+    doc.text("OFFICIAL PAYMENT RECEIPT", 140, 20);
+
+    // ===================== RECEIPT ID =====================
+    const receiptId = "UNI-" + Math.floor(Math.random() * 99999999);
+
+    doc.setFontSize(10);
+    doc.setTextColor(150);
+    doc.text("Receipt ID: " + receiptId, 140, 28);
+
+    // ===================== BODY =====================
+    doc.setTextColor(30, 30, 30);
+    doc.setFontSize(12);
+
+    doc.text("This document serves as an official confirmation of payment received by UNISTAY.", 14, 55);
+
+    doc.setFont("helvetica", "bold");
+    doc.text("Hostel Name:", 14, 75);
+    doc.text(hostel, 60, 75);
+
+    doc.text("Subscription Plan:", 14, 85);
+    doc.text(selectedPlan, 60, 85);
+
+    doc.text("Date of Payment:", 14, 95);
+    doc.text(date, 60, 95);
+
+    doc.text("Amount Paid:", 14, 105);
+    doc.setTextColor(...green);
+    doc.text("UGX " + amount, 60, 105);
+
+    // ===================== PREMIUM MESSAGE =====================
+    doc.setTextColor(60, 60, 60);
+    doc.setFont("helvetica", "normal");
+
+    doc.text(
+        "UNISTAY confirms that the above payment has been successfully received and processed.",
+        14,
+        125,
+        { maxWidth: 180 }
+    );
+
+    doc.text(
+        "The hostel listing has been upgraded to the selected subscription tier and is now active on the platform.",
+        14,
+        140,
+        { maxWidth: 180 }
+    );
+
+    // ===================== FOOTER =====================
+    doc.setDrawColor(...blue);
+    doc.line(14, 260, 196, 260);
+
+    doc.setFontSize(10);
+    doc.setTextColor(120);
+
+    doc.text("Thank you for partnering with UNISTAY.", 14, 270);
+    doc.text("This is a system-generated receipt and does not require a signature.", 14, 278);
+
+    doc.save(hostel + "_UNISTAY_Receipt.pdf");
+
+    closeReceipt();
 }
 
 </script>
