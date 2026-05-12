@@ -195,6 +195,8 @@ button:hover {
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import { getAuth, onAuthStateChanged } 
+from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 import { getFirestore, collection, addDoc } 
 from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
@@ -206,6 +208,21 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
+
+let currentUser = null;
+
+onAuthStateChanged(auth, (user) => {
+    if (!user) {
+        alert("Please log in first");
+        window.location = "auth.html";
+        return;
+    }
+
+    currentUser = user;
+    console.log("✅ Logged in as:", user.uid);
+});
+
 
 /* CLOUDINARY */
 const upload = async (file) => {
@@ -279,36 +296,53 @@ function validate() {
     return valid;
 }
 
+/* =========================
+   SUBMIT PROPERTY
+========================= */
 window.submitProperty = async () => {
 
     if (!validate()) return;
 
-    const hostelName = document.getElementById("hostelName").value;
-    const university = document.getElementById("university").value;
-    const location = document.getElementById("location").value;
-    const price = document.getElementById("price").value;
-    const contact = document.getElementById("contact").value;
-    const amenities = document.getElementById("amenities").value;
-    const description = document.getElementById("description").value;
-    const file = document.getElementById("image").files[0];
+    if (!currentUser) {
+        alert("User not loaded yet. Try again.");
+        return;
+    }
 
-    const imageUrl = await upload(file);
+    try {
+        const hostelName = document.getElementById("hostelName").value;
+        const university = document.getElementById("university").value;
+        const location = document.getElementById("location").value;
+        const price = document.getElementById("price").value;
+        const contact = document.getElementById("contact").value;
+        const amenities = document.getElementById("amenities").value;
+        const description = document.getElementById("description").value;
+        const file = document.getElementById("image").files[0];
 
-    await addDoc(collection(db, "properties"), {
-        hostelName,
-        university,
-        location,
-        price,
-        contact,
-        amenities,
-        description,
-        cover: imageUrl,
-        status: "pending",
-        createdAt: Date.now()
-    });
+        // Upload image
+        const imageUrl = await upload(file);
 
-    alert("Submitted successfully ✅");
-    location.reload();
+        // Save to Firestore
+        await addDoc(collection(db, "properties"), {
+            hostelName,
+            university,
+            location,
+            price,
+            contact,
+            amenities,
+            description,
+            cover: imageUrl,
+            landlordId: currentUser.uid, // ✅ CRITICAL FIX
+            status: "pending",
+            createdAt: Date.now()
+        });
+
+        alert("Submitted successfully ✅");
+        location.reload();
+
+    } catch (err) {
+        console.error("❌ ERROR:", err);
+        alert("Failed to submit property");
+    }
 };
 
 /* PARTICLES */
