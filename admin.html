@@ -475,32 +475,43 @@ async function loadUsers() {
 
 /* PROPERTIES */
 async function loadProperties() {
-    const snap = await getDocs(collection(db, "properties"));
 
-    const plan = d.plan || "boost";
+    const snap = await getDocs(collection(db, "properties"));
 
     const box = document.getElementById("properties");
     box.innerHTML = "";
 
     snap.forEach(p => {
+
         const d = p.data();
+
+        const plan = d.plan || "boost";
 
         const card = document.createElement("div");
         card.className = "card";
 
         card.innerHTML = `
-            <h3>${d.hostelName}</h3>
-            <p>${d.university}</p>
+            <h3>${d.hostelName || "Unnamed Hostel"}</h3>
+
+            <p>${d.university || "No University"}</p>
+
+            <p>Plan: ${plan}</p>
 
             <span class="status ${d.status || "pending"}">
                 ${(d.status || "pending").toUpperCase()}
             </span>
 
-            <button class="btn approve" onclick="approve('${p.id}')">Approve</button>
-            <button class="btn delete" onclick="remove('${p.id}')">Delete</button>
+            <button class="btn approve" onclick="approve('${p.id}')">
+                Approve
+            </button>
+
+            <button class="btn delete" onclick="remove('${p.id}')">
+                Delete
+            </button>
         `;
 
         box.appendChild(card);
+
     });
 }
 
