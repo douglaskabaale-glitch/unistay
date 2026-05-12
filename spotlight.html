@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UNISTAY - Spotlight</title>
+
+<style>
+
+/* ===== BASE ===== */
+body {
+    margin: 0;
+    font-family: "Segoe UI", sans-serif;
+    background: #05070d;
+    color: #e6f1ff;
+}
+
+/* ===== HERO SLIDER ===== */
+.hero-slider {
+    position: relative;
+    height: 70vh;
+    overflow: hidden;
+}
+
+.hero-track {
+    display: flex;
+    height: 100%;
+    transition: transform 0.8s ease;
+}
+
+.hero-slide {
+    min-width: 100%;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.hero-slide::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, #05070d 15%, rgba(0,0,0,0.4));
+}
+
+.hero-content {
+    position: absolute;
+    bottom: 50px;
+    left: 30px;
+    z-index: 2;
+}
+
+.hero-content h1 {
+    font-size: 34px;
+}
+
+.hero-content p {
+    opacity: 0.7;
+}
+
+/* HERO BUTTONS */
+.hero-btn {
+    padding: 10px 18px;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: 0.3s;
+}
+
+/* UNISTAY GLOW */
+.view-btn {
+    background: linear-gradient(135deg, #4da6ff, #7ecbff);
+}
+
+.contact-btn {
+    background: rgba(255,255,255,0.1);
+    color: white;
+}
+
+.hero-btn:hover {
+    box-shadow: 0 0 20px rgba(77,166,255,0.6);
+    transform: scale(1.05);
+}
+
+/* ===== SECTIONS ===== */
+.section {
+    padding: 25px 20px;
+}
+
+.section h2 {
+    font-size: 16px;
+    opacity: 0.7;
+}
+
+/* ===== ROW ===== */
+.row {
+    display: flex;
+    gap: 18px;
+    overflow-x: auto;
+}
+.row::-webkit-scrollbar { display: none; }
+
+/* ===== FEATURED (BIG CARDS) ===== */
+.featured-card {
+    min-width: 200px;
+    height: 260px;
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+
+    transition: 0.3s;
+}
+
+.featured-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* glow colors */
+.featured-card:nth-child(1) { box-shadow: 0 0 20px rgba(77,166,255,0.3); }
+.featured-card:nth-child(2) { box-shadow: 0 0 20px rgba(168,85,247,0.3); }
+.featured-card:nth-child(3) { box-shadow: 0 0 20px rgba(34,197,94,0.3); }
+
+.featured-card:hover {
+    transform: scale(1.06);
+}
+
+/* overlay */
+.featured-info {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: 10px;
+    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+}
+
+/* ===== STUDENT FREQUENT (SMALL CARDS) ===== */
+.small-card {
+    min-width: 140px;
+    height: 180px;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: 0.25s;
+    position: relative;
+}
+
+.small-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.small-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0 15px rgba(77,166,255,0.3);
+}
+
+.small-info {
+    position: absolute;
+    bottom: 0;
+    padding: 6px;
+    font-size: 12px;
+    background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+}
+
+/* ================= SPOTLIGHT HEADER (IMPROVED) ================= */
+.spotlight-banner {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+
+    padding: 16px 20px;
+
+    background: rgba(28, 15, 10, 0.75);
+    backdrop-filter: blur(18px);
+
+    border-bottom: 1px solid rgba(126,200,255,0.15);
+
+    box-shadow: 0 0 25px rgba(77,166,255,0.15);
+}
+
+/* center layout */
+.spotlight-content {
+    max-width: 1100px;
+    margin: auto;
+
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+/* small brand pill */
+.spotlight-badge {
+    padding: 6px 12px;
+    border-radius: 999px;
+
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2px;
+
+    color: #0d0705;
+    background: linear-gradient(135deg, #4da6ff, #7ecbff);
+
+    box-shadow: 0 0 15px rgba(77,166,255,0.35);
+}
+
+/* main title */
+.spotlight-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #e6f1ff;
+    letter-spacing: 1px;
+}
+
+/* subtitle */
+.spotlight-sub {
+    margin-left: auto;
+    font-size: 12px;
+    color: rgba(126,200,255,0.7);
+}
+
+/* mobile fix */
+@media (max-width: 600px) {
+    .spotlight-sub {
+        display: none;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+    <div class="spotlight-banner">
+    <div class="spotlight-content">
+        <div class="spotlight-badge">UNISTAY</div>
+        <div class="spotlight-title">SPOTLIGHT LISTINGS</div>
+        <div class="spotlight-sub">Premium & Featured Hostels Only</div>
+    </div>
+</div>
+
+<!-- HERO SLIDER -->
+<div class="hero-slider">
+    <div class="hero-track" id="heroTrack"></div>
+</div>
+
+<!-- FEATURED -->
+<div class="section">
+    <h2>🌟 Featured List</h2>
+    <div class="row" id="featuredRow"></div>
+</div>
+
+<!-- STUDENT FREQUENT -->
+<div class="section">
+    <h2>🎯 Student Frequent</h2>
+    <div class="row" id="frequentRow"></div>
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import {
+    getFirestore,
+    collection,
+    getDocs
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSy...",
+  authDomain: "unistay-v1.firebaseapp.com",
+  projectId: "unistay-v1"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+/* LOAD DATA */
+async function loadData() {
+    const snap = await getDocs(collection(db, "properties"));
+
+    let data = [];
+    snap.forEach(doc => {
+    const p = doc.data();
+    const plan = p.plan || "boost";
+
+    data.push({ id: doc.id, ...p, plan });
+});
+
+    if (!data.length) return;
+
+    render(data);
+}
+
+/* HERO SLIDES */
+function renderHero(elite) {
+    const track = document.getElementById("heroTrack");
+
+    track.innerHTML = elite.map(h => `
+        <div class="hero-slide" style="background-image:url(${h.cover})">
+            <div class="hero-content">
+                <h1>${h.hostelName}</h1>
+                <p>UGX ${h.price}</p>
+                <button class="hero-btn view-btn" onclick="go('${h.id}')">
+                   View Hostel
+                </button>
+            </div>
+        </div>
+    `).join("");
+
+    let index = 0;
+    setInterval(() => {
+        index = (index + 1) % elite.length;
+        track.style.transform = `translateX(-${index * 100}%)`;
+    }, 5000);
+}
+
+/* FEATURED */
+function renderFeatured(data) {
+    document.getElementById("featuredRow").innerHTML =
+        data.map(h => `
+            <div class="featured-card" onclick="go('${h.id || ""}')">
+                <img src="${h.cover}">
+                <div class="featured-info">
+                    <h4>${h.hostelName}</h4>
+                    <p>UGX ${h.price}</p>
+                </div>
+            </div>
+        `).join("");
+}
+
+/* SMALL */
+function renderFrequent(data) {
+    document.getElementById("frequentRow").innerHTML =
+        data.map(h => `
+            <div class="small-card" onclick="go('${h.id || ""}')">
+                <img src="${h.cover}">
+                <div class="small-info">
+                    ${h.hostelName}
+                </div>
+            </div>
+        `).join("");
+}
+
+/* NAV */
+window.go = (id) => {
+    if (!id) return;
+    window.location.href = `hostel-details.html?id=${encodeURIComponent(id)}`;
+};
+
+/* MAIN */
+function render(data) {
+
+    const elite = data.filter(h => h.plan === "elite");
+    const prime = data.filter(h => h.plan === "prime");
+    const amplify = data.filter(h => h.plan === "amplify");
+
+    renderHero(elite);
+    renderFeatured(prime);
+    renderFrequent(amplify);
+}
+
+loadData();
+
+</script>
+
+</body>
+</html>
