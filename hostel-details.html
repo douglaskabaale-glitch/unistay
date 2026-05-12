@@ -318,9 +318,11 @@ body {
                 <div class="value" id="desc"></div>
             </div>
 
+            <button class="book-btn" onclick="bookNow()">BOOK NOW ON WHATSAPP</button>
+
         </div>
 
-        <button class="book-btn" onclick="bookNow()">BOOK NOW ON WHATSAPP</button>
+       
     </div>
 
     <div class="reviews-box">
@@ -347,10 +349,11 @@ body {
 </div>
 
 <script type="module">
-/* 🔥 YOUR ORIGINAL LOGIC UNCHANGED */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
     getFirestore,
+    doc,
+    getDoc,
     collection,
     addDoc,
     getDocs,
@@ -366,51 +369,95 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-let property = JSON.parse(localStorage.getItem("selectedProperty"));
+/* =========================
+   GET ID FROM URL
+========================= */
+const params = new URLSearchParams(window.location.search);
+const propertyId = params.get("id");
 
-if (!property || !property.id) {
-    alert("Missing hostel data");
-    window.location.href = "student-results.html";
+let property = null;
+
+/* =========================
+   LOAD HOSTEL
+========================= */
+async function loadProperty() {
+
+    if (!propertyId) {
+        alert("No hostel selected");
+        window.location.href = "spotlight.html";
+        return;
+    }
+
+    const ref = doc(db, "properties", propertyId);
+    const snap = await getDoc(ref);
+
+    if (!snap.exists()) {
+        alert("Hostel not found");
+        window.location.href = "spotlight.html";
+        return;
+    }
+
+    property = { id: snap.id, ...snap.data() };
+
+    renderProperty();
+    loadReviews();
 }
 
+/* =========================
+   RENDER HOSTEL
+========================= */
 function renderProperty() {
 
     document.getElementById("mainImage").src = property.cover || "";
     document.getElementById("name").innerText = property.hostelName || "";
     document.getElementById("price").innerText = "UGX " + (property.price || "");
-    document.getElementById("room").innerText = property.roomType || "";
-    document.getElementById("location").innerText = property.location || "";
-    document.getElementById("contact").innerText = property.contact || "";
-    document.getElementById("desc").innerText = property.description || "";
+    document.getElementById("room").innerText = property.roomType || "Standard";
+    document.getElementById("location").innerText = property.location || "Not set";
+    document.getElementById("contact").innerText = property.contact || "Not available";
+    document.getElementById("desc").innerText = property.description || "No description";
 
     document.getElementById("amenities").innerHTML =
         (property.amenities || "")
         .split(",")
+        .filter(a => a.trim())
         .map(a => `<span class="tag">${a.trim()}</span>`)
         .join("");
 }
 
-renderProperty();
-
+/* =========================
+   WHATSAPP BOOKING
+========================= */
 window.bookNow = function () {
+
     let phone = (property.contact || "").replace(/\s+/g, '');
     if (!phone.startsWith("+")) phone = "+256" + phone;
 
-    window.open(`https://wa.me/${phone}?text=Hello, interested in ${property.hostelName}`, "_blank");
+    const msg = `Hello, I'm interested in ${property.hostelName}`;
+
+    window.open(
+        `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`,
+        "_blank"
+    );
 };
 
+/* =========================
+   REVIEWS
+========================= */
 window.submitReview = async function () {
 
     const rating = Number(document.getElementById("rating").value);
     const text = document.getElementById("reviewText").value;
 
-    if (!rating || !text) return alert("Invalid input");
+    if (!rating || !text) return alert("Fill all fields");
 
     await addDoc(collection(db, "properties", property.id, "reviews"), {
         rating,
         text,
         createdAt: serverTimestamp()
     });
+
+    document.getElementById("rating").value = "";
+    document.getElementById("reviewText").value = "";
 
     loadReviews();
 };
@@ -422,8 +469,8 @@ async function loadReviews() {
     let reviews = [];
     let total = 0;
 
-    snap.forEach(doc => {
-        const r = doc.data();
+    snap.forEach(d => {
+        const r = d.data();
         reviews.push(r);
         total += r.rating || 0;
     });
@@ -442,9 +489,12 @@ async function loadReviews() {
         `).join("");
 }
 
-loadReviews();
+/* =========================
+   INIT
+========================= */
+loadProperty();
 
-/* particles unchanged */
+/* particles (unchanged) */
 const symbols = ["π","Σ","√","∫","θ","∞","Δ"];
 const container = document.getElementById("particles");
 
@@ -452,10 +502,8 @@ for (let i = 0; i < 30; i++) {
     let p = document.createElement("div");
     p.className = "particle";
     p.innerText = symbols[Math.floor(Math.random()*symbols.length)];
-
     p.style.left = Math.random() * 100 + "vw";
     p.style.animationDuration = (6 + Math.random()*6) + "s";
-
     container.appendChild(p);
 }
 </script>
