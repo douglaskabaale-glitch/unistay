@@ -130,6 +130,11 @@ h2 {
     box-shadow: 0 0 25px rgba(77,166,255,0.2);
 }
 
+.upgrade-btn {
+    background: linear-gradient(135deg, #00c853, #4811e0);
+    color: rgb(15, 202, 235);
+}
+
 .card img {
     width: 100%;
     height: 180px;
@@ -193,6 +198,17 @@ h2 {
     box-shadow: 0 0 25px rgba(77,166,255,0.15);
 }
 
+#plansModal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(8px);
+    justify-content: center;
+    align-items: center;
+}
+
 .modal h3 {
     color: #7ecbff;
 }
@@ -209,13 +225,181 @@ h2 {
     outline: none;
 }
 
-/* MODAL BUTTONS */
-.modal button {
-    width: 48%;
-    margin-top: 8px;
-    background: linear-gradient(135deg, #2f8cff, #4da6ff);
-    color: black;
+/* ================= UPGRADE MODAL (SPOTLIGHT STYLE) ================= */
+
+.upgrade-modal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    justify-content: center;
+    align-items: center;
+
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(18px);
+
+    z-index: 999;
 }
+
+.upgrade-card {
+    width: 92%;
+    max-width: 950px;
+
+    padding: 28px;
+    border-radius: 24px;
+
+    background: rgba(10, 14, 25, 0.55);
+    backdrop-filter: blur(30px);
+
+    border: 1px solid rgba(126,203,255,0.12);
+
+    box-shadow:
+        0 0 50px rgba(0,0,0,0.6),
+        inset 0 0 20px rgba(255,255,255,0.03);
+
+    animation: pop 0.35s ease;
+}
+
+@keyframes pop {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.upgrade-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.upgrade-header h2 {
+    color: #7ecbff;
+}
+
+.close {
+    cursor: pointer;
+    font-size: 22px;
+    color: #ff6b6b;
+}
+
+/* PLANS GRID */
+.plans {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+}
+
+/* PLAN CARD */
+.plan {
+    padding: 18px;
+    border-radius: 18px;
+
+    border: 1px solid rgba(255,255,255,0.08);
+
+    transition: 0.25s ease;
+
+    backdrop-filter: blur(10px);
+
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* BOOST - dark blue gradient */
+.boost {
+    background: linear-gradient(145deg,
+        rgba(30, 64, 175, 0.25),
+        rgba(10, 14, 25, 0.4)
+    );
+}
+
+/* AMPLIFY - dark green */
+.amplify {
+    background: linear-gradient(145deg,
+        rgba(22, 163, 74, 0.25),
+        rgba(10, 14, 25, 0.4)
+    );
+}
+
+/* PRIME - dark purple */
+.prime {
+    background: linear-gradient(145deg,
+        rgba(126, 34, 206, 0.25),
+        rgba(10, 14, 25, 0.4)
+    );
+}
+
+/* ELITE - dark gold premium */
+.elite {
+    background: linear-gradient(145deg,
+        rgba(234, 179, 8, 0.25),
+        rgba(10, 14, 25, 0.4)
+    );
+    border: 1px solid rgba(234, 179, 8, 0.35);
+}
+/* TEXT */
+.plan h3 {
+    color: #ffffff;
+    font-size: 18px;
+    margin: 0;
+}
+
+.plan p {
+    color: #7ecbff;
+    font-size: 13px;
+    margin: 0;
+}
+
+.plan .price {
+    font-size: 16px;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.plan ul {
+    font-size: 12px;
+    color: #cbd5f5;
+    margin: 8px 0;
+    padding-left: 15px;
+    opacity: 0.9;
+}
+
+.plan ul li {
+    margin-bottom: 4px;
+}
+
+/* BUTTON */
+.plan button {
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px;
+
+    border-radius: 999px;
+    border: none;
+
+    cursor: pointer;
+
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: white;
+
+    font-weight: bold;
+
+    box-shadow: 0 0 18px rgba(34,197,94,0.25);
+
+    transition: 0.25s ease;
+}
+
+.plan button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(34,197,94,0.4);
+}
+
+.plans {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 10px;
+}
+
 </style>
 </head>
 
@@ -255,6 +439,63 @@ h2 {
             <button onclick="saveEdit()">Save</button>
             <button onclick="closeEdit()">Cancel</button>
         </div>
+    </div>
+</div>
+
+<!-- UPGRADE MODAL (SPOTLIGHT STYLE) -->
+<div id="upgradeModal" class="upgrade-modal">
+
+    <div class="upgrade-card">
+
+        <div class="upgrade-header">
+            <h2 id="upgradeTitle">Upgrade Hostel</h2>
+            <span class="close" onclick="closeUpgrade()">✕</span>
+        </div>
+
+        <div class="plans">
+
+            <div class="plan boost">
+                <h3>Boost</h3>
+                <p>UGX 50,000 / month</p>
+                <ul>
+                    <li>Search visibility</li>
+                    <li>Basic exposure</li>
+                </ul>
+                <button onclick="selectPlan('boost', 50000)">Select</button>
+            </div>
+
+            <div class="plan amplify">
+                <h3>Amplify</h3>
+                <p>UGX 100,000 / month</p>
+                <ul>
+                    <li>Higher ranking</li>
+                    <li>Highlighted listing</li>
+                </ul>
+                <button onclick="selectPlan('amplify', 100000)">Select</button>
+            </div>
+
+            <div class="plan prime">
+                <h3>Prime</h3>
+                <p>UGX 200,000 / month</p>
+                <ul>
+                    <li>Homepage rotation</li>
+                    <li>Priority Spotlight</li>
+                </ul>
+                <button onclick="selectPlan('prime', 200000)">Select</button>
+            </div>
+
+            <div class="plan elite">
+                <h3>Elite</h3>
+                <p>UGX 350,000 / month</p>
+                <ul>
+                    <li>Pinned Spotlight</li>
+                    <li>Maximum exposure</li>
+                </ul>
+                <button onclick="selectPlan('elite', 350000)">Select</button>
+            </div>
+
+        </div>
+
     </div>
 </div>
 
@@ -360,8 +601,9 @@ function render(properties) {
                 <p>${p.contact}</p>
 
                 <div class="actions">
-                    <button class="edit-btn" onclick="openEdit('${p.id}','${p.hostelName}','${p.price}','${p.contact}')">Edit</button>
-                    <button class="delete-btn" onclick="deleteProperty('${p.id}')">Delete</button>
+                   <button class="edit-btn" onclick="openEdit('${p.id}','${p.hostelName}','${p.price}','${p.contact}')">Edit</button>
+                   <button class="delete-btn" onclick="deleteProperty('${p.id}')">Delete</button>
+                   <button class="upgrade-btn" onclick="openUpgrade('${p.id}','${p.hostelName}')">Upgrade</button>
                 </div>
             </div>
         `;
@@ -402,6 +644,44 @@ window.saveEdit = async () => {
 
 window.goAdd = () => window.location = "add-property.html";
 window.logout = () => signOut(auth).then(() => location = "auth.html");
+
+let selectedHostelId = null;
+
+window.openUpgrade = (id, name) => {
+    selectedHostelId = id;
+
+    document.getElementById("upgradeTitle").innerText = "Upgrade " + name;
+    document.getElementById("upgradeModal").style.display = "flex";
+};
+
+window.closeUpgrade = () => {
+    document.getElementById("upgradeModal").style.display = "none";
+};
+
+
+window.onclick = (e) => {
+    if (e.target.id === "upgradeModal") {
+        closeUpgrade();
+    }
+};
+
+window.selectPlan = (tier, price) => {
+
+    const message = `Hello, I want to upgrade my hostel.
+
+Hostel ID: ${selectedHostelId}
+Plan: ${tier.toUpperCase()}
+Price: UGX ${price}`;
+
+    const phone = "256769216912";
+
+    window.open(
+        `https://wa.me/${phone}?text=${encodeURIComponent(message)}`,
+        "_blank"
+    );
+
+    document.getElementById("plansModal").style.display = "none";
+};
 
 </script>
 
