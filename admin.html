@@ -463,10 +463,21 @@ async function loadUsers() {
                 </span>` : ""}
             </h3>
 
-            <p>Status: ${d.status || "pending"}</p>
+           <span class="status ${d.status || "pending"}">
+              ${(d.status || "pending").toUpperCase()}
+           </span>
 
-            <button class="btn verify" onclick="verify('${u.id}')">Verify</button>
-            <button class="btn unverify" onclick="unverify('${u.id}')">Unverify</button>
+           <button class="btn approve" onclick="approveUser('${u.id}')">
+              Approve
+           </button>
+
+           <button class="btn verify" onclick="verify('${u.id}')">
+              Verify
+           </button>
+
+           <button class="btn unverify" onclick="unverify('${u.id}')">
+              Unverify
+           </button>
         `;
 
         box.appendChild(card);
