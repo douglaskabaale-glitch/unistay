@@ -432,7 +432,7 @@ window.bookNow = function () {
     let phone = (property.contact || "").replace(/\s+/g, '');
     if (!phone.startsWith("+")) phone = "+256" + phone;
 
-    const msg = `Hello, I'm interested in ${property.hostelName}`;
+    const msg = `Hello, I found your hostel listing on https://douglaskabaale-glitch.github.io/unistay/ and I'm interested in ${property.hostelName}`;
 
     window.open(
         `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`,
