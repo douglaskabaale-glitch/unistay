@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UNISTAY — Student Hostels Near You</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="unistay-theme.css">
+
+<style>
+.hero{
+    padding: 56px 0 44px;
+    border-bottom: 1px solid var(--rule);
+}
+.hero-inner{
+    max-width: 640px;
+}
+.hero-inner img.logo{
+    height: 34px;
+    margin-bottom: 22px;
+}
+.hero h1{
+    font-size: 34px;
+    margin-bottom: 12px;
+}
+.hero p.tagline{
+    font-size: 16px;
+    margin-bottom: 26px;
+}
+.hero-actions{
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.steps-list, .reasons-list{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 22px;
+}
+.steps-list li{
+    display: flex;
+    gap: 12px;
+}
+.step-num{
+    font-family: "Lora", serif;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--pen-blue);
+    border: 1px solid var(--rule-strong);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.reasons-list li{
+    padding-left: 18px;
+    border-left: 2px solid var(--leaf-green);
+}
+.reasons-list li h4{ margin-bottom: 4px; font-size: 15px; }
+.reasons-list li p{ font-size: 14px; margin: 0; }
+
+.stats-row{
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap;
+}
+.stat-num{
+    font-family: "Lora", serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--ink);
+}
+.stat-label{
+    font-size: 13px;
+    color: var(--ink-soft);
+}
+
+.about-text{ max-width: 640px; margin-bottom: 22px; }
+.founder-card{
+    padding: 20px;
+    max-width: 480px;
+}
+.founder-top{
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 12px;
+}
+.founder-img{
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid var(--rule);
+}
+.founder-top h3{ font-size: 16px; margin-bottom: 2px; }
+.founder-top p{ margin: 0; font-size: 13px; }
+.founder-card dl{
+    margin: 0;
+    font-size: 14px;
+    color: var(--ink-soft);
+}
+.founder-card dl div{ display: flex; gap: 6px; margin-bottom: 4px; }
+.founder-card dt{ font-weight: 600; color: var(--ink); }
+
+footer{
+    text-align: center;
+    padding: 26px 20px;
+    color: var(--ink-faint);
+    font-size: 13px;
+    border-top: 1px solid var(--rule);
+    margin-top: 20px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="u-topbar">
+    <span class="u-wordmark">UNISTAY</span>
+    <div style="display:flex; gap:18px; align-items:center;">
+        <a href="find-hostel.html" style="color:var(--ink-soft); font-size:14px;">Find a Hostel</a>
+        <a href="spotlight.html" style="color:var(--ink-soft); font-size:14px;">Spotlight</a>
+        <a href="auth.html" class="u-btn u-btn-outline" style="padding:8px 14px;">List My Property</a>
+    </div>
+</div>
+
+<section class="hero">
+    <div class="u-container hero-inner">
+        <img src="logo.png" class="logo" alt="UNISTAY logo">
+        <h1>Find a trusted student hostel near campus.</h1>
+        <p class="tagline">UNISTAY connects students with verified, affordable hostels close to their university — search by school, compare, and book in minutes.</p>
+        <div class="hero-actions">
+            <button class="u-btn u-btn-primary" onclick="window.location='find-hostel.html'">Find a Hostel</button>
+            <button class="u-btn u-btn-outline" onclick="window.location='auth.html'">List My Property</button>
+        </div>
+    </div>
+</section>
+
+<section class="u-section">
+    <div class="u-container">
+        <h2 class="u-section-title">How it works</h2>
+        <ul class="steps-list">
+            <li><span class="step-num">1</span><div><h4 style="font-size:15px;margin-bottom:2px;">Search your university</h4><p style="font-size:14px;margin:0;">Pick your school from the list.</p></div></li>
+            <li><span class="step-num">2</span><div><h4 style="font-size:15px;margin-bottom:2px;">Browse nearby hostels</h4><p style="font-size:14px;margin:0;">Compare price, location and rooms.</p></div></li>
+            <li><span class="step-num">3</span><div><h4 style="font-size:15px;margin-bottom:2px;">Read reviews</h4><p style="font-size:14px;margin:0;">See what other students say before you book.</p></div></li>
+        </ul>
+    </div>
+</section>
+
+<section class="u-section" style="background:var(--paper-raised); border-top:1px solid var(--rule); border-bottom:1px solid var(--rule);">
+    <div class="u-container">
+        <h2 class="u-section-title">Why UNISTAY</h2>
+        <ul class="reasons-list">
+            <li><h4>Verified listings</h4><p>Every hostel is checked before it goes live.</p></li>
+            <li><h4>Student friendly</h4><p>Built around what students actually need.</p></li>
+            <li><h4>Safe &amp; affordable</h4><p>Clear pricing, no hidden surprises.</p></li>
+        </ul>
+    </div>
+</section>
+
+<section class="u-section">
+    <div class="u-container">
+        <h2 class="u-section-title">Our impact</h2>
+        <div class="stats-row">
+            <div><div class="stat-num">120+</div><div class="stat-label">Hostels listed</div></div>
+            <div><div class="stat-num">1,000+</div><div class="stat-label">Students served</div></div>
+            <div><div class="stat-num">Nationwide</div><div class="stat-label">Coverage across Uganda</div></div>
+        </div>
+    </div>
+</section>
+
+<section class="u-section" style="background:var(--paper-raised); border-top:1px solid var(--rule);">
+    <div class="u-container">
+        <h2 class="u-section-title">About UNISTAY</h2>
+        <p class="about-text">UNISTAY started as a simple school project, but it quickly grew into something bigger — a way to solve the accommodation challenges university students face every semester.</p>
+
+        <div class="founder-card u-card">
+            <div class="founder-top">
+                <img src="founder.jpg" class="founder-img" alt="Founder">
+                <div>
+                    <h3>Douglas Kabaale</h3>
+                    <p>Founder &amp; Developer</p>
+                </div>
+            </div>
+            <dl>
+                <div><dt>Education:</dt><dd style="margin:0;">Victoria University — BIT (2025)</dd></div>
+                <div><dt>Location:</dt><dd style="margin:0;">Kampala, Uganda</dd></div>
+                <div><dt>Contact:</dt><dd style="margin:0;">0769216912</dd></div>
+            </dl>
+        </div>
+
+        <p class="about-text" style="margin-top:18px;">The vision is to expand UNISTAY across every university in Uganda, and beyond.</p>
+    </div>
+</section>
+
+<footer>
+    © 2026 UNISTAY. All rights reserved.
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UNISTAY - Spotlight</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="unistay-theme.css">
+
+<style>
+/* ===== HERO SLIDER ===== */
+.hero-slider{
+    position: relative;
+    height: 56vh;
+    overflow: hidden;
+    border-bottom: 1px solid var(--rule);
+}
+.hero-track{
+    display: flex;
+    height: 100%;
+    transition: transform 0.6s ease;
+}
+.hero-slide{
+    min-width: 100%;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+.hero-slide::after{
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(34,28,20,0.75) 10%, rgba(34,28,20,0.1));
+}
+.hero-content{
+    position: absolute;
+    bottom: 28px;
+    left: 24px;
+    z-index: 2;
+    color: #fff;
+    max-width: 420px;
+}
+.hero-content h1{ font-size: 26px; color: #fff; margin-bottom: 4px; }
+.hero-content p{ color: rgba(255,255,255,0.85); margin-bottom: 14px; }
+
+.hero-btn{
+    padding: 10px 18px;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+}
+.view-btn{ background: #fff; color: var(--ink); }
+.view-btn:hover{ background: var(--paper); }
+
+/* ===== SECTIONS ===== */
+.section{ padding: 26px 20px; max-width: 1080px; margin: 0 auto; }
+.section h2{ font-size: 16px; margin-bottom: 14px; }
+
+.row{ display: flex; gap: 16px; overflow-x: auto; padding-bottom: 4px; }
+.row::-webkit-scrollbar{ height: 6px; }
+.row::-webkit-scrollbar-thumb{ background: var(--rule-strong); border-radius: 3px; }
+
+/* ===== FEATURED (BIG CARDS) ===== */
+.featured-card{
+    min-width: 200px;
+    height: 240px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    border: 1px solid var(--rule);
+    flex-shrink: 0;
+}
+.featured-card img{ width: 100%; height: 100%; object-fit: cover; }
+.featured-info{
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: 10px 12px;
+    background: linear-gradient(to top, rgba(0,0,0,0.75), transparent);
+    color: #fff;
+}
+.featured-info h4{ color: #fff; font-size: 14px; margin: 0 0 2px; }
+.featured-info p{ color: rgba(255,255,255,0.85); font-size: 13px; margin: 0; }
+
+/* ===== STUDENT FREQUENT (SMALL CARDS) ===== */
+.small-card{
+    min-width: 140px;
+    height: 170px;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+    border: 1px solid var(--rule);
+    flex-shrink: 0;
+}
+.small-card img{ width: 100%; height: 100%; object-fit: cover; }
+.small-info{
+    position: absolute;
+    bottom: 0;
+    padding: 6px 8px;
+    font-size: 12px;
+    color: #fff;
+    background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+    width: 100%;
+}
+
+/* ================= SPOTLIGHT HEADER ================= */
+.spotlight-banner{
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    padding: 14px 20px;
+    background: var(--paper-raised);
+    border-bottom: 1px solid var(--rule);
+}
+.spotlight-content{
+    max-width: 1080px;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+.spotlight-badge{
+    padding: 5px 11px;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    background: var(--pen-blue);
+}
+.spotlight-title{
+    font-family: "Lora", serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink);
+}
+.spotlight-sub{
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--ink-soft);
+}
+@media (max-width: 600px){
+    .spotlight-sub{ display: none; }
+}
+</style>
+</head>
+
+<body>
+
+    <div class="spotlight-banner">
+    <div class="spotlight-content">
+        <div class="spotlight-badge">UNISTAY</div>
+        <div class="spotlight-title">Spotlight listings</div>
+        <div class="spotlight-sub">Premium &amp; featured hostels only</div>
+    </div>
+</div>
+
+<!-- HERO SLIDER -->
+<div class="hero-slider">
+    <div class="hero-track" id="heroTrack"></div>
+</div>
+
+<!-- FEATURED -->
+<div class="section">
+    <h2>Featured list</h2>
+    <div class="row" id="featuredRow"></div>
+</div>
+
+<!-- STUDENT FREQUENT -->
+<div class="section">
+    <h2>Student frequent</h2>
+    <div class="row" id="frequentRow"></div>
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import {
+    getFirestore,
+    collection,
+    getDocs
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSy...",
+  authDomain: "unistay-v1.firebaseapp.com",
+  projectId: "unistay-v1"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+/* LOAD DATA */
+async function loadData() {
+    const snap = await getDocs(collection(db, "properties"));
+
+    let data = [];
+    snap.forEach(doc => {
+    const p = doc.data();
+    const plan = p.plan || "boost";
+
+    data.push({ id: doc.id, ...p, plan });
+});
+
+    if (!data.length) return;
+
+    render(data);
+}
+
+/* HERO SLIDES */
+function renderHero(elite) {
+    const track = document.getElementById("heroTrack");
+
+    track.innerHTML = elite.map(h => `
+        <div class="hero-slide" style="background-image:url(${h.cover})">
+            <div class="hero-content">
+                <h1>${h.hostelName}</h1>
+                <p>UGX ${h.price}</p>
+                <button class="hero-btn view-btn" onclick="go('${h.id}')">
+                   View Hostel
+                </button>
+            </div>
+        </div>
+    `).join("");
+
+    let index = 0;
+    setInterval(() => {
+        index = (index + 1) % elite.length;
+        track.style.transform = `translateX(-${index * 100}%)`;
+    }, 5000);
+}
+
+/* FEATURED */
+function renderFeatured(data) {
+    document.getElementById("featuredRow").innerHTML =
+        data.map(h => `
+            <div class="featured-card" onclick="go('${h.id || ""}')">
+                <img src="${h.cover}">
+                <div class="featured-info">
+                    <h4>${h.hostelName}</h4>
+                    <p>UGX ${h.price}</p>
+                </div>
+            </div>
+        `).join("");
+}
+
+/* SMALL */
+function renderFrequent(data) {
+    document.getElementById("frequentRow").innerHTML =
+        data.map(h => `
+            <div class="small-card" onclick="go('${h.id || ""}')">
+                <img src="${h.cover}">
+                <div class="small-info">
+                    ${h.hostelName}
+                </div>
+            </div>
+        `).join("");
+}
+
+/* NAV */
+window.go = (id) => {
+    if (!id) return;
+    window.location.href = `hostel-details.html?id=${encodeURIComponent(id)}`;
+};
+
+/* MAIN */
+function render(data) {
+
+    const elite = data.filter(h => h.plan === "elite");
+    const prime = data.filter(h => h.plan === "prime");
+    const amplify = data.filter(h => h.plan === "amplify");
+
+    renderHero(elite);
+    renderFeatured(prime);
+    renderFrequent(amplify);
+}
+
+loadData();
+
+</script>
+
+</body>
+</html>

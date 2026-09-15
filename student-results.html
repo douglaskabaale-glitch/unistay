@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UNISTAY - Results</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="unistay-theme.css">
+
+<style>
+.header{
+    background: var(--paper-raised);
+    border-bottom: 1px solid var(--rule);
+    color: var(--ink);
+    padding: 16px;
+    text-align: center;
+    font-family: "Lora", serif;
+    font-size: 19px;
+    font-weight: 700;
+}
+
+.info{
+    text-align: center;
+    margin: 12px;
+    font-size: 14px;
+    color: var(--ink-soft);
+}
+
+.grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 18px;
+    padding: 20px;
+    max-width: 1080px;
+    margin: 0 auto;
+}
+
+.card{
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    cursor: pointer;
+    color: var(--ink);
+    background: var(--paper-raised);
+    border: 1px solid var(--rule);
+    border-top: 3px solid var(--accent, var(--pen-blue));
+}
+.card:hover{ background: var(--paper); }
+
+.card img{
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+}
+
+.card-content{ padding: 14px; }
+
+.title{
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--ink);
+}
+
+.section{
+    display: flex;
+    justify-content: space-between;
+    margin: 6px 0;
+    font-size: 13px;
+    padding: 7px 10px;
+    border-radius: var(--radius-sm);
+    background: var(--paper);
+    color: var(--ink-soft);
+}
+
+.price{ font-weight: 700; color: var(--leaf-green); }
+
+.rating{
+    margin-top: 8px;
+    font-size: 13px;
+    color: var(--amber);
+    font-weight: 700;
+}
+
+.verified-badge{
+    display: inline-block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--pen-blue);
+    font-weight: 700;
+}
+
+.empty{
+    height: 50vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--ink-faint);
+}
+
+/* ===== UNIVERSITY ACCENT (matches find-hostel.html) ===== */
+.makerere{ --accent: #2C5B8C; }
+.kyambogo{ --accent: #3D6B4A; }
+.mubs{ --accent: #966C1F; }
+.ucu{ --accent: #A23F2E; }
+.victoria{ --accent: #6A4C93; }
+.gulu{ --accent: #1E6E6E; }
+.must{ --accent: #B98A2E; }
+.kabale{ --accent: #4A7856; }
+.kiu{ --accent: #8C4A2C; }
+.cavendish{ --accent: #3F5A7D; }
+</style>
+</head>
+
+<body>
+
+<div class="header">UNISTAY — Available Hostels</div>
+<div class="info" id="infoText"></div>
+
+<div id="container"></div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import {
+    getFirestore,
+    collection,
+    query,
+    where,
+    getDocs
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCwDxwL4j_fgzGi1ffHHhaG36nw2uzNiE",
+  authDomain: "unistay-v1.firebaseapp.com",
+  projectId: "unistay-v1"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+/* INPUT */
+const selectedUniversity =
+    (localStorage.getItem("selectedUniversity") || "").trim();
+
+const selectedLocation =
+    (localStorage.getItem("selectedLocation") || "").trim();
+
+document.getElementById("infoText").innerText =
+`${selectedUniversity} → ${selectedLocation}`;
+
+/* NORMALIZE */
+function norm(v){
+    return (v || "").toLowerCase().trim();
+}
+
+/* RATINGS */
+async function getRating(id){
+    const snap = await getDocs(collection(db,"properties",id,"reviews"));
+
+    let t=0,c=0;
+    snap.forEach(d=>{
+        t+=d.data().rating||0;
+        c++;
+    });
+
+    return {
+        avg: c ? t/c : 0,
+        count: c
+    };
+}
+
+/* LOAD */
+async function loadResults(){
+
+    const container = document.getElementById("container");
+
+    if(!selectedUniversity){
+        container.innerHTML = `<div class="empty">No university selected</div>`;
+        return;
+    }
+
+    container.innerHTML = `<div class="empty">Loading...</div>`;
+
+    const q = query(
+        collection(db,"properties"),
+        where("university","==",selectedUniversity)
+    );
+
+    const snap = await getDocs(q);
+
+    let results = [];
+
+    snap.forEach(doc=>{
+        const p = doc.data();
+        const plan = p.plan || "boost";
+
+        const ok =
+            (p.status || "pending") === "approved" &&
+            norm(p.university) === norm(selectedUniversity) &&
+            (!selectedLocation || norm(p.location) === norm(selectedLocation));
+
+        if(ok){
+            results.push({id:doc.id,...p});
+        }
+    });
+
+    render(results);
+}
+
+/* RENDER */
+async function render(results){
+
+    const container = document.getElementById("container");
+
+    if(!results.length){
+        container.innerHTML = `<div class="empty">No hostels found</div>`;
+        return;
+    }
+
+    const grid = document.createElement("div");
+    grid.className = "grid";
+
+    for(let p of results){
+
+        const rating = await getRating(p.id);
+
+        const uniClass =
+            p.university.includes("Makerere") ? "makerere" :
+            p.university.includes("Kyambogo") ? "kyambogo" :
+            p.university.includes("MUBS") ? "mubs" :
+            p.university.includes("UCU") ? "ucu" :
+            p.university.includes("Victoria") ? "victoria" :
+            p.university.includes("Gulu") ? "gulu" :
+            p.university.includes("Mbarara") ? "must" :
+            p.university.includes("Kabale") ? "kabale" :
+            p.university.includes("KIU") ? "kiu" :
+            "cavendish";
+
+        const card = document.createElement("div");
+        card.className = `card ${uniClass}`;
+
+        card.innerHTML = `
+            <img src="${p.cover}" onerror="this.src='https://via.placeholder.com/400x300'">
+           
+            <div class="card-content">
+                <div class="title">${p.hostelName}</div>
+                
+                <div class="section"><span>Location</span><span>${p.location}</span></div>
+                <div class="section"><span>Price</span><span class="price">UGX ${p.price}</span></div>
+                <div class="section"><span>Type</span><span>${p.roomType||"-"}</span></div>
+                
+                ${p.verified ? `<div class="verified-badge">✔ Verified</div>` : ""}
+                <div class="rating">⭐ ${rating.avg.toFixed(1)} (${rating.count})</div>
+            </div>
+        `;
+
+        card.onclick = ()=>{
+            localStorage.setItem("selectedProperty", JSON.stringify(p));
+            window.location.href = "hostel-details.html?id=" + p.id;
+        };
+
+        grid.appendChild(card);
+    }
+
+    container.innerHTML="";
+    container.appendChild(grid);
+}
+
+loadResults();
+
+</script>
+
+</body>
+</html>

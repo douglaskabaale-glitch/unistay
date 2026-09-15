@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UNISTAY - Add Property</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="unistay-theme.css">
+
+<style>
+body{
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.container{
+    width: 100%;
+    max-width: 460px;
+    margin: 40px 20px;
+    padding: 26px;
+}
+
+h2{
+    font-size: 21px;
+    margin-bottom: 16px;
+}
+
+.input-group{ margin-top: 12px; }
+
+input, select, textarea{
+    width: 100%;
+    padding: 11px 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--rule-strong);
+    outline: none;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+}
+
+select{ background-color: var(--paper); color: var(--ink); }
+select option{ background-color: var(--paper-raised); color: var(--ink); }
+
+input:focus, select:focus, textarea:focus{
+    border-color: var(--pen-blue);
+}
+
+textarea{ height: 85px; resize: vertical; }
+
+.error{
+    color: var(--pen-red);
+    font-size: 12px;
+    margin-top: 4px;
+    display: none;
+}
+
+button{
+    width: 100%;
+    margin-top: 18px;
+    padding: 13px;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: var(--pen-blue);
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+}
+button:hover{ background: var(--pen-blue-dark); }
+</style>
+</head>
+
+<body>
+
+<div class="container u-card">
+
+    <h2>Add property</h2>
+
+    <div class="input-group">
+        <input id="hostelName" placeholder="Hostel Name">
+        <div class="error" id="err-hostelName">Field needed</div>
+    </div>
+
+    <div class="input-group">
+        <select id="university">
+            <option value="">Select University</option>
+            <option>Makerere University</option>
+            <option>Kyambogo University</option>
+            <option>Makerere University Business School</option>
+            <option>Uganda Christian University</option>
+            <option>Victoria University</option>
+            <option>Gulu University</option>
+            <option>Mbarara University of Science and Technology</option>
+            <option>Kabale University</option>
+            <option>Kampala International University</option>
+            <option>Cavendish University Uganda</option>
+        </select>
+        <div class="error" id="err-university">Field needed</div>
+    </div>
+
+    <div class="input-group">
+        <select id="location">
+            <option value="">Select Location</option>
+        </select>
+        <div class="error" id="err-location">Field needed</div>
+    </div>
+
+    <div class="input-group">
+        <input id="price" type="number" placeholder="Price (UGX)">
+        <div class="error" id="err-price">Field needed</div>
+    </div>
+
+    <div class="input-group">
+        <input id="contact" placeholder="Contact">
+        <div class="error" id="err-contact">Field needed</div>
+    </div>
+
+    <div class="input-group">
+        <input id="amenities" placeholder="Amenities (WiFi, Water, Security)">
+    </div>
+
+    <div class="input-group">
+        <textarea id="description" placeholder="Description"></textarea>
+    </div>
+
+    <div class="input-group">
+        <input type="file" id="image">
+        <div class="error" id="err-image">Field needed</div>
+    </div>
+
+    <button onclick="submitProperty()">Submit property</button>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import { getAuth, onAuthStateChanged } 
+from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import { getFirestore, collection, addDoc } 
+from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCwDxwL4j_fgzGi1ffHhaG36nw2uzNiZ1E",
+  authDomain: "unistay-v1.firebaseapp.com",
+  projectId: "unistay-v1"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+let currentUser = null;
+
+onAuthStateChanged(auth, (user) => {
+    if (!user) {
+        alert("Please log in first");
+        window.location = "auth.html";
+        return;
+    }
+
+    currentUser = user;
+    console.log("✅ Logged in as:", user.uid);
+});
+
+
+/* CLOUDINARY */
+const upload = async (file) => {
+    const url = "https://api.cloudinary.com/v1_1/dsanvos33/image/upload";
+    const form = new FormData();
+    form.append("file", file);
+    form.append("upload_preset", "unistay-images");
+
+    const res = await fetch(url, { method: "POST", body: form });
+    const data = await res.json();
+
+    return data.secure_url;
+};
+
+/* LOCATION DATA */
+const data = {
+    "Makerere University": ["Wandegeya","Kikoni","Bwaise","Makerere Hill","Naakulabye"],
+    "Kyambogo University": ["Banda","Kiwatule","Ntinda","Naalya","Kyambogo Hill"],
+    "Makerere University Business School": ["Nakawa","Bugolobi","Mbuya","Luzira","Kitintale"],
+    "Uganda Christian University": ["Mukono","Seeta","Namilyango","Goma","Sonde"],
+    "Victoria University": ["Nakasero","Kololo","Kampala Road","Nsambya","CBD"],
+    "Gulu University": ["Pece","Bardege","Layibi","Gulu Town","Laroo"],
+    "Mbarara University of Science and Technology": ["Kakoba","Nyamitanga","Kamukuzi","Mbarara Town","Katete"],
+    "Kabale University": ["Makanga","Kabale Town","Kikungiri","Rushoroza","Nyabikoni"],
+    "Kampala International University": ["Kansanga","Ggaba Road","Muyenga","Makindye","Kabalagala"],
+    "Cavendish University Uganda": ["Nsambya","Nakasero","Kampala CBD","Wandegeya","Nateete"]
+};
+
+/* DROPDOWN */
+document.getElementById("university").addEventListener("change", function () {
+
+    const uni = this.value;
+    const locationSelect = document.getElementById("location");
+
+    locationSelect.innerHTML = `<option value="">Select Location</option>`;
+
+    if (data[uni]) {
+        data[uni].forEach(loc => {
+            let opt = document.createElement("option");
+            opt.value = loc;
+            opt.textContent = loc;
+            locationSelect.appendChild(opt);
+        });
+    }
+});
+
+/* VALIDATION + SUBMIT (UNCHANGED) */
+function showError(id, show) {
+    document.getElementById("err-" + id).style.display = show ? "block" : "none";
+}
+
+function validate() {
+    let valid = true;
+
+    ["hostelName","university","location","price","contact"].forEach(f => {
+        const val = document.getElementById(f).value;
+        const empty = !val || val.trim() === "";
+        showError(f, empty);
+        if (empty) valid = false;
+    });
+
+    const file = document.getElementById("image").files[0];
+
+    if (!file) {
+        showError("image", true);
+        valid = false;
+    } else {
+        showError("image", false);
+    }
+
+    return valid;
+}
+
+/* =========================
+   SUBMIT PROPERTY
+========================= */
+window.submitProperty = async () => {
+
+    if (!validate()) return;
+
+    if (!currentUser) {
+        alert("User not loaded yet. Try again.");
+        return;
+    }
+
+    try {
+        const hostelName = document.getElementById("hostelName").value;
+        const university = document.getElementById("university").value;
+        const location = document.getElementById("location").value;
+        const price = document.getElementById("price").value;
+        const contact = document.getElementById("contact").value;
+        const amenities = document.getElementById("amenities").value;
+        const description = document.getElementById("description").value;
+        const file = document.getElementById("image").files[0];
+
+        // Upload image
+        const imageUrl = await upload(file);
+
+        // Save to Firestore
+        await addDoc(collection(db, "properties"), {
+            hostelName,
+            university,
+            location,
+            price,
+            contact,
+            amenities,
+            description,
+            cover: imageUrl,
+            landlordId: currentUser.uid, // ✅ CRITICAL FIX
+            status: "pending",
+            createdAt: Date.now()
+        });
+
+        alert("Submitted successfully ✅");
+        location.reload();
+
+    } catch (err) {
+        console.error("❌ ERROR:", err);
+        alert("Failed to submit property");
+    }
+};
+
+</script>
+
+</body>
+</html>

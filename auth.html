@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UNISTAY - Access</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="unistay-theme.css">
+
+<style>
+body{
+    min-height: 100vh;
+}
+
+.auth-wrap{
+    width: 100%;
+    max-width: 400px;
+    margin: 60px auto;
+    padding: 0 20px;
+}
+
+.auth-card{
+    padding: 28px;
+}
+
+.auth-card h2{
+    font-size: 22px;
+    margin-bottom: 18px;
+}
+
+.auth-card input{ margin-bottom: 10px; }
+
+.switch{
+    text-align: center;
+    margin-top: 12px;
+    color: var(--pen-blue);
+    cursor: pointer;
+    font-size: 14px;
+}
+.switch:hover{ text-decoration: underline; }
+
+#strength{
+    font-size: 13px;
+    margin: -4px 0 10px;
+}
+
+#preview{
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    margin: 4px auto 10px;
+    display: block;
+    object-fit: cover;
+    border: 1px solid var(--rule-strong);
+}
+
+.file-label{
+    display: block;
+    background: var(--paper);
+    border: 1px solid var(--rule-strong);
+    color: var(--ink);
+    padding: 10px;
+    border-radius: var(--radius-sm);
+    text-align: center;
+    cursor: pointer;
+    margin: 4px 0 10px;
+    font-size: 14px;
+}
+.file-label:hover{ background: var(--pen-blue-tint); }
+.file-label input{ display: none; }
+
+#msg{
+    text-align: center;
+    margin-top: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    min-height: 18px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="u-topbar">
+    <a href="index__1_.html" class="u-wordmark" style="color:var(--ink);">UNISTAY</a>
+</div>
+
+<div class="auth-wrap">
+<div class="auth-card u-card">
+
+<div id="loginForm">
+    <h2>Log in</h2>
+    <input class="u-field" type="text" id="loginUser" placeholder="Email">
+    <input class="u-field" type="password" id="loginPass" placeholder="Password">
+    <button class="u-btn u-btn-primary" style="width:100%;" onclick="login()">Log in</button>
+    <div class="switch" onclick="showSignup()">Create an account</div>
+</div>
+
+<div id="signupForm" style="display:none;">
+    <h2>Create account</h2>
+
+    <input class="u-field" type="text" id="signupUser" placeholder="Username">
+
+    <label class="file-label" id="fileLabel">
+        Choose profile picture
+        <input type="file" id="profilePic" accept="image/*" onchange="loadImage(event)">
+    </label>
+
+    <img id="preview" src="" style="display:none;">
+
+    <input class="u-field" type="text" id="signupContact" placeholder="Email">
+
+    <input class="u-field" type="password" id="signupPass" placeholder="Password" oninput="checkStrength()">
+    <div id="strength"></div>
+
+    <input class="u-field" type="password" id="confirmPass" placeholder="Confirm password">
+
+    <p style="text-align:center; color:var(--ink-soft); font-size:14px;">
+        Account type: <strong style="color:var(--ink);">Landlord</strong>
+    </p>
+
+    <button class="u-btn u-btn-primary" style="width:100%;" onclick="signup()">Sign up</button>
+    <div class="switch" onclick="showLogin()">Back to log in</div>
+</div>
+
+<p id="msg"></p>
+
+</div>
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import { 
+    getAuth, 
+    createUserWithEmailAndPassword, 
+    signInWithEmailAndPassword 
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
+import {
+    getFirestore,
+    doc,
+    setDoc
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+/* KEEP YOUR ORIGINAL CONFIG (UNCHANGED) */
+const firebaseConfig = {
+  apiKey: "AIzaSyCwDxwL4j_fgzGi1ffHhaG36nw2uzNiZ1E",
+  authDomain: "unistay-v1.firebaseapp.com",
+  projectId: "unistay-v1",
+  storageBucket: "unistay-v1.firebasestorage.app",
+  messagingSenderId: "125895379967",
+  appId: "1:125895379967:web:197892746f83a6bf3cf5ca"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+/* MESSAGE */
+function showMessage(text, color="#A23F2E") {
+    let msg = document.getElementById("msg");
+    msg.style.color = color;
+    msg.innerText = text;
+}
+
+/* NAV */
+window.showSignup = function() {
+    document.getElementById("loginForm").style.display = "none";
+    document.getElementById("signupForm").style.display = "block";
+    showMessage("");
+}
+
+window.showLogin = function() {
+    document.getElementById("signupForm").style.display = "none";
+    document.getElementById("loginForm").style.display = "block";
+    showMessage("");
+}
+
+/* IMAGE */
+let profileBase64 = "";
+
+window.loadImage = function(event) {
+    let reader = new FileReader();
+    reader.onload = function () {
+        profileBase64 = reader.result;
+
+        let img = document.getElementById("preview");
+        img.src = profileBase64;
+        img.style.display = "block";
+
+        document.getElementById("fileLabel").innerText = "Image selected";
+    };
+    reader.readAsDataURL(event.target.files[0]);
+}
+
+/* PASSWORD STRENGTH */
+window.checkStrength = function() {
+    let pass = document.getElementById("signupPass").value;
+    let strength = document.getElementById("strength");
+
+    if (pass.length < 4) {
+        strength.innerText = "Weak";
+        strength.style.color = "#A23F2E";
+    } else if (pass.length < 8) {
+        strength.innerText = "Medium";
+        strength.style.color = "#966C1F";
+    } else {
+        strength.innerText = "Strong";
+        strength.style.color = "#3D6B4A";
+    }
+}
+
+/* SIGNUP (UNCHANGED LOGIC) */
+window.signup = async function() {
+    let email = document.getElementById("signupContact").value.trim();
+    let pass = document.getElementById("signupPass").value.trim();
+    let confirm = document.getElementById("confirmPass").value.trim();
+    let username = document.getElementById("signupUser").value.trim();
+
+    if (!email || !pass || !confirm || !username) {
+        showMessage("All fields are required!");
+        return;
+    }
+
+    if (pass !== confirm) {
+        showMessage("Passwords do not match!");
+        return;
+    }
+
+    try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+        const user = userCredential.user;
+
+        await setDoc(doc(db, "users", user.uid), {
+            name: username,
+            email: email,
+            role: "landlord",
+            status: "pending",
+            profileImage: profileBase64 || null,
+            createdAt: new Date()
+        });
+
+        showMessage("Account created successfully!", "#3D6B4A");
+
+        setTimeout(() => {
+            window.location.href = "dashboard.html";
+        }, 1000);
+
+    } catch (error) {
+        showMessage(error.message);
+    }
+}
+
+/* LOGIN (UNCHANGED LOGIC) */
+window.login = async function() {
+    let email = document.getElementById("loginUser").value.trim();
+    let pass = document.getElementById("loginPass").value.trim();
+
+    if (!email || !pass) {
+        showMessage("Please fill in all login fields!");
+        return;
+    }
+
+    try {
+        await signInWithEmailAndPassword(auth, email, pass);
+
+        showMessage("Login successful!", "#3D6B4A");
+
+        setTimeout(() => {
+            window.location.href = "dashboard.html";
+        }, 800);
+
+    } catch (error) {
+        showMessage("Invalid login!");
+    }
+}
+
+</script>
+
+</body>
+</html>

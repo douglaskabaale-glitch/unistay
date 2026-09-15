@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UNISTAY - Find Hostel</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="unistay-theme.css">
+
+<style>
+.header{
+    text-align: left;
+    padding: 28px 20px 6px;
+    max-width: 1080px;
+    margin: 0 auto;
+}
+.header h1{ font-size: 26px; }
+.header p{ font-size: 14px; }
+
+.grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    padding: 20px;
+    max-width: 1080px;
+    margin: 0 auto;
+}
+
+/* UNIVERSITY CARDS — flat, accent as a top rule not a full glow gradient */
+.card{
+    padding: 22px 20px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    color: var(--ink);
+    font-weight: 600;
+    background: var(--paper-raised);
+    border: 1px solid var(--rule);
+    border-top: 3px solid var(--accent, var(--pen-blue));
+    transition: border-color .15s ease, background-color .15s ease;
+}
+.card:hover{ background: var(--paper); }
+
+.makerere{ --accent: #2C5B8C; }
+.kyambogo{ --accent: #3D6B4A; }
+.mubs{ --accent: #966C1F; }
+.ucu{ --accent: #A23F2E; }
+.victoria{ --accent: #6A4C93; }
+.gulu{ --accent: #1E6E6E; }
+.must{ --accent: #B98A2E; }
+.kabale{ --accent: #4A7856; }
+.kiu{ --accent: #8C4A2C; }
+.cavendish{ --accent: #3F5A7D; }
+
+/* OVERLAY */
+.overlay{
+    position: fixed;
+    inset: 0;
+    background: rgba(34,28,20,0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 5;
+    padding: 16px;
+}
+
+/* POPUP */
+.zoomCard{
+    width: 100%;
+    max-width: 560px;
+    padding: 26px;
+    border-radius: var(--radius-lg);
+    background: var(--paper-raised);
+    border: 1px solid var(--rule);
+    border-top: 4px solid var(--accent, var(--pen-blue));
+    color: var(--ink);
+    max-height: 85vh;
+    overflow-y: auto;
+}
+.zoomCard h2{ font-size: 19px; margin-bottom: 14px; }
+
+/* AREAS */
+.area{
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    padding: 13px 14px;
+    margin: 8px 0;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--ink);
+}
+.area:hover{ border-color: var(--pen-blue); background: var(--pen-blue-tint); }
+</style>
+</head>
+
+<body>
+
+<div class="header">
+    <h1>Find your hostel</h1>
+    <p>Select your university to explore nearby areas.</p>
+</div>
+
+<div class="grid" id="uniGrid"></div>
+
+<div class="overlay" id="overlay" onclick="closeOverlay(event)">
+    <div class="zoomCard" id="zoomCard">
+        <h2 id="title"></h2>
+        <div id="areas"></div>
+    </div>
+</div>
+
+<script>
+
+/* DATA */
+const universities = {
+    "Makerere University": ["Wandegeya","Kikoni","Bwaise","Kawempe","Makerere Hill"],
+    "Kyambogo University": ["Banda","Ntinda","Kiwatule","Naalya","Kyambogo Hill"],
+    "Makerere University Business School": ["Nakawa","Bugolobi","Mbuya","Banda","Luzira"],
+    "Uganda Christian University": ["Mukono","Seeta","Namilyango","Goma","Wantoni"],
+    "Victoria University": ["Nakasero","Kololo","Kampala Road","Nsambya","Bugolobi"],
+    "Gulu University": ["Pece","Bardege","Layibi","Gulu Town","Unyama"],
+    "Mbarara University of Science and Technology": ["Kakoba","Nyamitanga","Mbarara Town","Kijungu","Nyakayojo"],
+    "Kabale University": ["Makanga","Kabale Town","Kikungiri","Rutooma","Kyanamira"],
+    "Kampala International University": ["Kansanga","Ggaba Road","Muyenga","Kabalagala","Bukasa"],
+    "Cavendish University Uganda": ["Nakasero","Nsambya","City Centre","Kololo","Wandegeya"]
+};
+
+const classMap = {
+    "Makerere University":"makerere",
+    "Kyambogo University":"kyambogo",
+    "Makerere University Business School":"mubs",
+    "Uganda Christian University":"ucu",
+    "Victoria University":"victoria",
+    "Gulu University":"gulu",
+    "Mbarara University of Science and Technology":"must",
+    "Kabale University":"kabale",
+    "Kampala International University":"kiu",
+    "Cavendish University Uganda":"cavendish"
+};
+
+/* GRID */
+const grid = document.getElementById("uniGrid");
+
+Object.keys(universities).forEach(name => {
+    const div = document.createElement("div");
+    div.className = "card " + classMap[name];
+    div.innerText = name;
+
+    div.onclick = () => {
+        localStorage.clear();
+        openUni(name);
+    };
+
+    grid.appendChild(div);
+});
+
+/* OPEN UNI */
+function openUni(name){
+    document.getElementById("overlay").style.display = "flex";
+    document.getElementById("zoomCard").className = "zoomCard " + classMap[name];
+    document.getElementById("title").innerText = name;
+
+    const box = document.getElementById("areas");
+    box.innerHTML = "";
+
+    universities[name].forEach(area => {
+        let div = document.createElement("div");
+        div.className = "area";
+        div.innerText = area;
+
+        div.onclick = () => {
+            localStorage.setItem("selectedUniversity", name.trim());
+            localStorage.setItem("selectedLocation", area.trim());
+            window.location.href = "student-results.html";
+        };
+
+        box.appendChild(div);
+    });
+}
+
+/* CLOSE */
+function closeOverlay(e){
+    if(e.target.id === "overlay"){
+        document.getElementById("overlay").style.display = "none";
+    }
+}
+
+</script>
+
+</body>
+</html>

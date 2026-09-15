@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UNISTAY - Dashboard</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="unistay-theme.css">
+
+<style>
+.user-box{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+}
+.user-box img{
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid var(--rule-strong);
+    object-fit: cover;
+}
+
+#statusBox{
+    font-size: 13px;
+    color: var(--ink-soft);
+}
+
+.right-actions{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.bell{ font-size: 18px; color: var(--ink-soft); }
+
+.container{ max-width: 1080px; margin: 0 auto; padding: 24px 20px; }
+
+.container h2{ font-size: 20px; margin-bottom: 16px; }
+
+/* PROPERTY CARD */
+.card{
+    background: var(--paper-raised);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-card);
+    margin-bottom: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.card img{
+    width: 220px;
+    height: 160px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.card-content{
+    padding: 16px;
+    flex: 1;
+    min-width: 220px;
+}
+.card-content h3{ font-size: 17px; margin-bottom: 4px; }
+
+.price{
+    color: var(--pen-blue);
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.actions{
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+}
+
+.actions button{
+    padding: 8px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--rule-strong);
+    background: transparent;
+    color: var(--ink);
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+}
+.edit-btn:hover{ background: var(--pen-blue-tint); border-color: var(--pen-blue); }
+.delete-btn{ color: var(--pen-red); }
+.delete-btn:hover{ background: var(--pen-red-tint); border-color: var(--pen-red); }
+.upgrade-btn{ color: var(--gold); }
+.upgrade-btn:hover{ background: var(--gold-tint); border-color: var(--gold); }
+
+.empty{ text-align: center; color: var(--ink-faint); margin-top: 50px; }
+
+/* EDIT MODAL */
+#editModal{
+    position: fixed;
+    inset: 0;
+    background: rgba(34,28,20,0.45);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    padding: 16px;
+    z-index: 100;
+}
+.modal{
+    background: var(--paper-raised);
+    padding: 22px;
+    border-radius: var(--radius-md);
+    width: 100%;
+    max-width: 340px;
+    border: 1px solid var(--rule);
+}
+.modal h3{ margin-bottom: 12px; font-size: 17px; }
+.modal input{
+    width: 100%;
+    padding: 10px;
+    margin: 6px 0;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--rule-strong);
+    background: var(--paper);
+    color: var(--ink);
+    outline: none;
+}
+.modal input:focus{ border-color: var(--pen-blue); }
+.modal .actions button{ flex: 1; }
+
+/* ================= UPGRADE MODAL ================= */
+.upgrade-modal{
+    position: fixed;
+    inset: 0;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    background: rgba(34,28,20,0.5);
+    z-index: 999;
+    padding: 16px;
+}
+
+.upgrade-card{
+    width: 100%;
+    max-width: 900px;
+    padding: 24px;
+    border-radius: var(--radius-lg);
+    background: var(--paper-raised);
+    border: 1px solid var(--rule);
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.upgrade-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+}
+.upgrade-header h2{ font-size: 19px; margin: 0; }
+
+.close{
+    cursor: pointer;
+    font-size: 20px;
+    color: var(--ink-soft);
+    line-height: 1;
+}
+.close:hover{ color: var(--pen-red); }
+
+.plans{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 14px;
+}
+
+.plan{
+    padding: 18px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--rule);
+    background: var(--paper);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.plan.elite{ border-color: var(--gold); background: var(--gold-tint); }
+
+.plan h3{ font-size: 16px; margin: 0; }
+.plan p{ font-size: 13px; margin: 0; color: var(--ink-soft); }
+.plan .price{ font-size: 15px; font-weight: 700; color: var(--ink); }
+
+.plan ul{
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin: 6px 0;
+    padding-left: 16px;
+}
+.plan ul li{ margin-bottom: 3px; }
+
+.plan button{
+    width: 100%;
+    margin-top: 8px;
+    padding: 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--pen-blue);
+    cursor: pointer;
+    background: var(--pen-blue);
+    color: #fff;
+    font-weight: 600;
+    font-size: 13px;
+}
+.plan button:hover{ background: var(--pen-blue-dark); }
+</style>
+</head>
+
+<body>
+
+<div class="header u-topbar">
+
+    <div class="user-box">
+        <img id="userPic">
+        <span id="userName"></span>
+    </div>
+
+    <div id="statusBox"></div>
+
+    <div class="right-actions">
+        <div class="bell">🔔</div>
+        <button class="u-btn u-btn-primary" onclick="goAdd()">+ Add Property</button>
+        <button class="u-btn u-btn-outline" onclick="logout()">Log out</button>
+    </div>
+</div>
+
+<div class="container">
+    <h2>Your properties</h2>
+    <div id="propertyList"></div>
+</div>
+
+<!-- EDIT MODAL -->
+<div id="editModal">
+    <div class="modal">
+        <h3>Edit property</h3>
+
+        <input id="eName" placeholder="Hostel Name">
+        <input id="ePrice" placeholder="Price">
+        <input id="eContact" placeholder="Contact">
+
+        <div class="actions" style="display:flex; justify-content:space-between; gap:8px;">
+            <button class="u-btn u-btn-primary" onclick="saveEdit()">Save</button>
+            <button class="u-btn u-btn-outline" onclick="closeEdit()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- UPGRADE MODAL -->
+<div id="upgradeModal" class="upgrade-modal">
+
+    <div class="upgrade-card">
+
+        <div class="upgrade-header">
+            <h2 id="upgradeTitle">Upgrade Hostel</h2>
+            <span class="close" onclick="closeUpgrade()">✕</span>
+        </div>
+
+        <div class="plans">
+
+            <div class="plan boost">
+                <h3>Boost</h3>
+                <p>UGX 50,000 / month</p>
+                <ul>
+                    <li>Search visibility</li>
+                    <li>Basic exposure</li>
+                </ul>
+                <button onclick="selectPlan('boost', 50000)">Select</button>
+            </div>
+
+            <div class="plan amplify">
+                <h3>Amplify</h3>
+                <p>UGX 100,000 / month</p>
+                <ul>
+                    <li>Higher ranking</li>
+                    <li>Highlighted listing</li>
+                </ul>
+                <button onclick="selectPlan('amplify', 100000)">Select</button>
+            </div>
+
+            <div class="plan prime">
+                <h3>Prime</h3>
+                <p>UGX 200,000 / month</p>
+                <ul>
+                    <li>Homepage rotation</li>
+                    <li>Priority Spotlight</li>
+                </ul>
+                <button onclick="selectPlan('prime', 200000)">Select</button>
+            </div>
+
+            <div class="plan elite">
+                <h3>Elite</h3>
+                <p>UGX 350,000 / month</p>
+                <ul>
+                    <li>Pinned Spotlight</li>
+                    <li>Maximum exposure</li>
+                </ul>
+                <button onclick="selectPlan('elite', 350000)">Select</button>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import { 
+    getAuth, 
+    onAuthStateChanged, 
+    signOut 
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
+import {
+    getFirestore,
+    collection,
+    query,
+    where,
+    getDocs,
+    doc,
+    getDoc,
+    deleteDoc,
+    updateDoc
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCwDxwL4j_fgzGi1ffHhaG36nw2uzNiZ1E",
+  authDomain: "unistay-v1.firebaseapp.com",
+  projectId: "unistay-v1",
+  storageBucket: "unistay-v1.firebasestorage.app",
+  messagingSenderId: "125895379967",
+  appId: "1:125895379967:web:197892746f83a6bf3cf5ca"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser = null;
+let editId = null;
+
+/* AUTH */
+onAuthStateChanged(auth, async (user) => {
+
+    if (!user) {
+        window.location = "auth.html";
+        return;
+    }
+
+    currentUser = user;
+
+    document.getElementById("userName").innerText =
+        user.email.split("@")[0];
+
+    document.getElementById("userPic").src =
+        "https://via.placeholder.com/35";
+
+    const userRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userRef);
+
+    if (userSnap.exists()) {
+        const status = userSnap.data().status;
+
+        document.getElementById("statusBox").innerText =
+            "Status: " + status;
+
+        document.getElementById("statusBox").style.color =
+            status === "approved" ? "#3D6B4A" : "#966C1F";
+    }
+
+    loadProperties(user.uid);
+});
+
+/* LOAD */
+async function loadProperties(uid) {
+    const q = query(collection(db, "properties"), where("landlordId", "==", uid));
+    const snap = await getDocs(q);
+
+    let data = [];
+    snap.forEach(d => data.push({ id: d.id, ...d.data() }));
+
+    render(data);
+}
+
+/* RENDER */
+function render(properties) {
+    let box = document.getElementById("propertyList");
+    box.innerHTML = "";
+
+    if (!properties.length) {
+        box.innerHTML = `<p class="empty">No properties yet.</p>`;
+        return;
+    }
+
+    properties.forEach(p => {
+        let div = document.createElement("div");
+        div.className = "card";
+
+        div.innerHTML = `
+            <img src="${p.cover}">
+            <div class="card-content">
+                <h3>${p.hostelName}</h3>
+                <p class="price">UGX ${p.price}</p>
+                <p>${p.contact}</p>
+
+                <div class="actions">
+                   <button class="edit-btn" onclick="openEdit('${p.id}','${p.hostelName}','${p.price}','${p.contact}')">Edit</button>
+                   <button class="delete-btn" onclick="deleteProperty('${p.id}')">Delete</button>
+                   <button class="upgrade-btn" onclick="openUpgrade('${p.id}','${p.hostelName}')">Upgrade</button>
+                </div>
+            </div>
+        `;
+
+        box.appendChild(div);
+    });
+}
+
+/* DELETE */
+window.deleteProperty = async (id) => {
+    await deleteDoc(doc(db, "properties", id));
+    location.reload();
+};
+
+/* EDIT */
+window.openEdit = (id, name, price, contact) => {
+    editId = id;
+    document.getElementById("eName").value = name;
+    document.getElementById("ePrice").value = price;
+    document.getElementById("eContact").value = contact;
+    document.getElementById("editModal").style.display = "flex";
+};
+
+window.closeEdit = () => {
+    document.getElementById("editModal").style.display = "none";
+};
+
+window.saveEdit = async () => {
+    await updateDoc(doc(db, "properties", editId), {
+        hostelName: document.getElementById("eName").value,
+        price: document.getElementById("ePrice").value,
+        contact: document.getElementById("eContact").value
+    });
+
+    closeEdit();
+    location.reload();
+};
+
+window.goAdd = () => window.location = "add-property.html";
+window.logout = () => signOut(auth).then(() => location = "auth.html");
+
+let selectedHostelId = null;
+
+window.openUpgrade = (id, name) => {
+    selectedHostelId = id;
+
+    document.getElementById("upgradeTitle").innerText = "Upgrade " + name;
+    document.getElementById("upgradeModal").style.display = "flex";
+};
+
+window.closeUpgrade = () => {
+    document.getElementById("upgradeModal").style.display = "none";
+};
+
+
+window.onclick = (e) => {
+    if (e.target.id === "upgradeModal") {
+        closeUpgrade();
+    }
+};
+
+window.selectPlan = (tier, price) => {
+
+    const message = `Hello, I want to upgrade my hostel.
+
+Hostel ID: ${selectedHostelId}
+Plan: ${tier.toUpperCase()}
+Price: UGX ${price}`;
+
+    const phone = "256769216912";
+
+    window.open(
+        `https://wa.me/${phone}?text=${encodeURIComponent(message)}`,
+        "_blank"
+    );
+
+    document.getElementById("plansModal").style.display = "none";
+};
+
+</script>
+
+</body>
+</html>
