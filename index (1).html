@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UNISTAY</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<button class="spotlight-btn" onclick="goSpotlight()">
+    🔥 Explore Spotlight Hostels
+</button>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+.spotlight-btn {
+    margin-top: 15px;
+    padding: 12px 20px;
+
+    border-radius: 999px;
+    border: none;
+
+    background: linear-gradient(135deg, #f59e0b, #ef4444);
+    color: white;
+
+    font-weight: bold;
+    font-size: 14px;
+
+    cursor: pointer;
+
+    box-shadow: 0 0 25px rgba(239,68,68,0.35);
+
+    transition: 0.3s ease;
+}
+
+.spotlight-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 35px rgba(239,68,68,0.6);
+}
+
+.spotlight-float {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+
+    padding: 12px 16px;
+
+    border-radius: 999px;
+
+    background: linear-gradient(135deg, #f97316, #ef4444);
+    color: white;
+
+    font-weight: bold;
+    font-size: 14px;
+
+    cursor: pointer;
+
+    box-shadow: 0 0 20px rgba(239,68,68,0.4);
+
+    z-index: 999;
+
+    transform: scale(1.05);
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+body {
+    background: linear-gradient(135deg, #0a0a0a, #121212);
+    color: #eee;
+    overflow-x: hidden;
+}
+
+
+/* CONTAINER */
+.container {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+/* LOGO BOX (GLOW FIXED) */
+.logo-box {
+    display: inline-block;
+    padding: 22px;
+    border-radius: 30px;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(12px);
+     box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+}
+
+.logo {
+    width: 320px;
+    max-width: 90%;
+}
+
+/* TAGLINE */
+.tagline {
+    margin: 25px 0;
+    color: #bbb;
+}
+
+/* 🔥 GLOW BUTTONS (ALWAYS ON) */
+.btn {
+    width: 260px;
+    padding: 18px;
+    border-radius: 18px;
+    border: none;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+
+    box-shadow:
+        0 0 12px rgba(77,166,255,0.6),
+        0 0 25px rgba(77,166,255,0.4);
+    transition: 0.3s;
+}
+
+.find {
+    background: linear-gradient(135deg, #00e676, #00c853);
+    box-shadow: 0 0 18px #00e676, 0 0 35px #00e676;
+}
+
+.list {
+    background: linear-gradient(135deg, #448aff, #2962ff);
+    box-shadow: 0 0 18px #448aff, 0 0 35px #2962ff;
+}
+
+.btn:hover {
+    transform: scale(1.05);
+}
+
+/* SECTION BOXES (GLOW RESTORED) */
+.section {
+    max-width: 900px;
+    margin: auto;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.section h2 {
+    color: #4da6ff;
+    margin-bottom: 15px;
+}
+
+.step,
+.reason,
+.stat,
+.about,
+.founder-card {
+    background: rgba(255,255,255,0.05);
+    border-radius: 16px;
+    padding: 20px;
+    margin: 10px;
+
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+
+/* GRIDS */
+.steps, .reasons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+/* STATS */
+.stats {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* ABOUT SECTION */
+.about {
+    text-align: left;
+}
+
+/* FOUNDER */
+.founder-top {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.founder-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 2px solid #4da6ff;
+}
+
+/* FOOTER */
+footer {
+    text-align: center;
+    padding: 20px;
+    color: #777;
+}
+</style>
+</head>
+
+<script>
+function goSpotlight() {
+    window.location.href = "spotlight.html";
+}
+</script>
+
+<body>
+
+
+<div class="container">
+
+    <!-- LOGO (RESTORED CONTENT) -->
+    <div class="logo-box">
+        <img src="logo.png" class="logo">
+    </div>
+
+    <div class="tagline">
+        Find trusted student hostels near your university in seconds.
+    </div>
+
+    <div>
+        <button class="btn find" onclick="window.location='find-hostel.html'">Find a Hostel</button><br><br>
+        <button class="btn list" onclick="window.location='auth.html'">List My Property</button>
+    </div>
+</div>
+
+<div class="section">
+    <h2>How it works</h2>
+    <div class="steps">
+        <div class="step">🔍 Search university</div>
+        <div class="step">🏠 Browse hostels</div>
+        <div class="step">⭐ Read reviews</div>
+    </div>
+</div>
+
+<div class="section">
+    <h2>Why UNISTAY?</h2>
+    <div class="reasons">
+        <div class="reason">✔ Verified listings</div>
+        <div class="reason">✔ Student friendly</div>
+        <div class="reason">✔ Safe & affordable</div>
+    </div>
+</div>
+
+<div class="section">
+    <h2>Our Impact</h2>
+    <div class="stats">
+        <div class="stat">120+ Hostels</div>
+        <div class="stat">Nationwide</div>
+        <div class="stat">1,000+ Students</div>
+    </div>
+</div>
+
+<div class="about">
+    <h2>About UNISTAY & Founder</h2>
+
+    <p>
+        UNISTAY started as a simple school project, but it quickly grew into something much bigger —
+        a vision to solve accommodation challenges faced by university students.
+    </p>
+
+    <div class="founder-card">
+
+        <div class="founder-top">
+            <img src="founder.jpg" class="founder-img">
+
+            <div>
+                <h3>Douglas Kabaale</h3>
+                <p>Founder & Developer</p>
+            </div>
+        </div>
+
+        <p><b>Education:</b> Victoria University — BIT (2025)</p>
+        <p><b>Location:</b> Kampala, Uganda</p>
+        <p><b>Contact:</b> 0769216912</p>
+    </div>
+
+    <p>
+        My vision is to expand UNISTAY across all universities in Uganda and beyond.
+    </p>
+</div>
+
+<footer>
+    © 2026 UNISTAY. All Rights Reserved.
+</footer>
+
+<div class="spotlight-float" onclick="goSpotlight()">
+    🔥 Spotlight
+</div>
+
+</body>
+</html>
