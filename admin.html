@@ -685,4 +685,22 @@ function generateReceipt() {
         { maxWidth: 180 }
     );
 
-    // ====
+    // ===================== FOOTER =====================
+    doc.setDrawColor(...blue);
+    doc.line(14, 260, 196, 260);
+
+    doc.setFontSize(10);
+    doc.setTextColor(120);
+
+    doc.text("Thank you for partnering with UNISTAY.", 14, 270);
+    doc.text("This is a system-generated receipt and does not require a signature.", 14, 278);
+
+    doc.save(hostel + "_UNISTAY_Receipt.pdf");
+
+    closeReceipt();
+}
+
+</script>
+
+</body>
+</html>

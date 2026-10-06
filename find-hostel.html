@@ -242,4 +242,79 @@
         nameLabel.textContent = name;
         const meta = document.createElement("span");
         meta.className = "uni-meta";
-        const areaCount = document.crea
+        const areaCount = document.createElement("span");
+        areaCount.className = "area-count";
+        areaCount.textContent = `${locations.length} areas`;
+        const help = document.createElement("span");
+        help.textContent = "Explore nearby";
+        meta.append(areaCount, help);
+        content.append(nameLabel, meta);
+
+        const arrow = document.createElement("span");
+        arrow.className = "uni-arrow";
+        arrow.setAttribute("aria-hidden", "true");
+        arrow.textContent = "↗";
+        card.append(icon, content, arrow);
+        card.addEventListener("click", () => openUniversity(name, card));
+        grid.appendChild(card);
+      });
+      emptyState.style.display = matches.length ? "none" : "block";
+    }
+
+    function openUniversity(name, trigger) {
+      activeUniversity = name;
+      lastTrigger = trigger;
+      title.textContent = name;
+      areas.replaceChildren();
+      universities[name].forEach((area) => {
+        const button = document.createElement("button");
+        button.className = "area-button";
+        button.type = "button";
+        const label = document.createElement("span");
+        label.textContent = area;
+        const arrow = document.createElement("span");
+        arrow.setAttribute("aria-hidden", "true");
+        arrow.textContent = "→";
+        button.append(label, arrow);
+        button.addEventListener("click", () => chooseArea(area));
+        areas.appendChild(button);
+      });
+      overlay.classList.add("is-open");
+      overlay.setAttribute("aria-hidden", "false");
+      document.body.classList.add("modal-open");
+      closeButton.focus();
+    }
+
+    function closeDialog() {
+      if (!overlay.classList.contains("is-open")) return;
+      overlay.classList.remove("is-open");
+      overlay.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("modal-open");
+      if (lastTrigger) lastTrigger.focus();
+    }
+
+    function chooseArea(area) {
+      // Preserve unrelated saved app data; update only the two keys used by results.
+      localStorage.setItem("selectedUniversity", activeUniversity.trim());
+      localStorage.setItem("selectedLocation", area.trim());
+      window.location.href = "student-results.html";
+    }
+
+    searchInput.addEventListener("input", (event) => renderUniversities(event.target.value));
+    closeButton.addEventListener("click", closeDialog);
+    overlay.addEventListener("click", (event) => { if (event.target === overlay) closeDialog(); });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeDialog();
+      if (event.key === "Tab" && overlay.classList.contains("is-open")) {
+        const focusable = [...dialog.querySelectorAll("button")];
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+      }
+    });
+
+    renderUniversities();
+  </script>
+</body>
+</html>

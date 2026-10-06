@@ -1,211 +1,327 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>UNISTAY — Student Hostels Near You</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8f7f1">
+  <meta name="description" content="Find trusted student hostels near your university with UNISTAY.">
+  <title>UNISTAY — Find your place near campus</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #18352b;
+      --muted: #64736a;
+      --green: #206b4d;
+      --green-dark: #164c38;
+      --mint: #e4f1e8;
+      --cream: #f8f7f1;
+      --paper: #fffefa;
+      --sun: #efc967;
+      --line: #e5e9df;
+      --shadow: 0 18px 50px rgba(31, 62, 47, .09);
+      --radius: 24px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 90px; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--cream);
+      font-family: "DM Sans", sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    button { font: inherit; }
+    .wrap { width: min(1160px, calc(100% - 48px)); margin: 0 auto; }
+    .site-header {
+      position: sticky; top: 0; z-index: 20;
+      background: rgba(248, 247, 241, .88);
+      border-bottom: 1px solid rgba(229, 233, 223, .75);
+      backdrop-filter: blur(16px);
+    }
+    .nav { min-height: 76px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+    .brand { display: inline-flex; align-items: center; gap: 10px; font: 800 21px/1 "Manrope", sans-serif; letter-spacing: -.8px; }
+    .brand-mark { width: 36px; height: 36px; display: grid; place-items: center; color: white; background: var(--green); border-radius: 12px; box-shadow: 0 6px 14px rgba(32,107,77,.2); }
+    .brand-mark svg { width: 22px; height: 22px; }
+    .nav-links { display: flex; align-items: center; gap: 30px; color: #506158; font-size: 14px; font-weight: 600; }
+    .nav-links a:not(.nav-cta):hover { color: var(--green); }
+    .nav-cta, .button { display: inline-flex; align-items: center; justify-content: center; gap: 9px; border: 0; border-radius: 999px; background: var(--green); color: white; font-weight: 700; transition: transform .25s ease, background .25s ease, box-shadow .25s ease; }
+    .nav-cta { padding: 11px 18px; font-size: 13px; }
+    .button { min-height: 54px; padding: 0 23px; font-size: 14px; box-shadow: 0 10px 22px rgba(32,107,77,.17); }
+    .button:hover, .nav-cta:hover { background: var(--green-dark); transform: translateY(-2px); box-shadow: 0 14px 26px rgba(32,107,77,.22); }
+    .button.secondary { color: var(--green-dark); background: white; border: 1px solid var(--line); box-shadow: none; }
+    .button.secondary:hover { background: #f2f7f2; border-color: #cbdccf; }
+    .arrow { font-size: 17px; line-height: 1; }
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="unistay-theme.css">
+    .hero { position: relative; padding: 74px 0 86px; isolation: isolate; }
+    .hero::before, .hero::after { position: absolute; z-index: -1; content: ""; border-radius: 50%; pointer-events: none; }
+    .hero::before { width: 430px; height: 430px; right: -130px; top: -160px; background: radial-gradient(circle, rgba(209,231,209,.8), rgba(209,231,209,0) 70%); animation: drift 13s ease-in-out infinite alternate; }
+    .hero::after { width: 340px; height: 340px; left: -220px; bottom: -180px; background: radial-gradient(circle, rgba(239,201,103,.16), rgba(239,201,103,0) 70%); animation: drift 16s ease-in-out infinite alternate-reverse; }
+    .hero-grid { display: grid; grid-template-columns: 1.02fr .98fr; align-items: center; gap: 56px; }
+    .eyebrow { display: inline-flex; align-items: center; gap: 9px; padding: 8px 13px; color: var(--green-dark); background: #e8f2e8; border: 1px solid #dceadd; border-radius: 999px; font-size: 12px; font-weight: 700; letter-spacing: .02em; }
+    .eyebrow-dot { width: 8px; height: 8px; border-radius: 50%; background: #66a978; box-shadow: 0 0 0 4px rgba(102,169,120,.14); }
+    h1, h2, h3, p { margin-top: 0; }
+    h1, h2, h3 { font-family: "Manrope", sans-serif; }
+    h1 { max-width: 610px; margin: 21px 0 19px; font-size: clamp(44px, 6vw, 70px); line-height: 1.06; letter-spacing: -.065em; }
+    h1 .highlight { position: relative; color: var(--green); white-space: nowrap; }
+    h1 .highlight::after { position: absolute; left: 0; right: 3px; bottom: 1px; z-index: -1; height: 13px; content: ""; border-radius: 99px; background: rgba(239,201,103,.55); transform: rotate(-1deg); }
+    .hero-copy { max-width: 490px; margin-bottom: 26px; color: var(--muted); font-size: 17px; line-height: 1.75; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+    .trust-row { display: flex; align-items: center; gap: 12px; margin-top: 27px; color: #637167; font-size: 12px; }
+    .avatar-stack { display: flex; padding-left: 4px; }
+    .avatar { width: 29px; height: 29px; margin-left: -5px; display: grid; place-items: center; color: var(--green-dark); background: #d9ebd8; border: 2px solid var(--cream); border-radius: 50%; font-size: 10px; font-weight: 800; }
+    .avatar:nth-child(2) { background: #f4ddb0; }.avatar:nth-child(3) { background: #dce6ee; }.avatar:nth-child(4) { background: #ead9e5; }
+    .trust-stars { color: #d6a932; letter-spacing: 1px; font-size: 13px; }
 
-<style>
-.hero{
-    padding: 56px 0 44px;
-    border-bottom: 1px solid var(--rule);
-}
-.hero-inner{
-    max-width: 640px;
-}
-.hero-inner img.logo{
-    height: 34px;
-    margin-bottom: 22px;
-}
-.hero h1{
-    font-size: 34px;
-    margin-bottom: 12px;
-}
-.hero p.tagline{
-    font-size: 16px;
-    margin-bottom: 26px;
-}
-.hero-actions{
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-}
+    .hero-art { min-height: 440px; position: relative; display: grid; place-items: center; }
+    .art-halo { position: absolute; width: min(100%, 450px); aspect-ratio: 1; border-radius: 50%; background: #e8f0e4; }
+    .campus-card { position: relative; width: min(100%, 435px); padding: 14px; overflow: hidden; background: rgba(255,254,250,.92); border: 1px solid rgba(255,255,255,.85); border-radius: 28px; box-shadow: 0 30px 70px rgba(32,75,51,.16); transform: rotate(1.3deg); animation: cardFloat 7s ease-in-out infinite; }
+    .campus-art { height: 245px; position: relative; overflow: hidden; border-radius: 19px; background: linear-gradient(155deg, #cce3d4 0%, #e6efda 58%, #f1e7c9 100%); }
+    .sun-disc { position: absolute; width: 58px; height: 58px; top: 25px; right: 42px; border-radius: 50%; background: #f4d273; box-shadow: 0 0 0 14px rgba(244,210,115,.2); animation: sunPulse 5s ease-in-out infinite; }
+    .hill { position: absolute; left: -8%; right: -8%; bottom: -1px; height: 90px; border-radius: 50% 50% 0 0 / 45% 45% 0 0; background: #8ab38c; transform: rotate(-3deg); }
+    .hill.back { bottom: 39px; left: 42%; right: -20%; height: 90px; background: #abc99b; transform: rotate(8deg); }
+    .path { position: absolute; width: 120px; height: 90px; bottom: -24px; left: 45%; background: #e9d69f; border-radius: 50% 50% 0 0; transform: rotate(-15deg); }
+    .building { position: absolute; width: 208px; height: 127px; left: 50%; bottom: 56px; transform: translateX(-50%); background: #f8f3e5; border: 5px solid #d4c8aa; border-bottom: 0; box-shadow: 0 7px 0 rgba(87,116,78,.18); }
+    .roof { position: absolute; left: -17px; right: -17px; top: -29px; height: 32px; background: #a65f45; clip-path: polygon(8% 0, 92% 0, 100% 100%, 0 100%); }
+    .building::before { position: absolute; content: ""; width: 29px; height: 43px; left: 50%; bottom: 0; transform: translateX(-50%); border-radius: 14px 14px 0 0; background: #9cbeac; }
+    .window { position: absolute; top: 24px; width: 30px; height: 33px; background: #a6c6b4; border: 4px solid #e5ddc8; }
+    .window.one { left: 19px; }.window.two { right: 19px; }
+    .tree { position: absolute; z-index: 2; bottom: 44px; width: 13px; height: 46px; background: #806e4e; }
+    .tree::before { position: absolute; content: ""; left: -13px; top: -27px; width: 40px; height: 42px; border-radius: 50%; background: #548260; box-shadow: 9px -10px 0 -4px #68936c; }
+    .tree.one { left: 44px; }.tree.two { right: 46px; transform: scale(.8); }
+    .campus-caption { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 15px 7px 4px; }
+    .campus-caption strong { display: block; font: 800 15px/1.35 "Manrope", sans-serif; }
+    .campus-caption small { color: var(--muted); font-size: 11px; }
+    .rating { flex: 0 0 auto; padding: 7px 10px; color: #755b1f; background: #fbf2d9; border-radius: 99px; font-size: 11px; font-weight: 700; }
+    .float-note { position: absolute; z-index: 3; display: flex; align-items: center; gap: 10px; padding: 12px 15px; background: white; border: 1px solid rgba(229,233,223,.9); border-radius: 15px; box-shadow: var(--shadow); animation: bob 5s ease-in-out infinite; }
+    .float-note strong { display: block; font: 800 12px/1.25 "Manrope", sans-serif; }
+    .float-note small { display: block; margin-top: 2px; color: var(--muted); font-size: 10px; }
+    .note-icon { width: 32px; height: 32px; display: grid; place-items: center; background: #e6f2e7; border-radius: 11px; font-size: 16px; }
+    .note-top { top: 52px; left: -16px; }.note-bottom { right: -11px; bottom: 37px; animation-delay: -2.5s; }
+    .sparkle { position: absolute; color: #dcad42; font-size: 23px; animation: twinkle 3.2s ease-in-out infinite; }.sparkle.s1 { top: 56px; right: 44px; }.sparkle.s2 { bottom: 90px; left: 8px; animation-delay: -1.4s; }
 
-.steps-list, .reasons-list{
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 22px;
-}
-.steps-list li{
-    display: flex;
-    gap: 12px;
-}
-.step-num{
-    font-family: "Lora", serif;
-    font-weight: 600;
-    font-size: 15px;
-    color: var(--pen-blue);
-    border: 1px solid var(--rule-strong);
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-.reasons-list li{
-    padding-left: 18px;
-    border-left: 2px solid var(--leaf-green);
-}
-.reasons-list li h4{ margin-bottom: 4px; font-size: 15px; }
-.reasons-list li p{ font-size: 14px; margin: 0; }
+    .quick-proof { position: relative; z-index: 2; margin-top: -1px; padding: 22px 0; background: var(--paper); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .proof-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    .proof-label { color: var(--muted); font-size: 12px; font-weight: 600; }
+    .proof-stats { display: flex; align-items: center; gap: clamp(24px, 5vw, 65px); }
+    .proof-stat { display: flex; align-items: baseline; gap: 8px; white-space: nowrap; }
+    .proof-stat strong { font: 800 21px/1 "Manrope", sans-serif; letter-spacing: -.04em; }
+    .proof-stat span { color: var(--muted); font-size: 12px; }
 
-.stats-row{
-    display: flex;
-    gap: 40px;
-    flex-wrap: wrap;
-}
-.stat-num{
-    font-family: "Lora", serif;
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--ink);
-}
-.stat-label{
-    font-size: 13px;
-    color: var(--ink-soft);
-}
+    .section { padding: 88px 0; }
+    .section-heading { max-width: 640px; margin: 0 auto 38px; text-align: center; }
+    .section-kicker { margin-bottom: 10px; color: var(--green); font-size: 11px; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; }
+    h2 { margin-bottom: 12px; font-size: clamp(29px, 4vw, 42px); line-height: 1.15; letter-spacing: -.055em; }
+    .section-heading p { margin-bottom: 0; color: var(--muted); font-size: 15px; }
+    .steps-grid, .reasons-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .step-card, .reason-card { position: relative; padding: 26px; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: 0 8px 25px rgba(31,62,47,.035); transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease; }
+    .step-card:hover, .reason-card:hover { transform: translateY(-5px); border-color: #c8dccb; box-shadow: var(--shadow); }
+    .step-number { position: absolute; top: 22px; right: 23px; color: #b5c4b6; font: 800 12px "Manrope", sans-serif; }
+    .step-icon, .reason-icon { width: 49px; height: 49px; display: grid; place-items: center; margin-bottom: 23px; background: var(--mint); border-radius: 15px; color: var(--green); font-size: 22px; }
+    .step-card h3, .reason-card h3 { margin-bottom: 8px; font-size: 17px; letter-spacing: -.03em; }
+    .step-card p, .reason-card p { margin-bottom: 0; color: var(--muted); font-size: 13px; line-height: 1.7; }
+    .benefits { background: #eef3eb; }
+    .reason-card { background: rgba(255,254,250,.78); }
+    .reason-icon.safe { color: #9b721e; background: #fbf1d8; }
+    .reason-icon.student { color: #5c658f; background: #ebecf8; }
 
-.about-text{ max-width: 640px; margin-bottom: 22px; }
-.founder-card{
-    padding: 20px;
-    max-width: 480px;
-}
-.founder-top{
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin-bottom: 12px;
-}
-.founder-img{
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 1px solid var(--rule);
-}
-.founder-top h3{ font-size: 16px; margin-bottom: 2px; }
-.founder-top p{ margin: 0; font-size: 13px; }
-.founder-card dl{
-    margin: 0;
-    font-size: 14px;
-    color: var(--ink-soft);
-}
-.founder-card dl div{ display: flex; gap: 6px; margin-bottom: 4px; }
-.founder-card dt{ font-weight: 600; color: var(--ink); }
+    .about-section { padding: 82px 0 92px; }
+    .about-panel { display: grid; grid-template-columns: 1fr .82fr; gap: 42px; align-items: center; padding: clamp(27px, 5vw, 55px); background: var(--green-dark); color: white; border-radius: 30px; overflow: hidden; position: relative; }
+    .about-panel::after { position: absolute; content: ""; width: 320px; height: 320px; right: -120px; top: -180px; border: 1px solid rgba(255,255,255,.12); border-radius: 50%; box-shadow: 0 0 0 35px rgba(255,255,255,.03), 0 0 0 72px rgba(255,255,255,.025); }
+    .about-panel .section-kicker { color: #c5e0c8; }
+    .about-panel h2 { max-width: 540px; }
+    .about-copy { max-width: 540px; color: rgba(255,255,255,.75); font-size: 14px; line-height: 1.8; }
+    .founder-card { position: relative; z-index: 1; padding: 23px; background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.14); border-radius: 22px; backdrop-filter: blur(10px); }
+    .founder-top { display: flex; align-items: center; gap: 14px; padding-bottom: 18px; border-bottom: 1px solid rgba(255,255,255,.15); }
+    .founder-avatar { width: 57px; height: 57px; display: grid; place-items: center; flex: 0 0 auto; color: var(--green-dark); background: #e5d49f; border: 2px solid rgba(255,255,255,.35); border-radius: 50%; font: 800 17px "Manrope", sans-serif; }
+    .founder-top h3 { margin: 0 0 2px; font-size: 16px; }.founder-top p { margin: 0; color: rgba(255,255,255,.68); font-size: 12px; }
+    .founder-details { display: grid; gap: 10px; padding-top: 17px; color: rgba(255,255,255,.82); font-size: 12px; }
+    .founder-details strong { color: white; }
+    .vision { margin: 17px 0 0; color: #dce9dc; font-size: 12px; line-height: 1.7; }
+    .cta-band { padding: 0 0 80px; }
+    .cta-inner { display: flex; align-items: center; justify-content: space-between; gap: 25px; padding: 26px 30px; background: #f5edd9; border: 1px solid #eee2c3; border-radius: 22px; }
+    .cta-inner h2 { margin: 0 0 4px; font-size: 22px; }.cta-inner p { margin: 0; color: #726a54; font-size: 13px; }
+    footer { padding: 23px 0; color: #7b887e; background: var(--paper); border-top: 1px solid var(--line); font-size: 12px; }
+    .footer-inner { display: flex; justify-content: space-between; align-items: center; gap: 14px; }
+    .footer-brand { color: var(--green-dark); font: 800 13px "Manrope", sans-serif; }
+    .spotlight-float { position: fixed; z-index: 15; right: 22px; bottom: 22px; display: inline-flex; align-items: center; gap: 8px; padding: 12px 17px; color: #654e1a; background: #f6d980; border: 1px solid rgba(255,255,255,.8); border-radius: 999px; box-shadow: 0 10px 26px rgba(111,85,23,.2); font-size: 12px; font-weight: 800; transition: transform .25s ease, box-shadow .25s ease; }
+    .spotlight-float:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(111,85,23,.27); }
+    .spotlight-flame { animation: flicker 2.4s ease-in-out infinite; }
+    .reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s cubic-bezier(.2,.7,.25,1); }
+    .reveal.is-visible { opacity: 1; transform: translateY(0); }
+    .delay-1 { transition-delay: .08s; }.delay-2 { transition-delay: .16s; }
 
-footer{
-    text-align: center;
-    padding: 26px 20px;
-    color: var(--ink-faint);
-    font-size: 13px;
-    border-top: 1px solid var(--rule);
-    margin-top: 20px;
-}
-</style>
+    @keyframes drift { to { transform: translate3d(-22px, 18px, 0) scale(1.04); } }
+    @keyframes cardFloat { 0%,100% { transform: translateY(0) rotate(1.3deg); } 50% { transform: translateY(-9px) rotate(.2deg); } }
+    @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+    @keyframes sunPulse { 0%,100% { box-shadow: 0 0 0 14px rgba(244,210,115,.2); } 50% { box-shadow: 0 0 0 20px rgba(244,210,115,.12); } }
+    @keyframes twinkle { 0%,100% { opacity: .45; transform: scale(.8) rotate(0); } 50% { opacity: 1; transform: scale(1.15) rotate(18deg); } }
+    @keyframes flicker { 0%,100% { transform: rotate(-4deg) scale(1); } 50% { transform: rotate(4deg) scale(1.12); } }
+
+    @media (max-width: 850px) {
+      .hero { padding: 55px 0 70px; }
+      .hero-grid { gap: 26px; grid-template-columns: 1fr .9fr; }
+      .hero-art { min-height: 365px; }
+      .campus-art { height: 205px; }
+      .building { transform: translateX(-50%) scale(.83); transform-origin: bottom center; }
+      .note-top { left: -5px; }.note-bottom { right: -5px; }
+      .nav-links { gap: 17px; }
+    }
+    @media (max-width: 650px) {
+      .wrap { width: min(100% - 36px, 520px); }
+      .nav { min-height: 66px; }.nav-links { gap: 0; }.nav-links > a:not(.nav-cta) { display: none; }.nav-cta { padding: 10px 14px; font-size: 12px; }
+      .brand { font-size: 19px; }.brand-mark { width: 33px; height: 33px; }
+      .hero { padding: 45px 0 50px; }.hero-grid { grid-template-columns: 1fr; gap: 16px; }
+      h1 { max-width: 520px; margin-top: 17px; font-size: clamp(43px, 12vw, 61px); }
+      .hero-copy { font-size: 15px; }.hero-art { min-height: 350px; margin: 0 3px; }.art-halo { width: min(90%, 360px); }
+      .campus-card { width: min(100%, 385px); }.campus-art { height: 195px; }
+      .note-top { top: 22px; left: -3px; }.note-bottom { right: -3px; bottom: 18px; }.sparkle.s1 { top: 20px; right: 16px; }
+      .proof-inner { align-items: flex-start; flex-direction: column; gap: 13px; }.proof-stats { width: 100%; justify-content: space-between; gap: 8px; }.proof-stat { display: block; }.proof-stat strong { display: block; margin-bottom: 4px; font-size: 18px; }.proof-stat span { font-size: 10px; }
+      .section { padding: 65px 0; }.section-heading { margin-bottom: 27px; }.steps-grid, .reasons-grid { grid-template-columns: 1fr; gap: 12px; }.step-card, .reason-card { display: grid; grid-template-columns: 48px 1fr; column-gap: 15px; padding: 20px; }.step-icon, .reason-icon { grid-row: span 2; margin: 0; }.step-number { top: 16px; right: 17px; }.step-card h3, .reason-card h3 { align-self: end; padding-right: 26px; }.step-card p, .reason-card p { align-self: start; }
+      .about-section { padding: 58px 0 64px; }.about-panel { grid-template-columns: 1fr; gap: 27px; border-radius: 24px; }.founder-card { padding: 19px; }
+      .cta-band { padding-bottom: 63px; }.cta-inner { align-items: flex-start; flex-direction: column; padding: 23px; }.footer-inner { flex-direction: column; text-align: center; }
+      .spotlight-float { right: 14px; bottom: 14px; padding: 11px 14px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+      .reveal { opacity: 1; transform: none; }
+    }
+  </style>
 </head>
-
 <body>
+  <header class="site-header">
+    <nav class="nav wrap" aria-label="Main navigation">
+      <a class="brand" href="#home" aria-label="UNISTAY home">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M3.5 10.4 12 3.8l8.5 6.6v9.1a.9.9 0 0 1-.9.9H4.4a.9.9 0 0 1-.9-.9v-9.1Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 20.4v-6.2h6v6.2M7.5 10.7h.01M16.5 10.7h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+        UNISTAY
+      </a>
+      <div class="nav-links">
+        <a href="#how-it-works">How it works</a>
+        <a href="#why-unistay">Why UNISTAY</a>
+        <a href="#about">Our story</a>
+        <a class="nav-cta" href="find-hostel.html">Find a hostel <span class="arrow" aria-hidden="true">↗</span></a>
+      </div>
+    </nav>
+  </header>
 
-<div class="u-topbar">
-    <span class="u-wordmark">UNISTAY</span>
-    <div style="display:flex; gap:18px; align-items:center;">
-        <a href="find-hostel.html" style="color:var(--ink-soft); font-size:14px;">Find a Hostel</a>
-        <a href="spotlight.html" style="color:var(--ink-soft); font-size:14px;">Spotlight</a>
-        <a href="auth.html" class="u-btn u-btn-outline" style="padding:8px 14px;">List My Property</a>
-    </div>
-</div>
-
-<section class="hero">
-    <div class="u-container hero-inner">
-        <img src="logo.png" class="logo" alt="UNISTAY logo">
-        <h1>Find a trusted student hostel near campus.</h1>
-        <p class="tagline">UNISTAY connects students with verified, affordable hostels close to their university — search by school, compare, and book in minutes.</p>
-        <div class="hero-actions">
-            <button class="u-btn u-btn-primary" onclick="window.location='find-hostel.html'">Find a Hostel</button>
-            <button class="u-btn u-btn-outline" onclick="window.location='auth.html'">List My Property</button>
+  <main>
+    <section class="hero" id="home">
+      <div class="hero-grid wrap">
+        <div class="hero-content">
+          <div class="eyebrow"><span class="eyebrow-dot"></span> Your next chapter starts near campus</div>
+          <h1>A place to stay.<br>A place to <span class="highlight">belong.</span></h1>
+          <p class="hero-copy">Find trusted student hostels near your university in seconds. Compare your options, read reviews, and feel at home before the semester begins.</p>
+          <div class="hero-actions">
+            <a class="button" href="find-hostel.html">Find your hostel <span class="arrow" aria-hidden="true">→</span></a>
+            <a class="button secondary" href="auth.html">List my property</a>
+          </div>
+          <div class="trust-row">
+            <div class="avatar-stack" aria-hidden="true"><span class="avatar">S</span><span class="avatar">J</span><span class="avatar">A</span><span class="avatar">+</span></div>
+            <div><span class="trust-stars" aria-label="Rated five stars">★★★★★</span><br>Made for students, built on trust</div>
+          </div>
         </div>
-    </div>
-</section>
-
-<section class="u-section">
-    <div class="u-container">
-        <h2 class="u-section-title">How it works</h2>
-        <ul class="steps-list">
-            <li><span class="step-num">1</span><div><h4 style="font-size:15px;margin-bottom:2px;">Search your university</h4><p style="font-size:14px;margin:0;">Pick your school from the list.</p></div></li>
-            <li><span class="step-num">2</span><div><h4 style="font-size:15px;margin-bottom:2px;">Browse nearby hostels</h4><p style="font-size:14px;margin:0;">Compare price, location and rooms.</p></div></li>
-            <li><span class="step-num">3</span><div><h4 style="font-size:15px;margin-bottom:2px;">Read reviews</h4><p style="font-size:14px;margin:0;">See what other students say before you book.</p></div></li>
-        </ul>
-    </div>
-</section>
-
-<section class="u-section" style="background:var(--paper-raised); border-top:1px solid var(--rule); border-bottom:1px solid var(--rule);">
-    <div class="u-container">
-        <h2 class="u-section-title">Why UNISTAY</h2>
-        <ul class="reasons-list">
-            <li><h4>Verified listings</h4><p>Every hostel is checked before it goes live.</p></li>
-            <li><h4>Student friendly</h4><p>Built around what students actually need.</p></li>
-            <li><h4>Safe &amp; affordable</h4><p>Clear pricing, no hidden surprises.</p></li>
-        </ul>
-    </div>
-</section>
-
-<section class="u-section">
-    <div class="u-container">
-        <h2 class="u-section-title">Our impact</h2>
-        <div class="stats-row">
-            <div><div class="stat-num">120+</div><div class="stat-label">Hostels listed</div></div>
-            <div><div class="stat-num">1,000+</div><div class="stat-label">Students served</div></div>
-            <div><div class="stat-num">Nationwide</div><div class="stat-label">Coverage across Uganda</div></div>
-        </div>
-    </div>
-</section>
-
-<section class="u-section" style="background:var(--paper-raised); border-top:1px solid var(--rule);">
-    <div class="u-container">
-        <h2 class="u-section-title">About UNISTAY</h2>
-        <p class="about-text">UNISTAY started as a simple school project, but it quickly grew into something bigger — a way to solve the accommodation challenges university students face every semester.</p>
-
-        <div class="founder-card u-card">
-            <div class="founder-top">
-                <img src="founder.jpg" class="founder-img" alt="Founder">
-                <div>
-                    <h3>Douglas Kabaale</h3>
-                    <p>Founder &amp; Developer</p>
-                </div>
+        <div class="hero-art" aria-label="Illustration of student accommodation near a leafy campus">
+          <div class="art-halo"></div>
+          <span class="sparkle s1" aria-hidden="true">✳</span><span class="sparkle s2" aria-hidden="true">✦</span>
+          <div class="float-note note-top"><span class="note-icon" aria-hidden="true">✓</span><span><strong>Verified places</strong><small>Browse with confidence</small></span></div>
+          <div class="campus-card">
+            <div class="campus-art" aria-hidden="true">
+              <div class="sun-disc"></div><div class="hill back"></div><div class="hill"></div><div class="path"></div>
+              <div class="building"><div class="roof"></div><span class="window one"></span><span class="window two"></span></div>
+              <span class="tree one"></span><span class="tree two"></span>
             </div>
-            <dl>
-                <div><dt>Education:</dt><dd style="margin:0;">Victoria University — BIT (2025)</dd></div>
-                <div><dt>Location:</dt><dd style="margin:0;">Kampala, Uganda</dd></div>
-                <div><dt>Contact:</dt><dd style="margin:0;">0769216912</dd></div>
-            </dl>
+            <div class="campus-caption"><div><strong>Your campus, closer</strong><small>Good stays. Great starts.</small></div><span class="rating">★ Student approved</span></div>
+          </div>
+          <div class="float-note note-bottom"><span class="note-icon" aria-hidden="true">⌂</span><span><strong>Near your university</strong><small>Find your people & place</small></span></div>
         </div>
+      </div>
+    </section>
 
-        <p class="about-text" style="margin-top:18px;">The vision is to expand UNISTAY across every university in Uganda, and beyond.</p>
-    </div>
-</section>
+    <section class="quick-proof" aria-label="UNISTAY at a glance">
+      <div class="proof-inner wrap">
+        <span class="proof-label">A growing home for student living</span>
+        <div class="proof-stats">
+          <div class="proof-stat"><strong>120+</strong><span>hostels</span></div>
+          <div class="proof-stat"><strong>1,000+</strong><span>students</span></div>
+          <div class="proof-stat"><strong>Nationwide</strong><span>in Uganda</span></div>
+        </div>
+      </div>
+    </section>
 
-<footer>
-    © 2026 UNISTAY. All rights reserved.
-</footer>
+    <section class="section" id="how-it-works">
+      <div class="wrap">
+        <div class="section-heading reveal">
+          <div class="section-kicker">Simple from the start</div>
+          <h2>Your next home is three steps away</h2>
+          <p>Skip the guesswork. Find a place that fits your campus, your budget, and your life.</p>
+        </div>
+        <div class="steps-grid">
+          <article class="step-card reveal"><span class="step-number">01</span><span class="step-icon" aria-hidden="true">⌕</span><h3>Choose your university</h3><p>Start with the campus you'll call home and discover nearby places to stay.</p></article>
+          <article class="step-card reveal delay-1"><span class="step-number">02</span><span class="step-icon" aria-hidden="true">⌂</span><h3>Explore your options</h3><p>Browse student-friendly hostels and compare the details that matter to you.</p></article>
+          <article class="step-card reveal delay-2"><span class="step-number">03</span><span class="step-icon" aria-hidden="true">☆</span><h3>Choose with confidence</h3><p>Check reviews, find your fit, and take the next step toward settling in.</p></article>
+        </div>
+      </div>
+    </section>
 
+    <section class="section benefits" id="why-unistay">
+      <div class="wrap">
+        <div class="section-heading reveal">
+          <div class="section-kicker">Made for student life</div>
+          <h2>More than a roof over your head</h2>
+          <p>Finding a place to live should make starting university easier—not harder.</p>
+        </div>
+        <div class="reasons-grid">
+          <article class="reason-card reveal"><span class="reason-icon" aria-hidden="true">✓</span><h3>Verified listings</h3><p>Clearer choices help you search for a stay with greater peace of mind.</p></article>
+          <article class="reason-card reveal delay-1"><span class="reason-icon student" aria-hidden="true">✎</span><h3>Student friendly</h3><p>A housing search designed around university life and what students need.</p></article>
+          <article class="reason-card reveal delay-2"><span class="reason-icon safe" aria-hidden="true">♡</span><h3>Safe & affordable</h3><p>Discover options that put comfort, value, and feeling at home first.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="about-section" id="about">
+      <div class="about-panel wrap reveal">
+        <div>
+          <div class="section-kicker">Our story</div>
+          <h2>A school project with a bigger purpose.</h2>
+          <p class="about-copy">UNISTAY started as a simple school project, then grew into a vision to solve accommodation challenges faced by university students. We're working toward making it easier to find a place to belong—at universities across Uganda and beyond.</p>
+        </div>
+        <div class="founder-card">
+          <div class="founder-top"><div class="founder-avatar" aria-hidden="true">DK</div><div><h3>Douglas Kabaale</h3><p>Founder &amp; Developer</p></div></div>
+          <div class="founder-details"><div><strong>Education:</strong> Victoria University — BIT (2025)</div><div><strong>Location:</strong> Kampala, Uganda</div><div><strong>Contact:</strong> 0769216912</div></div>
+          <p class="vision">“My vision is to expand UNISTAY across all universities in Uganda and beyond.”</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta-band">
+      <div class="cta-inner wrap reveal"><div><h2>Ready to find your place?</h2><p>Make your next move a little easier with UNISTAY.</p></div><a class="button" href="find-hostel.html">Explore hostels <span class="arrow" aria-hidden="true">→</span></a></div>
+    </section>
+  </main>
+
+  <footer><div class="footer-inner wrap"><span class="footer-brand">UNISTAY</span><span>© 2026 UNISTAY. All Rights Reserved.</span><span>Find your place near campus.</span></div></footer>
+  <a class="spotlight-float" href="spotlight.html"><span class="spotlight-flame" aria-hidden="true">✦</span> Explore Spotlight Hostels</a>
+  <script>
+    // Reveal sections gently as they enter view; all content remains visible without JS.
+    (function () {
+      const items = document.querySelectorAll('.reveal');
+      if (!('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        items.forEach((item) => item.classList.add('is-visible'));
+        return;
+      }
+      const observer = new IntersectionObserver((entries, currentObserver) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            currentObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12, rootMargin: '0px 0px -24px 0px' });
+      items.forEach((item) => observer.observe(item));
+    })();
+  </script>
 </body>
 </html>

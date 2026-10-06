@@ -188,4 +188,294 @@
           <section class="reviews-card" aria-labelledby="reviewsTitle">
             <div class="section-head"><h2 id="reviewsTitle">Student reviews</h2><span class="section-label" id="reviewStatus">Loading reviews…</span></div>
             <div class="review-summary"><span class="review-star" aria-hidden="true">★</span><span><span class="review-score" id="avgRating">—</span><span class="review-count" id="reviewCount">Loading ratings</span></span></div>
-    
+            <form class="review-form" id="reviewForm">
+              <h3>Share your experience</h3>
+              <p class="form-help">Your review helps other students make an informed choice.</p>
+              <label class="form-label" for="rating">Your rating (1–5)</label>
+              <input class="rating-input" id="rating" type="number" min="1" max="5" step="1" inputmode="numeric" placeholder="Choose a rating from 1 to 5" required>
+              <label class="form-label" for="reviewText">Your review</label>
+              <textarea class="review-input" id="reviewText" maxlength="1000" placeholder="What should other students know?" required></textarea>
+              <button class="submit-review" id="submitReviewButton" type="submit">Submit review</button>
+              <p class="form-status" id="formStatus" aria-live="polite"></p>
+            </form>
+            <div class="review-list" id="reviewsContainer" aria-live="polite"></div>
+          </section>
+        </div>
+        <a class="back-to-results" href="student-results.html"><span aria-hidden="true">←</span> Back to hostel results</a>
+      </div>
+    </section>
+  </main>
+
+  <footer><div class="footer-inner wrap"><span class="footer-brand">UNISTAY</span><span>© 2026 UNISTAY. All Rights Reserved.</span><span>Find your place near campus.</span></div></footer>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import { getFirestore, doc, getDoc, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCwDxwL4j_fgzGi1ffHHhaG36nw2uzNiE",
+      authDomain: "unistay-v1.firebaseapp.com",
+      projectId: "unistay-v1"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const propertyId = new URLSearchParams(window.location.search).get("id");
+    let property = null;
+    let reviews = [];
+
+    const loadingState = document.getElementById("loadingState");
+    const errorState = document.getElementById("errorState");
+    const propertyContent = document.getElementById("propertyContent");
+    const mainImage = document.getElementById("mainImage");
+    const photoFallback = document.getElementById("photoFallback");
+    const gallery = document.getElementById("gallery");
+    const formStatus = document.getElementById("formStatus");
+    const submitButton = document.getElementById("submitReviewButton");
+
+    mainImage.addEventListener("error", () => {
+      mainImage.hidden = true;
+      photoFallback.hidden = false;
+    });
+
+    function setText(id, value) { document.getElementById(id).textContent = value; }
+
+    function showError(title, message) {
+      loadingState.hidden = true;
+      propertyContent.hidden = true;
+      errorState.hidden = false;
+      setText("errorTitle", title);
+      setText("errorMessage", message);
+    }
+
+    function setMainPhoto(source, alt) {
+      if (!source) {
+        mainImage.hidden = true;
+        photoFallback.hidden = false;
+        return;
+      }
+      mainImage.hidden = false;
+      photoFallback.hidden = true;
+      mainImage.alt = alt || "Hostel property photo";
+      mainImage.src = source;
+    }
+
+    function renderGallery() {
+      const sources = [];
+      if (property.cover) sources.push(property.cover);
+      const extras = Array.isArray(property.images) ? property.images : Array.isArray(property.gallery) ? property.gallery : [];
+      extras.forEach((item) => {
+        const source = typeof item === "string" ? item : item && (item.url || item.src);
+        if (source && !sources.includes(source)) sources.push(source);
+      });
+      gallery.replaceChildren();
+      gallery.hidden = sources.length < 2;
+      if (sources.length < 2) return;
+      sources.forEach((source, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = `thumb${index === 0 ? " is-active" : ""}`;
+        button.setAttribute("aria-label", `Show hostel photo ${index + 1}`);
+        button.setAttribute("aria-pressed", String(index === 0));
+        const image = document.createElement("img");
+        image.src = source;
+        image.alt = "";
+        image.loading = "lazy";
+        image.addEventListener("error", () => { button.hidden = true; }, { once: true });
+        button.appendChild(image);
+        button.addEventListener("click", () => {
+          setMainPhoto(source, `${property.hostelName || "Hostel"} photo ${index + 1}`);
+          gallery.querySelectorAll(".thumb").forEach((thumb) => {
+            thumb.classList.remove("is-active");
+            thumb.setAttribute("aria-pressed", "false");
+          });
+          button.classList.add("is-active");
+          button.setAttribute("aria-pressed", "true");
+        });
+        gallery.appendChild(button);
+      });
+    }
+
+    function renderAmenities() {
+      const container = document.getElementById("amenities");
+      container.replaceChildren();
+      const source = property.amenities;
+      const items = Array.isArray(source) ? source : String(source || "").split(",");
+      const values = items.map((item) => String(item).trim()).filter(Boolean);
+      if (!values.length) {
+        const empty = document.createElement("span");
+        empty.className = "amenity-empty";
+        empty.textContent = "Amenities have not been listed.";
+        container.appendChild(empty);
+        return;
+      }
+      values.forEach((value) => {
+        const tag = document.createElement("span");
+        tag.className = "amenity-tag";
+        const dot = document.createElement("span");
+        dot.className = "amenity-dot";
+        dot.setAttribute("aria-hidden", "true");
+        tag.append(dot, document.createTextNode(value));
+        container.appendChild(tag);
+      });
+    }
+
+    function renderProperty() {
+      document.title = `${property.hostelName || "Hostel Details"} — UNISTAY`;
+      setText("name", property.hostelName || "Student hostel");
+      setText("price", property.price !== null && property.price !== undefined && String(property.price).trim() ? `UGX ${property.price}` : "Contact for price");
+      setText("room", property.roomType || "Standard");
+      setText("location", property.location || "Not set");
+      setText("locationEyebrow", property.location || "Student accommodation");
+      setText("contact", property.contact || "Not available");
+      setText("desc", property.description || "No description has been provided for this listing.");
+      const verified = Boolean(property.verified);
+      document.getElementById("verifiedNote").hidden = !verified;
+      document.getElementById("photoVerified").hidden = !verified;
+      setMainPhoto(property.cover || "", property.hostelName ? `${property.hostelName} property photo` : "Hostel property photo");
+      renderGallery();
+      renderAmenities();
+      document.getElementById("bookButton").disabled = !whatsappPhone(property.contact);
+      loadingState.hidden = true;
+      errorState.hidden = true;
+      propertyContent.hidden = false;
+    }
+
+    function formatDate(timestamp) {
+      try {
+        const date = timestamp && typeof timestamp.toDate === "function" ? timestamp.toDate() : null;
+        return date ? new Intl.DateTimeFormat(undefined, { year: "numeric", month: "short", day: "numeric" }).format(date) : "";
+      } catch { return ""; }
+    }
+
+    function renderReviews() {
+      const total = reviews.reduce((sum, review) => sum + (Number(review.rating) || 0), 0);
+      const avg = reviews.length ? total / reviews.length : 0;
+      setText("avgRating", reviews.length ? avg.toFixed(1) : "—");
+      setText("reviewCount", reviews.length ? `${reviews.length} ${reviews.length === 1 ? "review" : "reviews"}` : "No ratings yet");
+      setText("reviewStatus", reviews.length ? `${reviews.length} total` : "Be the first to review");
+      const container = document.getElementById("reviewsContainer");
+      container.replaceChildren();
+      if (!reviews.length) {
+        const empty = document.createElement("div");
+        empty.className = "review-empty";
+        empty.textContent = "No reviews yet. Share the first review for this hostel.";
+        container.appendChild(empty);
+        return;
+      }
+      [...reviews].sort((a, b) => {
+        const aTime = a.createdAt && typeof a.createdAt.toMillis === "function" ? a.createdAt.toMillis() : 0;
+        const bTime = b.createdAt && typeof b.createdAt.toMillis === "function" ? b.createdAt.toMillis() : 0;
+        return bTime - aTime;
+      }).forEach((review) => {
+        const article = document.createElement("article");
+        article.className = "review-item";
+        const head = document.createElement("div");
+        head.className = "review-item-head";
+        const rating = document.createElement("span");
+        rating.className = "review-item-rating";
+        rating.textContent = `★ ${Number(review.rating) || 0}/5`;
+        const date = document.createElement("span");
+        date.className = "review-date";
+        date.textContent = formatDate(review.createdAt);
+        head.append(rating, date);
+        const text = document.createElement("p");
+        text.className = "review-text";
+        text.textContent = review.text || "";
+        article.append(head, text);
+        container.appendChild(article);
+      });
+    }
+
+    async function loadReviews() {
+      if (!property) return;
+      setText("reviewStatus", "Loading reviews…");
+      try {
+        const snapshot = await getDocs(collection(db, "properties", property.id, "reviews"));
+        reviews = [];
+        snapshot.forEach((documentSnapshot) => reviews.push(documentSnapshot.data()));
+        renderReviews();
+      } catch (error) {
+        console.error("Could not load reviews:", error);
+        reviews = [];
+        renderReviews();
+        setText("reviewStatus", "Reviews unavailable");
+        setText("reviewCount", "Could not load ratings");
+      }
+    }
+
+    async function loadProperty() {
+      if (!propertyId) {
+        showError("No hostel selected", "Choose a hostel from the results page to see its details.");
+        return;
+      }
+      try {
+        const snapshot = await getDoc(doc(db, "properties", propertyId));
+        if (!snapshot.exists()) {
+          showError("Hostel not found", "This listing may have been removed or the link may have expired.");
+          return;
+        }
+        property = { id: snapshot.id, ...snapshot.data() };
+        renderProperty();
+        loadReviews();
+      } catch (error) {
+        console.error("Could not load hostel details:", error);
+        showError("We couldn't load this listing", "Please check your connection and try again later.");
+      }
+    }
+
+    function whatsappPhone(contact) {
+      let digits = String(contact || "").trim().replace(/\D/g, "");
+      if (!digits) return "";
+      if (String(contact).trim().startsWith("+")) return digits;
+      if (digits.startsWith("00")) return digits.slice(2);
+      if (digits.startsWith("256")) return digits;
+      if (digits.startsWith("0")) digits = digits.slice(1);
+      return `256${digits}`;
+    }
+
+    document.getElementById("bookButton").addEventListener("click", () => {
+      if (!property) return;
+      const phone = whatsappPhone(property.contact);
+      if (!phone) return;
+      const message = `Hello, I found your hostel listing on https://douglaskabaale-glitch.github.io/unistay/ and I'm interested in ${property.hostelName || "your hostel"}.`;
+      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
+    });
+
+    document.getElementById("reviewForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!property) return;
+      const ratingInput = document.getElementById("rating");
+      const reviewInput = document.getElementById("reviewText");
+      const rating = Number(ratingInput.value);
+      const text = reviewInput.value.trim();
+      formStatus.className = "form-status";
+      if (!Number.isInteger(rating) || rating < 1 || rating > 5 || !text) {
+        formStatus.textContent = "Enter a whole-number rating from 1 to 5 and write a review.";
+        formStatus.classList.add("error");
+        return;
+      }
+      submitButton.disabled = true;
+      submitButton.textContent = "Submitting…";
+      formStatus.textContent = "";
+      try {
+        await addDoc(collection(db, "properties", property.id, "reviews"), { rating, text, createdAt: serverTimestamp() });
+        ratingInput.value = "";
+        reviewInput.value = "";
+        formStatus.textContent = "Thanks—your review was submitted.";
+        formStatus.classList.add("success");
+        await loadReviews();
+      } catch (error) {
+        console.error("Could not submit review:", error);
+        formStatus.textContent = "We couldn't submit your review. Please try again.";
+        formStatus.classList.add("error");
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = "Submit review";
+      }
+    });
+
+    loadProperty();
+  </script>
+</body>
+</html>
