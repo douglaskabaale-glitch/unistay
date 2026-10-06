@@ -1,400 +1,191 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>UNISTAY - Hostel Details</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8f7f1">
+  <meta name="description" content="View student hostel details and reviews with UNISTAY.">
+  <title>Hostel Details — UNISTAY</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #18352b;
+      --muted: #64736a;
+      --green: #206b4d;
+      --green-dark: #164c38;
+      --mint: #e4f1e8;
+      --cream: #f8f7f1;
+      --paper: #fffefa;
+      --sun: #efc967;
+      --line: #e5e9df;
+      --shadow: 0 18px 50px rgba(31,62,47,.09);
+      --radius: 22px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; min-height: 100vh; color: var(--ink); background: var(--cream); font-family: "DM Sans", sans-serif; line-height: 1.6; overflow-x: hidden; }
+    a { color: inherit; text-decoration: none; }
+    button, input, textarea { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    .wrap { width: min(1080px, calc(100% - 48px)); margin: 0 auto; }
+    .site-header { position: sticky; top: 0; z-index: 10; background: rgba(248,247,241,.9); border-bottom: 1px solid rgba(229,233,223,.8); backdrop-filter: blur(16px); }
+    .nav { min-height: 73px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    .brand { display: inline-flex; align-items: center; gap: 10px; font: 800 21px/1 "Manrope", sans-serif; letter-spacing: -.8px; }
+    .brand-mark { width: 36px; height: 36px; display: grid; place-items: center; color: white; background: var(--green); border-radius: 12px; box-shadow: 0 6px 14px rgba(32,107,77,.2); }
+    .brand-mark svg { width: 22px; height: 22px; }
+    .nav-actions { display: flex; align-items: center; gap: 20px; }
+    .nav-link { color: #506158; font-size: 12px; font-weight: 700; transition: color .2s ease; }.nav-link:hover { color: var(--green); }
+    .nav-cta, .button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; color: white; background: var(--green); border: 0; border-radius: 999px; font-weight: 800; transition: background .2s ease, transform .2s ease, box-shadow .2s ease; cursor: pointer; }
+    .nav-cta { padding: 10px 15px; font-size: 12px; }.nav-cta:hover, .button:hover { background: var(--green-dark); transform: translateY(-2px); box-shadow: 0 10px 20px rgba(32,107,77,.16); }
+    .hero { position: relative; isolation: isolate; padding: 27px 0 23px; overflow: hidden; }
+    .hero::before { position: absolute; z-index: -1; content: ""; width: 410px; height: 410px; top: -300px; right: -90px; border-radius: 50%; background: radial-gradient(circle, rgba(205,230,207,.8), rgba(205,230,207,0) 70%); animation: drift 15s ease-in-out infinite alternate; }
+    .breadcrumbs { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; color: #829087; font-size: 11px; }
+    .breadcrumbs a { transition: color .2s ease; }.breadcrumbs a:hover { color: var(--green); }.crumb-sep { color: #b8c2b9; }
+    .property-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; }
+    .location-line { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; color: var(--green); font-size: 11px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; }
+    .location-dot { width: 7px; height: 7px; border-radius: 50%; background: #6eab7c; box-shadow: 0 0 0 4px rgba(110,171,124,.14); }
+    h1, h2, h3 { font-family: "Manrope", sans-serif; }
+    h1 { margin: 0; font-size: clamp(30px, 4.5vw, 44px); line-height: 1.12; letter-spacing: -.06em; }
+    .heading-note { flex: 0 0 auto; padding: 9px 12px; color: var(--green-dark); background: #e9f2e7; border: 1px solid #dceadd; border-radius: 999px; font-size: 10px; font-weight: 800; }
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Lora:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="unistay-theme.css">
+    .main { padding: 8px 0 80px; }
+    .loading-state, .error-state { min-height: 290px; display: grid; place-items: center; padding: 28px 20px; text-align: center; background: var(--paper); border: 1px solid var(--line); border-radius: 24px; }
+    .state-inner { max-width: 400px; }.state-icon { width: 53px; height: 53px; display: grid; place-items: center; margin: 0 auto 14px; color: var(--green); background: var(--mint); border-radius: 17px; font-size: 22px; animation: softPulse 1.6s ease-in-out infinite; }
+    .error-state .state-icon { color: #9a5b46; background: #f6e6df; animation: none; }
+    .state-inner h2 { margin: 0 0 6px; font-size: 19px; letter-spacing: -.035em; }.state-inner p { margin: 0 0 18px; color: var(--muted); font-size: 13px; }
+    .button { min-height: 45px; padding: 0 18px; font-size: 12px; }
+    .property-layout { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(300px, .75fr); align-items: start; gap: 20px; }
+    .gallery-panel, .summary-card, .info-card, .reviews-card { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: 0 7px 22px rgba(31,62,47,.04); }
+    .gallery-panel { padding: 12px; }
+    .main-photo-wrap { height: 380px; position: relative; overflow: hidden; background: linear-gradient(145deg, #d6e8d8, #eff0de 56%, #ebdfc3); border-radius: 16px; }
+    .main-photo-wrap::before, .main-photo-wrap::after { position: absolute; content: ""; border-radius: 50%; pointer-events: none; }
+    .main-photo-wrap::before { width: 55%; height: 95px; left: -4%; bottom: -53px; background: #a7c69b; transform: rotate(-8deg); }
+    .main-photo-wrap::after { width: 50%; height: 82px; right: -5%; bottom: -51px; background: #84b28b; transform: rotate(8deg); }
+    .photo-fallback { position: absolute; inset: 0; display: grid; place-items: center; color: rgba(32,107,77,.68); }
+    .photo-fallback svg { position: relative; z-index: 1; width: 82px; height: 82px; opacity: .75; }
+    .main-photo { position: absolute; z-index: 2; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity .25s ease; }
+    .verified-badge { position: absolute; z-index: 3; top: 14px; left: 14px; display: inline-flex; align-items: center; gap: 6px; padding: 8px 11px; color: var(--green-dark); background: rgba(255,254,250,.95); border: 1px solid rgba(255,255,255,.9); border-radius: 999px; box-shadow: 0 5px 14px rgba(22,76,56,.08); font-size: 10px; font-weight: 800; }
+    .verified-check { width: 16px; height: 16px; display: grid; place-items: center; color: white; background: #4d9965; border-radius: 50%; font-size: 9px; }
+    .gallery-thumbs { display: flex; gap: 9px; padding: 11px 1px 1px; overflow-x: auto; scrollbar-width: thin; }
+    .thumb { position: relative; flex: 0 0 90px; width: 90px; height: 66px; padding: 0; overflow: hidden; background: linear-gradient(145deg,#d6e8d8,#ebdfc3); border: 2px solid transparent; border-radius: 11px; cursor: pointer; transition: border-color .2s ease, transform .2s ease; }
+    .thumb:hover { transform: translateY(-2px); }.thumb.is-active { border-color: var(--green); }.thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .summary-card { padding: 23px; }
+    .summary-kicker { margin: 0 0 11px; color: var(--green); font-size: 10px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+    .price-label { margin: 0; color: var(--muted); font-size: 11px; font-weight: 700; }
+    .price { margin: 2px 0 0; color: var(--green-dark); font: 800 clamp(25px, 4vw, 33px)/1.2 "Manrope", sans-serif; letter-spacing: -.05em; overflow-wrap: anywhere; }
+    .price-suffix { margin-top: 3px; color: #829087; font-size: 10px; }
+    .summary-divider { height: 1px; margin: 19px 0; background: var(--line); }
+    .summary-row { display: flex; align-items: flex-start; gap: 12px; margin-top: 15px; }
+    .summary-icon { width: 35px; height: 35px; display: grid; place-items: center; flex: 0 0 auto; color: var(--green); background: #e8f2e8; border-radius: 12px; font-size: 15px; }
+    .summary-label { display: block; color: #829087; font-size: 10px; }.summary-value { display: block; color: var(--ink); font-size: 12px; font-weight: 700; overflow-wrap: anywhere; }
+    .book-btn { width: 100%; min-height: 51px; margin-top: 22px; padding: 0 15px; color: white; background: var(--green); border: 0; border-radius: 999px; box-shadow: 0 9px 20px rgba(32,107,77,.15); cursor: pointer; font-size: 12px; font-weight: 800; transition: background .22s ease, transform .22s ease, box-shadow .22s ease; }
+    .book-btn:hover:not(:disabled) { background: var(--green-dark); transform: translateY(-2px); box-shadow: 0 13px 25px rgba(32,107,77,.22); }.book-btn:disabled { color: #929c94; background: #e9ece6; box-shadow: none; cursor: not-allowed; }
+    .whatsapp-icon { margin-right: 7px; font-size: 15px; vertical-align: -1px; }
+    .content-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, .82fr); gap: 20px; margin-top: 20px; }
+    .info-card, .reviews-card { padding: 23px; }
+    .section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+    .section-head h2 { margin: 0; font-size: 19px; letter-spacing: -.045em; }
+    .section-label { color: #8b978e; font-size: 10px; }
+    .description { margin: 0; color: #5f6f65; font-size: 13px; line-height: 1.85; white-space: pre-line; overflow-wrap: anywhere; }
+    .amenities { display: flex; flex-wrap: wrap; gap: 8px; }
+    .amenity-tag { display: inline-flex; align-items: center; gap: 7px; padding: 8px 11px; color: #365443; background: #edf4eb; border: 1px solid #e2ecdf; border-radius: 999px; font-size: 11px; font-weight: 700; }
+    .amenity-dot { width: 6px; height: 6px; background: #70a57a; border-radius: 50%; }
+    .amenity-empty { color: #8b978e; font-size: 12px; }
+    .review-summary { display: flex; align-items: center; gap: 13px; margin-bottom: 17px; padding: 14px; background: #fbf5e4; border: 1px solid #f2e9cc; border-radius: 16px; }
+    .review-star { color: #d2a431; font-size: 24px; line-height: 1; }.review-score { display: block; color: #634d1c; font: 800 19px "Manrope", sans-serif; }.review-count { display: block; color: #83744f; font-size: 10px; }
+    .review-form { padding: 16px; background: #f7f8f3; border: 1px solid #edf0e9; border-radius: 17px; }
+    .review-form h3 { margin: 0 0 4px; font-size: 14px; letter-spacing: -.025em; }.form-help { margin: 0 0 12px; color: var(--muted); font-size: 10px; }
+    .form-label { display: block; margin: 0 0 5px; color: #506158; font-size: 10px; font-weight: 800; }
+    .rating-input, .review-input { width: 100%; color: var(--ink); background: white; border: 1px solid var(--line); border-radius: 11px; outline: none; font-size: 12px; transition: border-color .2s ease, box-shadow .2s ease; }
+    .rating-input:focus, .review-input:focus { border-color: #91b89b; box-shadow: 0 0 0 3px rgba(32,107,77,.1); }
+    .rating-input { height: 42px; padding: 0 12px; margin-bottom: 11px; }
+    .review-input { min-height: 92px; padding: 11px 12px; resize: vertical; }
+    .submit-review { width: 100%; min-height: 42px; margin-top: 11px; color: white; background: var(--green); border: 0; border-radius: 11px; cursor: pointer; font-size: 11px; font-weight: 800; transition: background .2s ease, transform .2s ease; }.submit-review:hover:not(:disabled) { background: var(--green-dark); transform: translateY(-1px); }.submit-review:disabled { opacity: .65; cursor: wait; }
+    .form-status { min-height: 16px; margin: 8px 0 0; color: #607167; font-size: 10px; }.form-status.error { color: #a34836; }.form-status.success { color: var(--green-dark); }
+    .review-list { display: grid; gap: 10px; margin-top: 17px; }
+    .review-item { padding: 14px; background: white; border: 1px solid var(--line); border-radius: 15px; }
+    .review-item-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 6px; }.review-item-rating { color: #957020; font-size: 11px; font-weight: 800; }.review-date { color: #9aa49d; font-size: 9px; }
+    .review-text { margin: 0; color: #53645a; font-size: 12px; line-height: 1.7; white-space: pre-line; overflow-wrap: anywhere; }
+    .review-empty { padding: 16px; text-align: center; color: #839087; background: white; border: 1px dashed #d8e0d6; border-radius: 15px; font-size: 11px; }
+    .review-status { color: #839087; font-size: 10px; }
+    .back-to-results { display: inline-flex; align-items: center; gap: 7px; margin-top: 25px; color: var(--green); font-size: 11px; font-weight: 800; transition: gap .2s ease; }.back-to-results:hover { gap: 10px; }
+    footer { padding: 22px 0; color: #7b887e; background: var(--paper); border-top: 1px solid var(--line); font-size: 11px; }
+    .footer-inner { display: flex; justify-content: space-between; align-items: center; gap: 14px; }.footer-brand { color: var(--green-dark); font: 800 13px "Manrope", sans-serif; }
+    [hidden] { display: none !important; }
 
-<style>
-.header{
-    background: var(--paper-raised);
-    border-bottom: 1px solid var(--rule);
-    color: var(--ink);
-    padding: 16px 20px;
-    text-align: center;
-    font-family: "Lora", serif;
-    font-size: 19px;
-    font-weight: 700;
-}
-
-.container{
-    max-width: 860px;
-    margin: auto;
-    padding: 20px;
-}
-
-.main-img{
-    width: 100%;
-    height: 320px;
-    object-fit: cover;
-    border-radius: var(--radius-md);
-    border: 1px solid var(--rule);
-}
-
-.gallery{
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-    overflow-x: auto;
-}
-.gallery img{
-    width: 110px;
-    height: 82px;
-    object-fit: cover;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    border: 1px solid var(--rule);
-}
-
-.card{
-    background: var(--paper-raised);
-    padding: 20px;
-    border-radius: var(--radius-md);
-    margin-top: 16px;
-    border: 1px solid var(--rule);
-}
-
-.title{
-    font-family: "Lora", serif;
-    font-size: 24px;
-    font-weight: 700;
-    color: var(--ink);
-    margin-bottom: 12px;
-}
-
-.details-grid{
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 10px;
-}
-
-.detail-box{
-    background: var(--paper);
-    border: 1px solid var(--rule);
-    padding: 13px 14px;
-    border-radius: var(--radius-sm);
-}
-
-.label{
-    font-size: 12px;
-    color: var(--ink-soft);
-    margin-bottom: 4px;
-}
-
-.value{
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--ink);
-}
-
-.price-box{
-    background: var(--pen-blue-tint);
-    border-color: rgba(44,91,140,0.2);
-}
-.price-box .label{ color: var(--pen-blue-dark); }
-.price-box .value{ color: var(--pen-blue-dark); font-size: 18px; }
-
-.tags{
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-/* BOOK BUTTON — flat, no glow/shine */
-.book-btn{
-    margin-top: 16px;
-    width: 100%;
-    padding: 14px;
-    border: none;
-    border-radius: var(--radius-sm);
-    background: var(--leaf-green);
-    color: #fff;
-    font-size: 15px;
-    font-weight: 700;
-    cursor: pointer;
-}
-.book-btn:hover{ background: #2f5a3c; }
-
-/* REVIEWS */
-.reviews-box{
-    margin-top: 22px;
-    background: var(--paper-raised);
-    padding: 20px;
-    border-radius: var(--radius-md);
-    border: 1px solid var(--rule);
-}
-.reviews-box h3{ margin-bottom: 12px; font-size: 17px; }
-
-.avg-rating{
-    font-weight: 700;
-    color: var(--amber);
-    margin-bottom: 15px;
-    background: var(--amber-tint);
-    padding: 10px 12px;
-    border-radius: var(--radius-sm);
-    display: inline-block;
-}
-
-.review{
-    background: var(--paper);
-    padding: 13px 14px;
-    margin-top: 10px;
-    border-radius: var(--radius-sm);
-    border-left: 3px solid var(--pen-blue);
-}
-.review p{ margin-top: 6px; color: var(--ink-soft); font-size: 14px; }
-
-.review-field{
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    background: var(--paper);
-    color: var(--ink);
-    border: 1px solid var(--rule-strong);
-    border-radius: var(--radius-sm);
-    font-family: "Inter", sans-serif;
-}
-textarea.review-field{ height: 80px; resize: vertical; }
-
-.submit-review-btn{
-    margin-top: 4px;
-    width: 100%;
-    padding: 11px;
-    background: var(--pen-blue);
-    color: #fff;
-    border: none;
-    border-radius: var(--radius-sm);
-    font-weight: 600;
-    cursor: pointer;
-}
-.submit-review-btn:hover{ background: var(--pen-blue-dark); }
-</style>
+    @keyframes drift { to { transform: translate3d(-18px, 16px, 0) scale(1.04); } }
+    @keyframes softPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+    @media (max-width: 850px) { .property-layout { grid-template-columns: minmax(0, 1fr) minmax(270px, .8fr); }.main-photo-wrap { height: 320px; }.content-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 620px) {
+      .wrap { width: min(100% - 36px, 520px); }.nav { min-height: 66px; }.brand { font-size: 19px; }.brand-mark { width: 33px; height: 33px; }.nav-actions { gap: 13px; }.nav-link { font-size: 10px; }.nav-cta { padding: 9px 11px; font-size: 10px; }
+      .hero { padding-top: 20px; }.property-heading { align-items: flex-start; flex-direction: column; gap: 11px; }.heading-note { align-self: flex-start; }
+      .main { padding-bottom: 57px; }.property-layout { grid-template-columns: 1fr; gap: 13px; }.main-photo-wrap { height: 255px; }.gallery-panel { padding: 9px; }.thumb { flex-basis: 78px; width: 78px; height: 58px; }
+      .summary-card, .info-card, .reviews-card { padding: 19px; }.summary-card { order: -1; }.content-grid { gap: 13px; margin-top: 13px; }.section-head h2 { font-size: 17px; }.footer-inner { flex-direction: column; text-align: center; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+  </style>
 </head>
-
 <body>
+  <header class="site-header">
+    <nav class="nav wrap" aria-label="Main navigation">
+      <a class="brand" href="index.html" aria-label="UNISTAY home">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M3.5 10.4 12 3.8l8.5 6.6v9.1a.9.9 0 0 1-.9.9H4.4a.9.9 0 0 1-.9-.9v-9.1Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 20.4v-6.2h6v6.2M7.5 10.7h.01M16.5 10.7h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+        UNISTAY
+      </a>
+      <div class="nav-actions"><a class="nav-link" href="index.html">Home</a><a class="nav-cta" href="find-hostel.html">Find another hostel <span aria-hidden="true">↗</span></a></div>
+    </nav>
+  </header>
 
-<div class="header">Hostel Details</div>
+  <main>
+    <section class="hero">
+      <div class="wrap">
+        <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="index.html">Home</a><span class="crumb-sep">/</span><a href="find-hostel.html">Find a hostel</a><span class="crumb-sep">/</span><a href="student-results.html">Results</a><span class="crumb-sep">/</span><span aria-current="page">Details</span></nav>
+        <div class="property-heading"><div><div class="location-line"><span class="location-dot"></span><span id="locationEyebrow">Student accommodation</span></div><h1 id="name">Hostel details</h1></div><span class="heading-note" id="verifiedNote" hidden>✓ Verified listing</span></div>
+      </div>
+    </section>
 
-<div class="container">
+    <section class="main wrap">
+      <div class="loading-state" id="loadingState" role="status" aria-live="polite"><div class="state-inner"><div class="state-icon" aria-hidden="true">⌂</div><h2>Loading hostel details…</h2><p>Getting the listing and reviews ready for you.</p></div></div>
+      <div class="error-state" id="errorState" role="alert" hidden><div class="state-inner"><div class="state-icon" aria-hidden="true">!</div><h2 id="errorTitle">We couldn't find this hostel</h2><p id="errorMessage">Check the link or return to the hostel listings.</p><a class="button" href="student-results.html">Back to listings <span aria-hidden="true">→</span></a></div></div>
 
-    <img id="mainImage" class="main-img">
-
-    <div class="gallery" id="gallery"></div>
-
-    <div class="card">
-        <div class="title" id="name"></div>
-
-        <div class="details-grid">
-
-            <div class="detail-box price-box">
-                <div class="label">Price</div>
-                <div class="value" id="price"></div>
+      <div id="propertyContent" hidden>
+        <div class="property-layout">
+          <section class="gallery-panel" aria-label="Hostel photos">
+            <div class="main-photo-wrap" id="mainPhotoWrap">
+              <div class="photo-fallback" id="photoFallback" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none"><path d="M8 29 32 10l24 19v25a3 3 0 0 1-3 3H11a3 3 0 0 1-3-3V29Z" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/><path d="M25 57V39h14v18M18 31h.1M46 31h.1" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><path d="M4 59h56" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+              <img class="main-photo" id="mainImage" alt="Hostel property photo" hidden>
+              <span class="verified-badge" id="photoVerified" hidden><span class="verified-check" aria-hidden="true">✓</span> Verified listing</span>
             </div>
+            <div class="gallery-thumbs" id="gallery" aria-label="Choose a hostel photo" hidden></div>
+          </section>
 
-            <div class="detail-box">
-                <div class="label">Room Type</div>
-                <div class="value" id="room"></div>
-            </div>
-
-            <div class="detail-box">
-                <div class="label">Location</div>
-                <div class="value" id="location"></div>
-            </div>
-
-            <div class="detail-box">
-                <div class="label">Amenities</div>
-                <div class="tags" id="amenities"></div>
-            </div>
-
-            <div class="detail-box">
-                <div class="label">Contact</div>
-                <div class="value" id="contact"></div>
-            </div>
-
-            <div class="detail-box">
-                <div class="label">Description</div>
-                <div class="value" id="desc"></div>
-            </div>
-
-            <button class="book-btn" onclick="bookNow()">Book now on WhatsApp</button>
-
+          <aside class="summary-card" aria-label="Hostel summary">
+            <p class="summary-kicker">Stay details</p>
+            <p class="price-label">Starting price</p>
+            <p class="price" id="price">—</p>
+            <p class="price-suffix">Price details as provided by the property</p>
+            <div class="summary-divider"></div>
+            <div class="summary-row"><span class="summary-icon" aria-hidden="true">⌂</span><span><span class="summary-label">Room type</span><span class="summary-value" id="room">—</span></span></div>
+            <div class="summary-row"><span class="summary-icon" aria-hidden="true">⌖</span><span><span class="summary-label">Location</span><span class="summary-value" id="location">—</span></span></div>
+            <div class="summary-row"><span class="summary-icon" aria-hidden="true">☎</span><span><span class="summary-label">Contact</span><span class="summary-value" id="contact">—</span></span></div>
+            <button class="book-btn" id="bookButton" type="button"><span class="whatsapp-icon" aria-hidden="true">◉</span>Contact on WhatsApp</button>
+          </aside>
         </div>
 
-       
-    </div>
+        <div class="content-grid">
+          <section class="info-card" aria-labelledby="aboutTitle">
+            <div class="section-head"><h2 id="aboutTitle">About this hostel</h2><span class="section-label">Property information</span></div>
+            <p class="description" id="desc"></p>
+            <div class="summary-divider"></div>
+            <div class="section-head"><h2>Amenities</h2><span class="section-label">At a glance</span></div>
+            <div class="amenities" id="amenities"></div>
+          </section>
 
-    <div class="reviews-box">
-        <h3>Reviews</h3>
-
-        <div id="avgRating" class="avg-rating">Loading reviews...</div>
-
-        <input id="rating" type="number" min="1" max="5"
-               placeholder="Rating (1-5)"
-               class="review-field">
-
-        <textarea id="reviewText"
-                  placeholder="Write your review..."
-                  class="review-field"></textarea>
-
-        <button onclick="submitReview()" class="submit-review-btn">
-            Submit review
-        </button>
-
-        <div id="reviewsContainer"></div>
-    </div>
-
-</div>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-import {
-    getFirestore,
-    doc,
-    getDoc,
-    collection,
-    addDoc,
-    getDocs,
-    serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyCwDxwL4j_fgzGi1ffHHhaG36nw2uzNiE",
-  authDomain: "unistay-v1.firebaseapp.com",
-  projectId: "unistay-v1"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-/* =========================
-   GET ID FROM URL
-========================= */
-const params = new URLSearchParams(window.location.search);
-const propertyId = params.get("id");
-
-let property = null;
-
-/* =========================
-   LOAD HOSTEL
-========================= */
-async function loadProperty() {
-
-    if (!propertyId) {
-        alert("No hostel selected");
-        window.location.href = "spotlight.html";
-        return;
-    }
-
-    const ref = doc(db, "properties", propertyId);
-    const snap = await getDoc(ref);
-
-    if (!snap.exists()) {
-        alert("Hostel not found");
-        window.location.href = "spotlight.html";
-        return;
-    }
-
-    property = { id: snap.id, ...snap.data() };
-
-    renderProperty();
-    loadReviews();
-}
-
-/* =========================
-   RENDER HOSTEL
-========================= */
-function renderProperty() {
-
-    document.getElementById("mainImage").src = property.cover || "";
-    document.getElementById("name").innerText = property.hostelName || "";
-    document.getElementById("price").innerText = "UGX " + (property.price || "");
-    document.getElementById("room").innerText = property.roomType || "Standard";
-    document.getElementById("location").innerText = property.location || "Not set";
-    document.getElementById("contact").innerText = property.contact || "Not available";
-    document.getElementById("desc").innerText = property.description || "No description";
-
-    document.getElementById("amenities").innerHTML =
-        (property.amenities || "")
-        .split(",")
-        .filter(a => a.trim())
-        .map(a => `<span class="u-tag">${a.trim()}</span>`)
-        .join("");
-}
-
-/* =========================
-   WHATSAPP BOOKING
-========================= */
-window.bookNow = function () {
-
-    let phone = (property.contact || "").replace(/\s+/g, '');
-    if (!phone.startsWith("+")) phone = "+256" + phone;
-
-    const msg = `Hello, I found your hostel listing on https://douglaskabaale-glitch.github.io/unistay/ and I'm interested in ${property.hostelName}`;
-
-    window.open(
-        `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`,
-        "_blank"
-    );
-};
-
-/* =========================
-   REVIEWS
-========================= */
-window.submitReview = async function () {
-
-    const rating = Number(document.getElementById("rating").value);
-    const text = document.getElementById("reviewText").value;
-
-    if (!rating || !text) return alert("Fill all fields");
-
-    await addDoc(collection(db, "properties", property.id, "reviews"), {
-        rating,
-        text,
-        createdAt: serverTimestamp()
-    });
-
-    document.getElementById("rating").value = "";
-    document.getElementById("reviewText").value = "";
-
-    loadReviews();
-};
-
-async function loadReviews() {
-
-    const snap = await getDocs(collection(db, "properties", property.id, "reviews"));
-
-    let reviews = [];
-    let total = 0;
-
-    snap.forEach(d => {
-        const r = d.data();
-        reviews.push(r);
-        total += r.rating || 0;
-    });
-
-    const avg = reviews.length ? (total / reviews.length).toFixed(1) : 0;
-
-    document.getElementById("avgRating").innerText =
-        reviews.length ? `⭐ ${avg} / 5 (${reviews.length})` : "No reviews yet";
-
-    document.getElementById("reviewsContainer").innerHTML =
-        reviews.map(r => `
-            <div class="review">
-                ⭐ ${r.rating}/5
-                <p>${r.text}</p>
-            </div>
-        `).join("");
-}
-
-/* =========================
-   INIT
-========================= */
-loadProperty();
-</script>
-
-</body>
-</html>
+          <section class="reviews-card" aria-labelledby="reviewsTitle">
+            <div class="section-head"><h2 id="reviewsTitle">Student reviews</h2><span class="section-label" id="reviewStatus">Loading reviews…</span></div>
+            <div class="review-summary"><span class="review-star" aria-hidden="true">★</span><span><span class="review-score" id="avgRating">—</span><span class="review-count" id="reviewCount">Loading ratings</span></span></div>
+    
