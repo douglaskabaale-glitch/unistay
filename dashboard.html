@@ -3,222 +3,340 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>UNISTAY - Dashboard</title>
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Lora:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="unistay-theme.css">
+<title>UNISTAY | Landlord dashboard</title>
 
 <style>
-.user-box{
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 14px;
-}
-.user-box img{
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    border: 1px solid var(--rule-strong);
-    object-fit: cover;
-}
-
-#statusBox{
-    font-size: 13px;
-    color: var(--ink-soft);
-}
-
-.right-actions{
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
+/* UNISTAY — calm, clear, school-friendly dashboard */
+:root {
+    color-scheme: light;
+    --ink: #243247;
+    --muted: #69778b;
+    --line: #e3e8ef;
+    --surface: #ffffff;
+    --canvas: #f5f7fa;
+    --accent: #356b9a;
+    --accent-strong: #28577f;
+    --accent-soft: #eaf2f8;
+    --success: #287a58;
+    --success-soft: #eaf5ef;
+    --danger: #a64b4b;
+    --danger-soft: #fbefef;
+    --shadow: 0 8px 24px rgba(36, 50, 71, 0.06);
 }
 
-.bell{ font-size: 18px; color: var(--ink-soft); }
+* { box-sizing: border-box; }
 
-.container{ max-width: 1080px; margin: 0 auto; padding: 24px 20px; }
-
-.container h2{ font-size: 20px; margin-bottom: 16px; }
-
-/* PROPERTY CARD */
-.card{
-    background: var(--paper-raised);
-    border: 1px solid var(--rule);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-card);
-    margin-bottom: 16px;
-    overflow: hidden;
-    display: flex;
-    flex-wrap: wrap;
-}
-
-.card img{
-    width: 220px;
-    height: 160px;
-    object-fit: cover;
-    flex-shrink: 0;
-}
-
-.card-content{
-    padding: 16px;
-    flex: 1;
-    min-width: 220px;
-}
-.card-content h3{ font-size: 17px; margin-bottom: 4px; }
-
-.price{
-    color: var(--pen-blue);
-    font-weight: 700;
-    margin-bottom: 4px;
-}
-
-.actions{
-    display: flex;
-    gap: 8px;
-    margin-top: 12px;
-    flex-wrap: wrap;
-}
-
-.actions button{
-    padding: 8px 14px;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--rule-strong);
-    background: transparent;
+body {
+    margin: 0;
+    min-height: 100vh;
+    overflow-x: hidden;
+    background: var(--canvas);
     color: var(--ink);
-    font-weight: 600;
-    font-size: 13px;
-    cursor: pointer;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
 }
-.edit-btn:hover{ background: var(--pen-blue-tint); border-color: var(--pen-blue); }
-.delete-btn{ color: var(--pen-red); }
-.delete-btn:hover{ background: var(--pen-red-tint); border-color: var(--pen-red); }
-.upgrade-btn{ color: var(--gold); }
-.upgrade-btn:hover{ background: var(--gold-tint); border-color: var(--gold); }
 
-.empty{ text-align: center; color: var(--ink-faint); margin-top: 50px; }
+button, input { font: inherit; }
+button {
+    min-height: 42px;
+    padding: 10px 16px;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 650;
+    line-height: 1.2;
+    transition: background-color .18s ease, border-color .18s ease, color .18s ease, transform .18s ease;
+}
+button:hover { transform: translateY(-1px); }
+button:active { transform: translateY(0); }
+button:focus-visible, input:focus-visible, .close:focus-visible {
+    outline: 3px solid rgba(53, 107, 154, .24);
+    outline-offset: 2px;
+}
 
-/* EDIT MODAL */
-#editModal{
+.header {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    min-height: 76px;
+    padding: 14px max(24px, calc((100vw - 1180px) / 2));
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+}
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-right: auto;
+    color: var(--ink);
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: .09em;
+}
+.brand-mark {
+    display: grid;
+    width: 34px;
+    height: 34px;
+    place-items: center;
+    border-radius: 10px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 16px;
+    letter-spacing: 0;
+}
+.user-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    padding: 5px 12px 5px 5px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 600;
+}
+.user-box img {
+    width: 34px;
+    height: 34px;
+    border: 0;
+    border-radius: 50%;
+    background: #e8edf2;
+    object-fit: cover;
+}
+#statusBox {
+    flex: 0 0 auto;
+    padding: 6px 11px;
+    border-radius: 999px;
+    background: var(--success-soft);
+    color: var(--success) !important;
+    font-size: 12px;
+    font-weight: 700;
+}
+.right-actions { display: flex; align-items: center; gap: 9px; }
+.bell {
+    display: grid;
+    width: 40px;
+    height: 40px;
+    place-items: center;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    background: var(--surface);
+    color: var(--muted);
+    font-size: 18px;
+    filter: none;
+}
+.add-btn, .plan button {
+    background: var(--accent);
+    color: #fff;
+}
+.add-btn:hover, .plan button:hover { background: var(--accent-strong); }
+.logout-btn {
+    border-color: var(--line);
+    background: var(--surface);
+    color: var(--muted);
+}
+.logout-btn:hover { border-color: #cbd4df; background: #f8fafc; color: var(--ink); }
+
+.container {
+    width: min(1180px, 100%);
+    margin: 0 auto;
+    padding: 38px 24px 64px;
+}
+.page-intro { margin-bottom: 23px; }
+h2 {
+    margin: 0;
+    color: var(--ink);
+    font-size: clamp(24px, 3vw, 30px);
+    font-weight: 750;
+    letter-spacing: -.035em;
+    line-height: 1.2;
+}
+.page-intro p { margin: 8px 0 0; color: var(--muted); font-size: 15px; }
+#propertyList {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 285px), 1fr));
+    align-items: stretch;
+    gap: 20px;
+}
+.card {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    overflow: hidden;
+    margin: 0;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+    transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+.card:hover {
+    transform: translateY(-2px);
+    border-color: #d4dde7;
+    box-shadow: 0 12px 28px rgba(36, 50, 71, .09);
+}
+.card img {
+    display: block;
+    width: 100%;
+    height: 190px;
+    background: #e8edf2;
+    object-fit: cover;
+}
+.card-content { display: flex; flex: 1; flex-direction: column; padding: 18px; }
+.card-content h3 {
+    margin: 0 0 8px;
+    color: var(--ink);
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -.015em;
+    line-height: 1.3;
+}
+.card-content p { margin: 5px 0; color: var(--muted); font-size: 14px; overflow-wrap: anywhere; }
+.card-content .price { margin: 0 0 5px; color: var(--accent-strong); font-size: 16px; font-weight: 750; }
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 18px;
+}
+.actions button { flex: 1 1 auto; padding: 9px 12px; }
+.edit-btn { border-color: var(--line); background: #fff; color: var(--ink); }
+.edit-btn:hover { border-color: #cbd4df; background: #f7f9fb; }
+.delete-btn { border-color: #f0dada; background: var(--danger-soft); color: var(--danger); }
+.delete-btn:hover { border-color: #e9c4c4; background: #f8e6e6; }
+.upgrade-btn { background: var(--accent-soft); color: var(--accent-strong); }
+.upgrade-btn:hover { background: #dceaf4; }
+.empty {
+    grid-column: 1 / -1;
+    margin: 0;
+    padding: 58px 20px;
+    border: 1px dashed #cbd5e1;
+    border-radius: 14px;
+    background: rgba(255,255,255,.65);
+    color: var(--muted);
+    text-align: center;
+}
+
+#editModal, #plansModal, .upgrade-modal {
     position: fixed;
     inset: 0;
-    background: rgba(34,28,20,0.45);
     display: none;
     justify-content: center;
     align-items: center;
-    padding: 16px;
-    z-index: 100;
+    padding: 18px;
+    background: rgba(25, 37, 52, .44);
+    z-index: 999;
 }
-.modal{
-    background: var(--paper-raised);
-    padding: 22px;
-    border-radius: var(--radius-md);
-    width: 100%;
-    max-width: 340px;
-    border: 1px solid var(--rule);
+#editModal { z-index: 1000; }
+.modal, .upgrade-card {
+    width: min(100%, 440px);
+    max-height: min(90vh, 760px);
+    overflow-y: auto;
+    padding: 25px;
+    border: 1px solid var(--line);
+    border-radius: 15px;
+    background: var(--surface);
+    box-shadow: 0 20px 60px rgba(26, 39, 55, .18);
 }
-.modal h3{ margin-bottom: 12px; font-size: 17px; }
-.modal input{
+.modal h3 { margin: 0 0 16px; color: var(--ink); font-size: 20px; }
+.modal input {
     width: 100%;
-    padding: 10px;
+    min-height: 44px;
     margin: 6px 0;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--rule-strong);
-    background: var(--paper);
+    padding: 10px 12px;
+    border: 1px solid #d8e0e8;
+    border-radius: 8px;
+    background: #fff;
     color: var(--ink);
     outline: none;
 }
-.modal input:focus{ border-color: var(--pen-blue); }
-.modal .actions button{ flex: 1; }
-
-/* ================= UPGRADE MODAL ================= */
-.upgrade-modal{
-    position: fixed;
-    inset: 0;
-    display: none;
-    justify-content: center;
-    align-items: center;
-    background: rgba(34,28,20,0.5);
-    z-index: 999;
-    padding: 16px;
-}
-
-.upgrade-card{
-    width: 100%;
-    max-width: 900px;
-    padding: 24px;
-    border-radius: var(--radius-lg);
-    background: var(--paper-raised);
-    border: 1px solid var(--rule);
-    max-height: 90vh;
-    overflow-y: auto;
-}
-
-.upgrade-header{
+.modal input::placeholder { color: #8793a2; }
+.modal input:focus { border-color: var(--accent); }
+.modal > div { gap: 10px; margin-top: 14px; }
+.modal > div button:first-child { background: var(--accent); color: white; }
+.modal > div button:last-child { border-color: var(--line); background: white; color: var(--muted); }
+.upgrade-card { width: min(100%, 900px); padding: 26px; }
+.upgrade-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 18px;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 22px;
 }
-.upgrade-header h2{ font-size: 19px; margin: 0; }
-
-.close{
-    cursor: pointer;
-    font-size: 20px;
-    color: var(--ink-soft);
-    line-height: 1;
-}
-.close:hover{ color: var(--pen-red); }
-
-.plans{
+.upgrade-header h2 { font-size: 23px; }
+.close {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-    gap: 14px;
+    width: 38px;
+    height: 38px;
+    flex: 0 0 auto;
+    place-items: center;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 18px;
 }
-
-.plan{
-    padding: 18px;
-    border-radius: var(--radius-md);
-    border: 1px solid var(--rule);
-    background: var(--paper);
+.close:hover { background: #f5f7fa; color: var(--ink); }
+.plans { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-top: 10px; }
+.plan {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
+    padding: 18px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: #fbfcfd;
 }
-.plan.elite{ border-color: var(--gold); background: var(--gold-tint); }
+.plan h3 { margin: 0; color: var(--ink); font-size: 17px; }
+.plan p { margin: 0; color: var(--accent-strong); font-size: 13px; font-weight: 650; }
+.plan .price { color: var(--ink); font-size: 16px; font-weight: 750; }
+.plan ul { min-height: 56px; margin: 4px 0; padding-left: 18px; color: var(--muted); font-size: 13px; }
+.plan li { margin-bottom: 5px; }
+.plan button { width: 100%; margin-top: auto; }
+/* Plan tiers share one calm palette; no tier relies on color alone. */
+.boost, .amplify, .prime, .elite { background: #fbfcfd; border-color: var(--line); }
 
-.plan h3{ font-size: 16px; margin: 0; }
-.plan p{ font-size: 13px; margin: 0; color: var(--ink-soft); }
-.plan .price{ font-size: 15px; font-weight: 700; color: var(--ink); }
-
-.plan ul{
-    font-size: 12px;
-    color: var(--ink-soft);
-    margin: 6px 0;
-    padding-left: 16px;
+@media (max-width: 760px) {
+    .header { min-height: 0; flex-wrap: wrap; gap: 12px; padding: 13px 18px; }
+    .brand { width: 100%; margin-right: 0; }
+    .user-box { margin-right: auto; }
+    .right-actions { gap: 7px; }
+    .container { padding: 30px 18px 48px; }
+    .plans { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
-.plan ul li{ margin-bottom: 3px; }
-
-.plan button{
-    width: 100%;
-    margin-top: 8px;
-    padding: 10px;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--pen-blue);
-    cursor: pointer;
-    background: var(--pen-blue);
-    color: #fff;
-    font-weight: 600;
-    font-size: 13px;
+@media (max-width: 480px) {
+    .header { gap: 10px; }
+    #statusBox { order: 3; }
+    .right-actions { width: 100%; }
+    .right-actions .add-btn { flex: 1; }
+    .container { padding: 27px 15px 40px; }
+    #propertyList { gap: 15px; }
+    .card img { height: 175px; }
+    .actions button { flex: 1 1 calc(50% - 8px); }
+    .upgrade-card, .modal { padding: 20px; }
+    .plans { grid-template-columns: 1fr; }
+    .plan ul { min-height: 0; }
 }
-.plan button:hover{ background: var(--pen-blue-dark); }
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}
+
 </style>
 </head>
 
 <body>
 
-<div class="header u-topbar">
+<div class="header">
+
+    <div class="brand" aria-label="UNISTAY"><span class="brand-mark" aria-hidden="true">U</span><span>UNISTAY</span></div>
 
     <div class="user-box">
         <img id="userPic">
@@ -228,41 +346,41 @@
     <div id="statusBox"></div>
 
     <div class="right-actions">
-        <div class="bell">🔔</div>
-        <button class="u-btn u-btn-primary" onclick="goAdd()">+ Add Property</button>
-        <button class="u-btn u-btn-outline" onclick="logout()">Log out</button>
+        <div class="bell" aria-label="Notifications">🔔</div>
+        <button class="add-btn" onclick="goAdd()">+ Add Property</button>
+        <button class="logout-btn" onclick="logout()">Logout</button>
     </div>
 </div>
 
-<div class="container">
-    <h2>Your properties</h2>
+<main class="container">
+    <div class="page-intro"><h2>Your properties</h2><p>Manage the places students call home.</p></div>
     <div id="propertyList"></div>
-</div>
+</main>
 
 <!-- EDIT MODAL -->
 <div id="editModal">
     <div class="modal">
-        <h3>Edit property</h3>
+        <h3>Edit Property</h3>
 
         <input id="eName" placeholder="Hostel Name">
         <input id="ePrice" placeholder="Price">
         <input id="eContact" placeholder="Contact">
 
-        <div class="actions" style="display:flex; justify-content:space-between; gap:8px;">
-            <button class="u-btn u-btn-primary" onclick="saveEdit()">Save</button>
-            <button class="u-btn u-btn-outline" onclick="closeEdit()">Cancel</button>
+        <div style="display:flex; justify-content:space-between;">
+            <button onclick="saveEdit()">Save</button>
+            <button onclick="closeEdit()">Cancel</button>
         </div>
     </div>
 </div>
 
-<!-- UPGRADE MODAL -->
+<!-- UPGRADE MODAL (SPOTLIGHT STYLE) -->
 <div id="upgradeModal" class="upgrade-modal">
 
     <div class="upgrade-card">
 
         <div class="upgrade-header">
             <h2 id="upgradeTitle">Upgrade Hostel</h2>
-            <span class="close" onclick="closeUpgrade()">✕</span>
+            <span class="close" role="button" tabindex="0" aria-label="Close upgrade plans" onclick="closeUpgrade()" onkeydown="if(event.key==='Enter'||event.key===' ')closeUpgrade()">✕</span>
         </div>
 
         <div class="plans">
@@ -375,7 +493,7 @@ onAuthStateChanged(auth, async (user) => {
             "Status: " + status;
 
         document.getElementById("statusBox").style.color =
-            status === "approved" ? "#3D6B4A" : "#966C1F";
+            status === "approved" ? "#7CFF7C" : "#FFD37C";
     }
 
     loadProperties(user.uid);
@@ -407,7 +525,7 @@ function render(properties) {
         div.className = "card";
 
         div.innerHTML = `
-            <img src="${p.cover}">
+            <img src="${p.cover || ''}" alt="Photo of ${p.hostelName || 'property'}">
             <div class="card-content">
                 <h3>${p.hostelName}</h3>
                 <p class="price">UGX ${p.price}</p>
